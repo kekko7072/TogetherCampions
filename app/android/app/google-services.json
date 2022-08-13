@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "884477588199",
+    "project_id": "together-champions",
+    "storage_bucket": "together-champions.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:884477588199:android:94f216eb88a4cb9fdda842",
+        "android_client_info": {
+          "package_name": "com.togetherchampions.app.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "884477588199-7f2037qvrtc9gqgtcn4o2d48b9mr9k0m.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDGcE1f80L6iGUCuqa1DQ0u3kRknUV3lZU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "884477588199-7f2037qvrtc9gqgtcn4o2d48b9mr9k0m.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
