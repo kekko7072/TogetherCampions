@@ -41,8 +41,9 @@ class DatabaseLog {
           latLng: LatLng(snapshot.data()?['gps']?['latitude'].toDouble() ?? 0.0,
               snapshot.data()?['gps']?['longitude'].toDouble() ?? 0.0),
           altitude: snapshot.data()?['gps']?['altitude'].toDouble() ?? 0.0,
-          satellites: snapshot.data()?['gps']?['satellites'].toInt() ?? 0,
           speed: snapshot.data()?['gps']?['speed'].toDouble() ?? 0.0,
+          course: snapshot.data()?['gps']?['course'].toDouble() ?? 0.0,
+          satellites: snapshot.data()?['gps']?['satellites'].toInt() ?? 0,
         ));
   }
 

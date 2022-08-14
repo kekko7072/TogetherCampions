@@ -40,9 +40,9 @@ void setup() {
 
   //Comunication
   Serial.begin(9600);
-  while (!Serial) {
+ /* while (!Serial) {
     ;  // wait for serial port to connect. Needed for native USB port only
-  }
+  }*/
 
   Serial.println("Initialized " + String(device_name));
 
@@ -90,9 +90,10 @@ void loop() {
     client.stop();
   }*/
 
-  Serial.println("Await " + String(delay_seconds) + " seconds.");
-  LowPower.sleep(delay_seconds * 1000);
-  /*for (int i = 0; i < delay_seconds; i++) {
+  //NO NEED TO STOP BECAUSE GPS.available is just taking too much time...
+  /*Serial.println("Await " + String(delay_seconds) + " seconds.");
+  //LowPower.sleep(delay_seconds * 1000);
+  for (int i = 0; i < delay_seconds; i++) {
     digitalWrite(LED_BUILTIN, HIGH);
     delay(1000);
     digitalWrite(LED_BUILTIN, HIGH);
@@ -101,7 +102,7 @@ void loop() {
 }
 
 void readBattery() {
-  // read the input on analog pin 0:
+  // Read the input on analog pin 0:
   int sensorValue = analogRead(ADC_BATTERY);
   // Convert the analog reading (which goes from 0 - 1023) to a voltage (0 - 4.3V):
   battery = sensorValue * (4.3 / 1023.0);
@@ -115,6 +116,7 @@ void readBattery() {
       digitalWrite(LED_BUILTIN, ledBATTERY);
       delay(100);
       ledBATTERY = ledBATTERY == HIGH ? LOW : HIGH;
+      readBattery();  //TO exit from loop if battery is charged
     }
   }
 }
@@ -131,6 +133,7 @@ void sendData() {
 
   //GPS
   Serial.println("Connecting GPS...");
+  GPS.wakeup();
   unsigned long startGPSMillis = millis();
   PinStatus ledGPS = HIGH;
   while (!GPS.available()) {
@@ -138,9 +141,7 @@ void sendData() {
     delay(500);
     ledGPS = ledGPS == HIGH ? LOW : HIGH;
   };
-  unsigned long endGPSMillis = millis();
-  Serial.println("GPS connected in " + String(endGPSMillis - startGPSMillis) + " ms");
-
+  Serial.println("GPS connected in " + String( millis() - startGPSMillis) + " ms");  ///TO INCREASE FREQUENCY OF DATA https://forum.arduino.cc/t/mkr-gps-shield-sampling-frequency/611995/12?u=kekko7072
 
   float latitude = GPS.latitude();
   float longitude = GPS.longitude();
@@ -148,6 +149,8 @@ void sendData() {
   float speed = GPS.speed();
   int satellites = GPS.satellites();
 
+  GPS.standby();
+  Serial.println("Disconnecting GPS...");
 
   //SERVER
   Serial.println("Connecting SERVER... ");
@@ -186,6 +189,7 @@ void sendData() {
     client.println(server);
     client.println("Connection: close");
     client.println();
+
 
   } else {
     Serial.println("connection failed");

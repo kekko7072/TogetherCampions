@@ -1,6 +1,7 @@
 "use strict";
 
 const admin = require("firebase-admin");
+const { Timestamp } = require("firebase-admin/firestore");
 const express = require("express");
 const app = express();
 const cors = require("cors");
@@ -68,7 +69,47 @@ app.get("/sendData", (req, res) => {
       res.end("<div><h1>Data reviced!</h1></div>");
     });
 });
-const PORT = 8080;
+
+app.post("/postData", async (req, res) => {
+  const uid = req.query.uid;
+
+  const val = JSON.parse(JSON.stringify(req.body));
+  console.log("INPUT: " + val.input);
+  console.log("FREQUENCY: " + val.frequency);
+  console.log("TIMESTAMP: " + val.timestamp * 100000);
+
+  const jsonData = JSON.parse(val.input);
+
+  const lengthData = jsonData.data.length ?? 0;
+
+  for (var i = 0; i < lengthData; i++) {
+    const value = jsonData.data[i];
+    const timestamp = val.timestamp * 1000 + val.frequency * i * 1000;
+    console.log(value);
+    console.log(timestamp);
+    await admin
+      .firestore()
+      .collection("users")
+      .doc(uid)
+      .collection("logs")
+      .doc(`${timestamp}`)
+      .set({
+        timestamp: Timestamp.fromMillis(timestamp),
+        battery: parseFloat(value.battery),
+        gps: {
+          latitude: parseFloat(value.latitude),
+          longitude: parseFloat(value.longitude),
+          altitude: parseFloat(value.altitude),
+          speed: parseFloat(value.speed),
+          course: value.course != null ? parseFloat(value.course) : null,
+          satellites: parseInt(value.satellites),
+        },
+      });
+  }
+  res.sendStatus(200);
+});
+
+const PORT = parseInt(process.env.PORT) || 8080;
 
 app.listen(PORT, () => {
   console.log(`App listening on port ${PORT}`);

@@ -18,12 +18,14 @@ class GPS {
   GPS({
     required this.latLng,
     required this.altitude,
-    required this.satellites,
     required this.speed,
+    required this.course,
+    required this.satellites,
   });
 
   final LatLng latLng;
   final double altitude;
-  final int satellites;
   final double speed;
+  final double course;
+  final int satellites;
 }
