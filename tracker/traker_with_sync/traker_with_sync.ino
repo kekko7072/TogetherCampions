@@ -95,7 +95,7 @@ void setup() {
     while (!Serial) {
       ;  // wait for serial port to connect. Needed for native USB port only
     }
-    Serial.println("Intializing  Device");
+    Serial.println("Intializing  device");
   }
 
   //GPRS
