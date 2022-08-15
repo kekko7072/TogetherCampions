@@ -54,7 +54,7 @@ app.get("/settings", async (req, res) => {
 });
 
 app.post("/post", async (req, res) => {
-  const uid = req.query.uid;
+  const id = req.query.id;
 
   const val = JSON.parse(JSON.stringify(req.body));
   console.log("INPUT: " + val.input);
@@ -70,7 +70,7 @@ app.post("/post", async (req, res) => {
     await admin
       .firestore()
       .collection("devices")
-      .doc(uid)
+      .doc(id)
       .collection("logs")
       .doc(`${timestamp}`)
       .set({

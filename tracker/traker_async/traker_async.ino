@@ -39,7 +39,7 @@ int frequency = 10;
 
 
 /*
-  The system use 144 byte for a single log. The max is 25000 bytes it means 173 logs.
+  The system use 144 byte for a single log. The max is 2200 bytes it means 152 logs.
 
   Calculate number of logs use this formula:
     N°logs = clock 
@@ -49,11 +49,12 @@ int frequency = 10;
 
   Replace bytes in StaticJsonDocument<BYTES> doc and remember to keep some margin (ex. for 6640 put 9000).
 */
-StaticJsonDocument<25000> doc;
+StaticJsonDocument<2200> doc;
 JsonArray array = doc.to<JsonArray>();
 
+StaticJsonDocument<64> doc_settings;
+
 ///TODO STORAGE https://github.com/cmaglie/FlashStorage
-/*FlashStorage(data_storage, String);*/
 
 ///***///
 
@@ -70,6 +71,8 @@ GSMClient gsmClient;
 GPRS gprs;
 GSM gsmAccess;
 HttpClient client = HttpClient(gsmClient, server, port);
+HttpClient http(gsmClient, server);
+
 
 const char PINNUMBER[] = SECRET_PINNUMBER;
 const char GPRS_APN[] = SECRET_GPRS_APN;
@@ -80,42 +83,28 @@ const char GPRS_PASSWORD[] = SECRET_GPRS_PASSWORD;
 //HELPERS
 int clock_counter = 1;
 PinStatus ledStatus = HIGH;
-
+int err = 0;
 
 ///***///
 
 
 void setup() {
-  //LED
-  pinMode(LED_BUILTIN, OUTPUT);
-
-  //COMUNICATION
+  //Initialize serial and wait for port to open:
   Serial.begin(9600);
-  if (DEBUG_MODE) {
-    while (!Serial) {
-      ;  // wait for serial port to connect. Needed for native USB port only
-    }
-    Serial.println("Intializing  device");
+  while (!Serial) {
+    ;  // wait for serial port to connect. Needed for native USB port only
   }
 
-  //GPRS
-  if (DEBUG_MODE) {
-    Serial.println();
-    Serial.print("Intializing  GPRS:  ");
-  }
   bool connected = false;
 
   while (!connected) {
     if ((gsmAccess.begin(PINNUMBER) == GSM_READY) && (gprs.attachGPRS(GPRS_APN, GPRS_LOGIN, GPRS_PASSWORD) == GPRS_READY)) {
-      digitalWrite(LED_BUILTIN, HIGH);
-      delay(1000);
-      digitalWrite(LED_BUILTIN, LOW);
       connected = true;
     } else {
-      if (DEBUG_MODE) {
-        Serial.println("Not connected");
-        delay(1000);
-      }
+
+      Serial.println("Not connected");
+      delay(1000);
+
       int duration = 0;
       while (duration <= 100) {
         digitalWrite(LED_BUILTIN, HIGH);
@@ -124,53 +113,52 @@ void setup() {
         ++duration;
       }
     }
-  }
-  if (DEBUG_MODE) {
-    Serial.print("OK");
-  }
-  ///
-
-  ///SETTINGS FROM SERVER
-  if (DEBUG_MODE) {
-    Serial.println("Intializing  SETTINGS from server:");
+    Serial.println("connected");
   }
 
-  client.get(path_settings + device_id);
+  ///LOAD SETTINGS
+  Serial.println("Initializing settings...");
+  err = http.get(path_settings + String(device_id));
+  if (err == 0) {
+    Serial.println("startedRequest ok");
 
-  int statusCode = client.responseStatusCode();
-  String response = client.responseBody();
+    err = http.responseStatusCode();
+    if (err >= 0) {
 
-  if (DEBUG_MODE) {
-    Serial.println();
-    Serial.println("Status code: " + String(statusCode));
-    Serial.println("Response: " + String(response));
-    Serial.println();
-  }
+      String response = http.responseBody();
+      Serial.println();
+      Serial.println("Status code: " + String(err));
+      Serial.println("Response: " + String(response));
+      Serial.println();
 
-  if (statusCode == 200) {
-    StaticJsonDocument<64> doc_settings;
-    DeserializationError error = deserializeJson(doc_settings, response);
+      DeserializationError error = deserializeJson(doc_settings, response);
 
-    if (error) {
-      Serial.print("deserializeJson() failed: ");
-      Serial.println(error.c_str());
-      return;
-    }
-    clock = doc_settings["clock"];
-    frequency = doc_settings["frequency"];
+      if (error) {
+        Serial.print("deserializeJson() failed: ");
+        Serial.println(error.c_str());
+        return;
+      }
+      clock = doc_settings["clock"];
+      frequency = doc_settings["frequency"];
 
-    if (DEBUG_MODE) {
       Serial.println("  clock:  " + String(clock));
       Serial.println("  frequency:  " + String(frequency));
+
+    } else {
+      Serial.print("Getting response failed: ");
+      Serial.println(err);
     }
+  } else {
+    Serial.print("Connect failed: ");
+    Serial.println(err);
   }
+  http.stop();
   ///
 
   ///GPS
-  if (DEBUG_MODE) {
-    Serial.println();
-    Serial.print("Intializing  GPS:  ");
-  }
+  Serial.println();
+  Serial.print("Intializing  GPS:  ");
+
   if (!GPS.begin()) {
     if (DEBUG_MODE) {
       Serial.println("Failed to initialize GPS!");
@@ -199,9 +187,8 @@ void loop() {
 
       //AWAIT SYNC FROM FREQUENCY
       for (int i = 0; i < frequency; i++) {
-        if (DEBUG_MODE) {
-          Serial.print(".");
-        }
+
+        Serial.print(".");
 
         digitalWrite(LED_BUILTIN, ledStatus);
         delay(1000);
@@ -210,10 +197,8 @@ void loop() {
 
       digitalWrite(LED_BUILTIN, HIGH);
 
-      if (DEBUG_MODE) {
-        Serial.println();
-        Serial.println("Saving data at cicle  " + String(clock_counter));
-      }
+      Serial.println();
+      Serial.println("Saving data at cicle  " + String(clock_counter));
 
       //SAVE DATA INTO JSON OBJECT
       JsonObject nested = array.createNestedObject();
@@ -226,50 +211,42 @@ void loop() {
       nested["course"] = GPS.course();
       nested["satellites"] = GPS.satellites();
 
-      if (DEBUG_MODE) {
-        serializeJson(array, Serial);
-        Serial.println();
-      }
+      serializeJson(array, Serial);
+      Serial.println();
 
       //INCREASE CLOCK
       ++clock_counter;
     } else {
 
-      if (DEBUG_MODE) {
-        Serial.println();
-        Serial.println("Duration cicle: " + String(clock_counter * frequency) + " s");
-        Serial.println("Memory used: " + String(array.memoryUsage()));
-        Serial.println("Logs saved: " + String(array.size()));
-        Serial.println();
-      }
+      Serial.println();
+      Serial.println("Duration cicle: " + String(clock_counter * frequency) + " s");
+      Serial.println("Memory used: " + String(array.memoryUsage()));
+      Serial.println("Logs saved: " + String(array.size()));
+      Serial.println();
 
-      //PREPARE DOCUMENTS TO SEND TO SERVER
+      //PREPARE DATA TO SEND TO SERVER
       String contentType = "application/x-www-form-urlencoded";
       String inputJSON = "";
       serializeJson(array, inputJSON);
       String postData = "input={\"data\":" + inputJSON + "}&frequency=" + frequency;
 
-      if (DEBUG_MODE) {
-        Serial.println();
-        Serial.println("making POST request");
-        Serial.println(postData);
-        Serial.println();
-      }
+      Serial.println();
+      Serial.println("making POST request");
+      Serial.println(postData);
+      Serial.println();
 
       //POST DATA
-      client.post(path_post + "?id=" + String(device_id), contentType, postData);
+      client.post(path_post + String(device_id), contentType, postData);
       //TODO MANAGE TO SEND ALSO THE SAVED DATA IF NEEDED TO UPLOAD AGAIN
 
       //READ RESPONSE
       int statusCode = client.responseStatusCode();
       String response = client.responseBody();
 
-      if (DEBUG_MODE) {
-        Serial.println();
-        Serial.println("Status code: " + String(statusCode));
-        Serial.println("Response: " + String(response));
-        Serial.println();
-      }
+      Serial.println();
+      Serial.println("Status code: " + String(statusCode));
+      Serial.println("Response: " + String(response));
+      Serial.println();
 
       if (statusCode == 200) {
         //RESET JSON AND COUNTER TO RESTART
@@ -281,15 +258,13 @@ void loop() {
         //LOPING TO SHOW ERROR
         ledStatus = HIGH;
         for (int i = 0; i < 10; i++) {
-          if (DEBUG_MODE) {
-            Serial.print(".");
-          }
+
+          Serial.print(".");
+
           digitalWrite(LED_BUILTIN, ledStatus);
           delay(1000);
           ledStatus = ledStatus == HIGH ? LOW : HIGH;
         }
-        //TODO SAVE IT TO LOCAL STORAGE....
-        /*data_storage.write(postData);*/
       }
     }
   }

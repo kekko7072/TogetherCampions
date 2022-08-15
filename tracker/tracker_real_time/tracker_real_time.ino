@@ -18,17 +18,16 @@ GPRS gprs;
 GSM gsmAccess;
 
 //DEVICE
-char device_name[] = "Traker";
 int delay_seconds = 5;
 float battery = 0;
 
 //SERVER https://console.cloud.google.com/appengine?project=together-champions&supportedpurview=project&serviceId=default
 char server[] = "together-champions.ew.r.appspot.com";
-char path[] = "/sendData";
+char path[] = "/post?id=";
 int port = 80;  // port 80 is the default for HTTP
 
 //USER
-char device_user[] = "RA207twfQF5LawcErH8j";
+String device_id = "RA207twQF5LawcErH8j";
 
 
 void setup() {
@@ -40,7 +39,7 @@ void setup() {
 
   //Comunication
   Serial.begin(9600);
- /* while (!Serial) {
+  /* while (!Serial) {
     ;  // wait for serial port to connect. Needed for native USB port only
   }*/
 
@@ -141,12 +140,13 @@ void sendData() {
     delay(500);
     ledGPS = ledGPS == HIGH ? LOW : HIGH;
   };
-  Serial.println("GPS connected in " + String( millis() - startGPSMillis) + " ms");  ///TO INCREASE FREQUENCY OF DATA https://forum.arduino.cc/t/mkr-gps-shield-sampling-frequency/611995/12?u=kekko7072
+  Serial.println("GPS connected in " + String(millis() - startGPSMillis) + " ms");  ///TO INCREASE FREQUENCY OF DATA https://forum.arduino.cc/t/mkr-gps-shield-sampling-frequency/611995/12?u=kekko7072
 
   float latitude = GPS.latitude();
   float longitude = GPS.longitude();
   float altitude = GPS.altitude();
   float speed = GPS.speed();
+  float course = GPS.course();
   int satellites = GPS.satellites();
 
   GPS.standby();
@@ -160,8 +160,35 @@ void sendData() {
     Serial.println("Server connected in " + String(endServerMillis - startServerMillis) + " ms");
 
 
+    //PREPARE DOCUMENTS TO SEND TO SERVER
+    String contentType = "application/x-www-form-urlencoded";
+    String inputJSON = "[{  \"timestamp\":" + String(gsmAccess.getTime()) + ", \"battery\":" String(battery) + ", \"latitude\": " + String(latitude) + ", \"longitude\": " + String(longitude) + ", \"altitude\":" + String(altitude) + ", \"speed\": " + String(speed) ", \"course\":" + String(course) + ", \"satellites\":" + String(satellites) + "}]";
+    String postData = "input={\"data\":" + inputJSON + "}&frequency=" + 1;
+
+    if (DEBUG_MODE) {
+      Serial.println();
+      Serial.println("making POST request");
+      Serial.println(postData);
+      Serial.println();
+    }
+
+    //POST DATA
+    client.post(path_post + "?id=" + String(device_id), contentType, postData);
+    //TODO MANAGE TO SEND ALSO THE SAVED DATA IF NEEDED TO UPLOAD AGAIN
+
+    //READ RESPONSE
+    int statusCode = client.responseStatusCode();
+    String response = client.responseBody();
+
+    if (DEBUG_MODE) {
+      Serial.println();
+      Serial.println("Status code: " + String(statusCode));
+      Serial.println("Response: " + String(response));
+      Serial.println();
+    }
+
     // Make a HTTP request:
-    client.print("GET ");
+    client.print("POST ");
     client.print(path);
     //Uid
     client.print("?uid=");
