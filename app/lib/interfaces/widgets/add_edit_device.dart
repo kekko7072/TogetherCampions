@@ -141,7 +141,7 @@ class _AddEditDeviceState extends State<AddEditDevice> {
                     ],
                   ),
                   const Text(
-                    'Durata ciclo sincronizzazione dati:',
+                    'Durata sincronizzazione dati:',
                     textAlign: TextAlign.center,
                   ),
                   Text(

@@ -72,7 +72,7 @@ class CardDevice extends StatelessWidget {
                   ),
                   Text('Id: ${device.id}'),
                   Text(
-                      'Ciclo di sincornizzazione: ${device.clock * device.frequency} s'),
+                      'Durata sincronizzazione dati: ${device.clock * device.frequency} s'),
                   Text('Clock: ${device.clock}'),
                   Text('Frequency: ${device.frequency}'),
                 ],
