@@ -48,11 +48,6 @@ class MenuState extends State<Menu> {
                       selectedIndex: currentPage,
                       onDestinationSelected: (index) =>
                           setState(() => currentPage = index),
-                      leading: Text(
-                        'Together Champions',
-                        style: Theme.of(context).textTheme.titleLarge,
-                      ),
-                      trailing: const Text('© 2022 Francesco Vezzani.'),
                       labelType: NavigationRailLabelType.all,
                       destinations: const [
                         NavigationRailDestination(
