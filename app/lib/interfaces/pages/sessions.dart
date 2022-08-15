@@ -1,7 +1,7 @@
 import 'package:app/services/imports.dart';
 
-class Home extends StatelessWidget {
-  const Home({Key? key}) : super(key: key);
+class Sessions extends StatelessWidget {
+  const Sessions({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -22,27 +22,30 @@ class Home extends StatelessWidget {
                             .titleLarge!
                             .copyWith(fontWeight: FontWeight.bold),
                       ),
-                      ListView.builder(
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          itemCount: userData.sessions.length,
-                          reverse: true,
-                          itemBuilder: (context, index) =>
-                              StreamBuilder<List<Log>>(
-                                  stream: DatabaseLog(uid: kDefaultUid)
-                                      .sessionLogs(
-                                          session: userData.sessions[index]),
-                                  builder: (context, snapshot) {
-                                    if (!snapshot.hasData) {
-                                      return const Text('Caricamento');
-                                    }
+                      for(String id in userData.devices)...[
+                        ListView.builder(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            itemCount: userData.sessions.length,
+                            reverse: true,
+                            itemBuilder: (context, index) =>
+                                StreamBuilder<List<Log>>(
+                                    stream: DatabaseLog(id: id)
+                                        .sessionLogs(
+                                        session: userData.sessions[index]),
+                                    builder: (context, snapshot) {
+                                      if (!snapshot.hasData) {
+                                        return const Text('Caricamento');
+                                      }
 
-                                    return CardSession(
-                                      userData: userData,
-                                      session: userData.sessions[index],
-                                      logs: snapshot.data!,
-                                    );
-                                  }))
+                                      return CardSession(
+                                        userData: userData,
+                                        session: userData.sessions[index],
+                                        logs: snapshot.data!,
+                                      );
+                                    }))
+                      ]
+
                     ],
                   ),
                 ),

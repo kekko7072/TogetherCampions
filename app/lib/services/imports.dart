@@ -34,7 +34,8 @@ export 'package:flutter_svg/flutter_svg.dart';
 
 ///INTERFACE
 ///##Pages
-export 'package:app/interfaces/pages/home.dart';
+export 'package:app/interfaces/pages/sessions.dart';
+export 'package:app/interfaces/pages/devices.dart';
 
 ///##Screens
 export 'package:app/interfaces/screens/track_map.dart';
@@ -49,6 +50,7 @@ export 'package:app/interfaces/widgets/list_logs_session.dart';
 export 'package:app/interfaces/widgets/card_log.dart';
 
 ///MODELS
+export 'package:app/models/device.dart';
 export 'package:app/models/log.dart';
 export 'package:app/models/user.dart';
 export 'package:app/models/telemetry.dart';
@@ -56,6 +58,7 @@ export 'package:app/models/telemetry.dart';
 ///SERVICES
 export 'package:app/services/database_log.dart';
 export 'package:app/services/database_user.dart';
+export 'package:app/services/database_device.dart';
 export 'package:app/services/auth.dart';
 export 'package:app/services/calculation.dart';
 export 'package:app/services/style.dart';

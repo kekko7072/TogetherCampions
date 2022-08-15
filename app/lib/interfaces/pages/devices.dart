@@ -1,0 +1,89 @@
+import 'package:app/services/imports.dart';
+
+class Devices extends StatelessWidget {
+  const Devices({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final userData = Provider.of<UserData?>(context);
+
+    return userData != null
+        ? Scaffold(
+            body: SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      Text(
+                        'Dispositivi',
+                        style: Theme.of(context)
+                            .textTheme
+                            .titleLarge!
+                            .copyWith(fontWeight: FontWeight.bold),
+                      ),
+                      ListView.builder(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemCount: userData.sessions.length,
+                          reverse: true,
+                          itemBuilder: (context, index) =>
+                              StreamBuilder<List<Log>>(
+                                  stream: DatabaseLog(id: kDefaultDeviceId).allLogs,
+                                  builder: (context, snapshot) {
+                                    if (!snapshot.hasData) {
+                                      return const Text('No data');
+                                    }
+                                    List<Log> logs = snapshot.data!;
+                                    return ListView.builder(
+                                        shrinkWrap: true,
+                                        reverse: true,
+                                        physics: const NeverScrollableScrollPhysics(),
+                                        itemCount: logs.length,
+                                        itemBuilder: (context, index) =>
+                                            CardLog(log: logs[index]));
+                                  }))
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            floatingActionButton: TextButton(
+              onPressed: () async => showModalBottomSheet(
+                context: context,
+                shape: AppStyle.kModalBottomStyle,
+                isScrollControlled: true,
+                isDismissible: true,
+                builder: (context) => AddEditSession(
+                  uid: userData.uid,
+                  isEdit: false,
+                ),
+              ),
+              child: Card(
+                  color: Theme.of(context).primaryColor,
+                  child: Padding(
+                    padding: const EdgeInsets.all(10.0),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: const [
+                        SizedBox(width: 7),
+                        Text(
+                          'Nuova sessione',
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, color: Colors.black),
+                        ),
+                        SizedBox(width: 5),
+                        Icon(
+                          Icons.add,
+                          color: Colors.black,
+                        ),
+                      ],
+                    ),
+                  )),
+            ),
+          )
+        : const Center(
+            child: CircularProgressIndicator(),
+          );
+  }
+}

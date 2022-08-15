@@ -13,6 +13,8 @@ class AuthService {
   }
 
   Future registerWithEmailAndPassword({
+    required String name,
+    required String surname,
     required String email,
     required String password,
   }) async {
@@ -25,9 +27,11 @@ class AuthService {
 
       UserData userData = UserData(
         uid: user.uid,
+        profile: Profile(name: name, surname: surname, email: email),
+        devices: [],
         sessions: [],
       );
-      await DatabaseUser().create(userData: userData);
+      await DatabaseUser().createEdit(isEdit: false, userData: userData);
 
       return _userFromFirebase(user);
     } on FirebaseAuthException catch (e) {

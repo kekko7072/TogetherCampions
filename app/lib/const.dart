@@ -1,1 +1,1 @@
-String kDefaultUid = 'RA207twfQF5LawcErH8j';
+String kDefaultDeviceId = 'RA207twfQF5LawcErH8j';

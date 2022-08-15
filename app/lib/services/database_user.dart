@@ -6,11 +6,19 @@ class DatabaseUser {
   static CollectionReference<Map<String, dynamic>> userCollection =
       FirebaseFirestore.instance.collection('users');
 
-  Future create({required UserData userData}) async {
+  Future createEdit({required bool isEdit, required UserData userData}) async {
     Map<String, dynamic> value = {
-      'sessions': null,
+      'profile': {
+        'name': userData.profile.name,
+        'surname': userData.profile.surname,
+        'email': userData.profile.email,
+      },
+      'devices': isEdit ? userData.devices : [kDefaultDeviceId],
+      'sessions': isEdit ? userData.sessions : [],
     };
-    return await userCollection.doc(userData.uid).set(value);
+    return isEdit
+        ? await userCollection.doc(userData.uid).update(value)
+        : await userCollection.doc(userData.uid).set(value);
   }
 
   ///SESSION
@@ -77,6 +85,16 @@ class DatabaseUser {
 
     return UserData(
       uid: snapshot.id,
+      profile: Profile(
+        name: snapshot.data()?['profile']?['name'] ?? '',
+        surname: snapshot.data()?['profile']?['surname'] ?? '',
+        email: snapshot.data()?['profile']?['email'] ?? '',
+      ),
+      devices: snapshot.data()?['devices'] != null
+          ? (snapshot.data()?['devices'] as List)
+              .map((item) => item as String)
+              .toList()
+          : [],
       sessions: sessions,
     );
   }

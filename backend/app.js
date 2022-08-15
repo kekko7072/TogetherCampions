@@ -70,6 +70,17 @@ app.get("/sendData", (req, res) => {
     });
 });
 
+app.get("/device", async (req, res) => {
+  let id = req.query.id;
+
+  var value = admin.firestore().collection("devices").doc(id).get();
+
+  res.writeHead(200, { "Content-Type": "text/html" });
+  res.end(
+    `name=${value.name}&clock=${value.clock}&frequency=${value.frequency}`
+  );
+});
+
 app.post("/postData", async (req, res) => {
   const uid = req.query.uid;
 

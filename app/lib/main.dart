@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'app_director.dart';
 import 'services/imports.dart';
 
 void main() async {
@@ -22,30 +23,19 @@ class MyApp extends StatelessWidget {
         primarySwatch: AppStyle.primaryMaterialColor,
         primaryColor: AppStyle.primaryColor,
       ),
-      home: StreamProvider<UserData?>.value(
-          value: DatabaseUser().userData(uid: kDefaultUid),
-          initialData: null,
-          builder: (context, snapshot) {
-            return Scaffold(
-              appBar: AppBar(
-                title: const Text('Tracker app'),
-                actions: [
-                  IconButton(
-                      onPressed: () => showModalBottomSheet(
-                            context: context,
-                            shape: AppStyle.kModalBottomStyle,
-                            isScrollControlled: true,
-                            isDismissible: true,
-                            builder: (context) => Dismissible(
-                                key: UniqueKey(),
-                                child: const AddEditProfile()),
-                          ),
-                      icon: const Icon(CupertinoIcons.person_alt_circle))
-                ],
-              ),
-              body: const Home(),
-            );
-          }),
+      home: StreamProvider<CurrentUser?>.value(
+          value: AuthService().user,
+          initialData: CurrentUser(),
+          catchError: (_, __) => null,
+          child: MaterialApp(
+            debugShowCheckedModeBanner: false,
+            theme: ThemeData(
+              useMaterial3: true,
+              primarySwatch: AppStyle.primaryMaterialColor,
+              primaryColor: AppStyle.primaryColor,
+            ),
+            home: AppDirector(),
+          )),
     );
   }
 }

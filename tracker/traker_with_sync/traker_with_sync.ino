@@ -27,7 +27,7 @@ bool DEBUG_MODE = true;
   Calculate time of code:
     Time of execution = clock * frequency;  
 */
-int clock = 60;
+int clock = 6;
 int frequency = 10;
 
 
@@ -69,8 +69,8 @@ const char GPRS_LOGIN[] = SECRET_GPRS_LOGIN;
 const char GPRS_PASSWORD[] = SECRET_GPRS_PASSWORD;
 
 
-//DEVICE
-char device_name[] = "Traker";
+//HELPERS
+char name[] = "Traker";
 int clock_counter = 1;
 PinStatus ledStatus = HIGH;
 
@@ -88,6 +88,9 @@ void setup() {
     }
     Serial.println("Initialized " + String(device_name));
   }
+
+  //LED BUILD IN
+  pinMode(LED_BUILTIN, OUTPUT);
 
   //GPRS
   bool connected = false;
@@ -120,6 +123,25 @@ void setup() {
     }
     while (1)
       ;
+  }
+
+  //GET SETTINGS
+  client.get("/postData?uid=RA207twfQF5LawcErH8j", contentType, postData);
+  //READ RESPONSE
+  int statusCode = client.responseStatusCode();
+  String response = client.responseBody();
+
+  if (DEBUG_MODE) {
+    Serial.println();
+    Serial.println("Status code: " + String(statusCode));
+    Serial.println("Response: " + String(response));
+    Serial.println();
+  }
+
+  if (statusCode == 200) {
+    name = "";
+    clock = 0;
+    frequency = 0;
   }
 }
 
@@ -186,7 +208,7 @@ void loop() {
       String contentType = "application/x-www-form-urlencoded";
       String inputJSON = "";
       serializeJson(array, inputJSON);
-      String postData = "input={\"data\":" + inputJSON + "}&frequency=" + frequency + "&timestamp=" + String(gsmAccess.getTime());
+      String postData = "input={\"data\":" + inputJSON + "}&frequency=" + frequency;
 
       if (DEBUG_MODE) {
         Serial.println();
@@ -216,6 +238,17 @@ void loop() {
         clock_counter = 1;
 
       } else {
+
+        //LOPING TO SHOW ERROR
+        ledStatus = HIGH;
+        for (int i = 0; i < 10; i++) {
+          if (DEBUG_MODE) {
+            Serial.print(".");
+          }
+          digitalWrite(LED_BUILTIN, ledStatus);
+          delay(1000);
+          ledStatus = ledStatus == HIGH ? LOW : HIGH;
+        }
         //TODO SAVE IT TO LOCAL STORAGE....
         /*data_storage.write(postData);*/
       }

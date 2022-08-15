@@ -1,18 +1,18 @@
 import 'imports.dart';
 
 class DatabaseLog {
-  DatabaseLog({required this.uid});
-  final String uid;
+  DatabaseLog({required this.id});
+  final String id;
 
   ///COLLECTIONS & DOCS
   late CollectionReference<Map<String, dynamic>> logCollection =
       FirebaseFirestore.instance
-          .collection('users')
-          .doc(uid)
+          .collection('devices')
+          .doc(id)
           .collection('logs');
   Future delete() async {
     List<Log> allLogs = DatabaseLog.logListFromSnapshot(
-        await DatabaseLog(uid: uid).logCollection.get());
+        await DatabaseLog(id: id).logCollection.get());
     for (Log log in allLogs) {
       await logCollection.doc(log.id).delete();
     }
@@ -20,7 +20,7 @@ class DatabaseLog {
 
   Future deleteSession({required String session}) async {
     List<Log> allLogs = DatabaseLog.logListFromSnapshot(
-        await DatabaseLog(uid: uid)
+        await DatabaseLog(id: id)
             .logCollection
             .where('session', isEqualTo: session)
             .get());

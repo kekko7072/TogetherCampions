@@ -27,6 +27,7 @@ class CardLog extends StatelessWidget {
         spacing: 10,
         children: [
           Text('Speed: ${log.gps.speed} km/h'),
+          Text('Course: ${log.gps.course} deg'),
           Text('Altitude: ${log.gps.altitude} m'),
           Text('Satellites: ${log.gps.satellites}'),
           Text('Battery: ${log.battery} V'),

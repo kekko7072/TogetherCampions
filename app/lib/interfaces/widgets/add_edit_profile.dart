@@ -22,23 +22,9 @@ class AddEditProfile extends StatelessWidget {
                       style: Theme.of(context).textTheme.titleLarge,
                     ),
                     Text(
-                      'UID: $kDefaultUid',
+                      'UID: ',
                     ),
-                    StreamBuilder<List<Log>>(
-                        stream: DatabaseLog(uid: kDefaultUid).allLogs,
-                        builder: (context, snapshot) {
-                          if (!snapshot.hasData) {
-                            return const Text('No data');
-                          }
-                          List<Log> logs = snapshot.data!;
-                          return ListView.builder(
-                              shrinkWrap: true,
-                              reverse: true,
-                              physics: const NeverScrollableScrollPhysics(),
-                              itemCount: logs.length,
-                              itemBuilder: (context, index) =>
-                                  CardLog(log: logs[index]));
-                        })
+
                   ],
                 ),
               ),
