@@ -76,7 +76,6 @@ app.post("/postData", async (req, res) => {
   const val = JSON.parse(JSON.stringify(req.body));
   console.log("INPUT: " + val.input);
   console.log("FREQUENCY: " + val.frequency);
-  console.log("TIMESTAMP: " + val.timestamp * 100000);
 
   const jsonData = JSON.parse(val.input);
 
@@ -84,7 +83,7 @@ app.post("/postData", async (req, res) => {
 
   for (var i = 0; i < lengthData; i++) {
     const value = jsonData.data[i];
-    const timestamp = val.timestamp * 1000 + val.frequency * i * 1000;
+    const timestamp = value.timestamp * 1000;
     console.log(value);
     console.log(timestamp);
     await admin

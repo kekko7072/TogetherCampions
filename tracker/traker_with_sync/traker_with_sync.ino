@@ -10,38 +10,43 @@
     TRUE: When debugging with serial monitor
     FALSE: When launcing code for stand alone usage
 */
-bool DEBUG_MODE = false;
+bool DEBUG_MODE = true;
 
 
 /*
   You can programm the duration of CLOCK and the FREQUENCY:
 
-    CLOCK: Is the time the code run in loop fetching data from GPS to SERVER in seconds [aproximatly]. 
-      Ex. clock = 60  Means run for 60 seconds then data are send
+    CLOCK: Is the time the code run in loop fetching data from GPS to SERVER [aproximatly]. 
+      Ex. clock = 60  Means run 60 times then data are send
 
     FREQUENCY: Is the time between each savings of data from GPS in seconds [aproximatly].
-      Ex. frequency = 10  Means every 10 seconds new data are saved
+      Ex. frequency = 10  Means run 1 clock every 10 seconds
 
   Remember to balance between CLOCK and FREQUENCY to optimize the code execuition.
+  Ideal for debugging is CLOCK = 6 and FREQUENCY = 10 .
+  Calculate time of code:
+    Time of execution = clock * frequency;  
 */
-int clock = 3600;  
-int frequency = 60;
+int clock = 60;
+int frequency = 10;
 
 
 /*
-  The system use 128 byte for a single log. The max is 25000 bytes it means 195 logs.
+  The system use 144 byte for a single log. The max is 25000 bytes it means 173 logs.
 
   Calculate number of logs use this formula:
-    N°logs = clock / frequency 
+    N°logs = clock 
 
   Calculate bytes using tthis formula:
-    Bytes = 128 * n°logs
+    Bytes = 144 * n°logs
 
-  Replace bytes in StaticJsonDocument<BYTES> doc and remember to keep some margin (ex. for 7680 put 8000).
+  Replace bytes in StaticJsonDocument<BYTES> doc and remember to keep some margin (ex. for 6640 put 9000).
 */
 StaticJsonDocument<8000> doc;
 JsonArray array = doc.to<JsonArray>();
 
+///TODO STORAGE https://github.com/cmaglie/FlashStorage
+/*FlashStorage(data_storage, String);*/
 
 ///***///
 
@@ -67,7 +72,7 @@ const char GPRS_PASSWORD[] = SECRET_GPRS_PASSWORD;
 //DEVICE
 char device_name[] = "Traker";
 int clock_counter = 1;
-int frequency_counter = 1;
+PinStatus ledStatus = HIGH;
 
 
 ///***///
@@ -76,8 +81,8 @@ int frequency_counter = 1;
 void setup() {
 
   //COMUNICATION
+  Serial.begin(9600);
   if (DEBUG_MODE) {
-    Serial.begin(9600);
     while (!Serial) {
       ;  // wait for serial port to connect. Needed for native USB port only
     }
@@ -98,8 +103,13 @@ void setup() {
         Serial.println("Not connected");
         delay(1000);
       }
-      digitalWrite(LED_BUILTIN, HIGH);
-      delay(10000);
+      int duration = 0;
+      while (duration <= 100) {
+        digitalWrite(LED_BUILTIN, HIGH);
+        delay(100);
+        digitalWrite(LED_BUILTIN, LOW);
+        ++duration;
+      }
     }
   }
 
@@ -116,49 +126,57 @@ void setup() {
 void loop() {
   /* 
 
-  NO HERE BECAUSE OUTSIIDE THE while (GPS.available()) LOOP 
+  NO CODE HERE BECAUSE IF YOU PUT LOGIC HERE, OUTSIIDE THE while (GPS.available()) LOOP,
   THE GPS WILL LOSE THE CONNECTION FROM THE SATELLITES 
   AND THEN TO RECONNECT IT WILL NEED 3/4 MINUTES
 
   */
   while (GPS.available()) {
-    digitalWrite(LED_BUILTIN, HIGH);
     if (clock_counter <= clock) {
-      if (DEBUG_MODE)
-        Serial.println("Running cicle  " + String(clock_counter));
 
+      digitalWrite(LED_BUILTIN, LOW);
 
-      if (frequency_counter == frequency) {
-        if (DEBUG_MODE)
-          Serial.println("Saving data at cicle  " + String(clock_counter));
-
-        //SAVE DATA IN JSON OBJECT
-        JsonObject nested = array.createNestedObject();
-        nested["battery"] = analogRead(ADC_BATTERY) * (4.3 / 1023.0);
-        nested["latitude"] = GPS.latitude();
-        nested["longitude"] = GPS.longitude();
-        nested["altitude"] = GPS.altitude();
-        nested["speed"] = GPS.speed();
-        nested["course"] = GPS.course();
-        nested["satellites"] = GPS.satellites();
-
+      //AWAIT SYNC FROM FREQUENCY
+      for (int i = 0; i < frequency; i++) {
         if (DEBUG_MODE) {
-          serializeJson(array, Serial);
-          Serial.println();
+          Serial.print(".");
         }
 
-        //RESET FREQUENCY
-        frequency_counter = 1;  //Reset frequency_counter
+        digitalWrite(LED_BUILTIN, ledStatus);
+        delay(1000);
+        ledStatus = ledStatus == HIGH ? LOW : HIGH;
       }
 
-      //INCREASE CLOCK AND FREQUENCY
+      digitalWrite(LED_BUILTIN, HIGH);
+
+      if (DEBUG_MODE) {
+        Serial.println();
+        Serial.println("Saving data at cicle  " + String(clock_counter));
+      }
+
+      //SAVE DATA INTO JSON OBJECT
+      JsonObject nested = array.createNestedObject();
+      nested["timestamp"] = gsmAccess.getTime();
+      nested["battery"] = analogRead(ADC_BATTERY) * (4.3 / 1023.0);
+      nested["latitude"] = GPS.latitude();
+      nested["longitude"] = GPS.longitude();
+      nested["altitude"] = GPS.altitude();
+      nested["speed"] = GPS.speed();
+      nested["course"] = GPS.course();
+      nested["satellites"] = GPS.satellites();
+
+      if (DEBUG_MODE) {
+        serializeJson(array, Serial);
+        Serial.println();
+      }
+
+      //INCREASE CLOCK
       ++clock_counter;
-      ++frequency_counter;
     } else {
 
       if (DEBUG_MODE) {
         Serial.println();
-        Serial.println("Duration cicle: " + String(clock_counter) + " s");
+        Serial.println("Duration cicle: " + String(clock_counter * frequency) + " s");
         Serial.println("Memory used: " + String(array.memoryUsage()));
         Serial.println("Logs saved: " + String(array.size()));
         Serial.println();
@@ -179,6 +197,7 @@ void loop() {
 
       //POST DATA
       client.post("/postData?uid=RA207twfQF5LawcErH8j", contentType, postData);
+      //TODO MANAGE TO SEND ALSO THE SAVED DATA IF NEEDED TO UPLOAD AGAIN
 
       //READ RESPONSE
       int statusCode = client.responseStatusCode();
@@ -195,12 +214,10 @@ void loop() {
         //RESET JSON AND COUNTER TO RESTART
         doc.clear();
         clock_counter = 1;
-        frequency_counter = 1;
 
-        digitalWrite(LED_BUILTIN, LOW);
-
-      } else {        
+      } else {
         //TODO SAVE IT TO LOCAL STORAGE....
+        /*data_storage.write(postData);*/
       }
     }
   }
