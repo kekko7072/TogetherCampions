@@ -1,4 +1,7 @@
+import 'package:app/interfaces/widgets/add_edit_device.dart';
 import 'package:app/services/imports.dart';
+
+import '../widgets/card_device.dart';
 
 class Devices extends StatelessWidget {
   const Devices({Key? key}) : super(key: key);
@@ -22,27 +25,24 @@ class Devices extends StatelessWidget {
                             .titleLarge!
                             .copyWith(fontWeight: FontWeight.bold),
                       ),
-                      ListView.builder(
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          itemCount: userData.sessions.length,
-                          reverse: true,
-                          itemBuilder: (context, index) =>
-                              StreamBuilder<List<Log>>(
-                                  stream: DatabaseLog(id: kDefaultDeviceId).allLogs,
-                                  builder: (context, snapshot) {
-                                    if (!snapshot.hasData) {
-                                      return const Text('No data');
-                                    }
-                                    List<Log> logs = snapshot.data!;
-                                    return ListView.builder(
-                                        shrinkWrap: true,
-                                        reverse: true,
-                                        physics: const NeverScrollableScrollPhysics(),
-                                        itemCount: logs.length,
-                                        itemBuilder: (context, index) =>
-                                            CardLog(log: logs[index]));
-                                  }))
+                      StreamBuilder<List<Device>>(
+                          stream:
+                              DatabaseDevice().allDevices(uid: userData.uid),
+                          builder: (context, snapshot) {
+                            if (!snapshot.hasData) {
+                              return const Text('No data');
+                            }
+                            List<Device> devices = snapshot.data!;
+                            return ListView.builder(
+                                shrinkWrap: true,
+                                reverse: true,
+                                physics: const NeverScrollableScrollPhysics(),
+                                itemCount: devices.length,
+                                itemBuilder: (context, index) => CardDevice(
+                                      device: devices[index],
+                                      uid: userData.uid,
+                                    ));
+                          })
                     ],
                   ),
                 ),
@@ -54,7 +54,7 @@ class Devices extends StatelessWidget {
                 shape: AppStyle.kModalBottomStyle,
                 isScrollControlled: true,
                 isDismissible: true,
-                builder: (context) => AddEditSession(
+                builder: (context) => AddEditDevice(
                   uid: userData.uid,
                   isEdit: false,
                 ),
@@ -68,7 +68,7 @@ class Devices extends StatelessWidget {
                       children: const [
                         SizedBox(width: 7),
                         Text(
-                          'Nuova sessione',
+                          'Nuovo dispositivo',
                           style: TextStyle(
                               fontWeight: FontWeight.bold, color: Colors.black),
                         ),

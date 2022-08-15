@@ -6,6 +6,13 @@
 
 
 /*
+  Set a device_id unique for every new device released
+  should be a string
+*/
+String device_id = "RA207twQF5LawcErH8j";
+
+
+/*
   Set DEBUG_MODE to
     TRUE: When debugging with serial monitor
     FALSE: When launcing code for stand alone usage
@@ -42,7 +49,7 @@ int frequency = 10;
 
   Replace bytes in StaticJsonDocument<BYTES> doc and remember to keep some margin (ex. for 6640 put 9000).
 */
-StaticJsonDocument<8000> doc;
+StaticJsonDocument<25000> doc;
 JsonArray array = doc.to<JsonArray>();
 
 ///TODO STORAGE https://github.com/cmaglie/FlashStorage
@@ -53,7 +60,8 @@ JsonArray array = doc.to<JsonArray>();
 
 //SERVER https://console.cloud.google.com/appengine?project=together-champions&supportedpurview=project&serviceId=default
 char server[] = "together-champions.ew.r.appspot.com";
-char path[] = "/postData";
+String path_settings = "/settings?id=";
+String path_post = "/post?id=";
 int port = 80;
 
 
@@ -70,7 +78,6 @@ const char GPRS_PASSWORD[] = SECRET_GPRS_PASSWORD;
 
 
 //HELPERS
-char name[] = "Traker";
 int clock_counter = 1;
 PinStatus ledStatus = HIGH;
 
@@ -79,6 +86,8 @@ PinStatus ledStatus = HIGH;
 
 
 void setup() {
+  //LED
+  pinMode(LED_BUILTIN, OUTPUT);
 
   //COMUNICATION
   Serial.begin(9600);
@@ -86,13 +95,14 @@ void setup() {
     while (!Serial) {
       ;  // wait for serial port to connect. Needed for native USB port only
     }
-    Serial.println("Initialized " + String(device_name));
+    Serial.println("Intializing  Device");
   }
 
-  //LED BUILD IN
-  pinMode(LED_BUILTIN, OUTPUT);
-
   //GPRS
+  if (DEBUG_MODE) {
+    Serial.println();
+    Serial.print("Intializing  GPRS:  ");
+  }
   bool connected = false;
 
   while (!connected) {
@@ -115,19 +125,18 @@ void setup() {
       }
     }
   }
+  if (DEBUG_MODE) {
+    Serial.print("OK");
+  }
+  ///
 
-  //GPS
-  if (!GPS.begin()) {
-    if (DEBUG_MODE) {
-      Serial.println("Failed to initialize GPS!");
-    }
-    while (1)
-      ;
+  ///SETTINGS FROM SERVER
+  if (DEBUG_MODE) {
+    Serial.println("Intializing  SETTINGS from server:");
   }
 
-  //GET SETTINGS
-  client.get("/postData?uid=RA207twfQF5LawcErH8j", contentType, postData);
-  //READ RESPONSE
+  client.get(path_settings + device_id);
+
   int statusCode = client.responseStatusCode();
   String response = client.responseBody();
 
@@ -139,10 +148,40 @@ void setup() {
   }
 
   if (statusCode == 200) {
-    name = "";
-    clock = 0;
-    frequency = 0;
+    StaticJsonDocument<64> doc_settings;
+    DeserializationError error = deserializeJson(doc_settings, response);
+
+    if (error) {
+      Serial.print("deserializeJson() failed: ");
+      Serial.println(error.c_str());
+      return;
+    }
+    clock = doc_settings["clock"];
+    frequency = doc_settings["frequency"];
+
+    if (DEBUG_MODE) {
+      Serial.println("  clock:  " + String(clock));
+      Serial.println("  frequency:  " + String(frequency));
+    }
   }
+  ///
+
+  ///GPS
+  if (DEBUG_MODE) {
+    Serial.println();
+    Serial.print("Intializing  GPS:  ");
+  }
+  if (!GPS.begin()) {
+    if (DEBUG_MODE) {
+      Serial.println("Failed to initialize GPS!");
+    }
+    while (1)
+      ;
+  }
+  if (DEBUG_MODE) {
+    Serial.print("OK");
+  }
+  ///
 }
 
 void loop() {
@@ -218,7 +257,7 @@ void loop() {
       }
 
       //POST DATA
-      client.post("/postData?uid=RA207twfQF5LawcErH8j", contentType, postData);
+      client.post(path_post + "?id=" + String(device_id), contentType, postData);
       //TODO MANAGE TO SEND ALSO THE SAVED DATA IF NEEDED TO UPLOAD AGAIN
 
       //READ RESPONSE

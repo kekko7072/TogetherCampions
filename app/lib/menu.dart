@@ -20,6 +20,27 @@ class MenuState extends State<Menu> {
     final userData = Provider.of<UserData?>(context);
     return userData != null
         ? Scaffold(
+            appBar: AppBar(
+              title: Text(
+                'Together Champions',
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
+              actions: [
+                IconButton(
+                    onPressed: () => showModalBottomSheet(
+                          context: context,
+                          shape: AppStyle.kModalBottomStyle,
+                          isScrollControlled: true,
+                          isDismissible: true,
+                          builder: (context) => Dismissible(
+                              key: UniqueKey(),
+                              child: AddEditProfile(
+                                userData: userData,
+                              )),
+                        ),
+                    icon: const Icon(CupertinoIcons.person_alt_circle))
+              ],
+            ),
             body: MediaQuery.of(context).size.width >= 500
                 ? Row(children: [
                     NavigationRail(

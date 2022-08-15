@@ -32,56 +32,28 @@ admin.initializeApp({
 
 admin.firestore().settings({ ignoreUndefinedProperties: true });
 
-app.get("/", (req, res) => {
-  res.writeHead(200, { "Content-Type": "text/html" });
-  res.end("<div><h1>Server working!</h1></div>");
-});
-
-app.get("/sendData", (req, res) => {
-  let uid = req.query.uid;
-  let battery = req.query.battery;
-  let latitude = req.query.latitude;
-  let longitude = req.query.longitude;
-  let altitude = req.query.altitude;
-  let speed = req.query.speed;
-  let satellites = req.query.satellites;
-
-  admin
-    .firestore()
-    .collection("users")
-    .doc(uid)
-    .collection("logs")
-    .doc(`${Date.now()}`)
-    .set({
-      timestamp: admin.firestore.Timestamp.now(),
-      battery: parseFloat(battery),
-      gps: {
-        latitude: parseFloat(latitude),
-        longitude: parseFloat(longitude),
-        altitude: parseFloat(altitude),
-        speed: parseFloat(speed),
-        satellites: parseInt(satellites),
-      },
-    })
-    .then((writeResult) => {
-      //res.status(200).end();
-      res.writeHead(200, { "Content-Type": "text/html" });
-      res.end("<div><h1>Data reviced!</h1></div>");
-    });
-});
-
-app.get("/device", async (req, res) => {
+app.get("/settings", async (req, res) => {
   let id = req.query.id;
 
-  var value = admin.firestore().collection("devices").doc(id).get();
+  if (id != null) {
+    var documentSnapshot = await admin
+      .firestore()
+      .collection("devices")
+      .doc(id)
+      .get();
 
-  res.writeHead(200, { "Content-Type": "text/html" });
-  res.end(
-    `name=${value.name}&clock=${value.clock}&frequency=${value.frequency}`
-  );
+    const clock = documentSnapshot.data().clock;
+    const frequency = documentSnapshot.data().frequency;
+
+    res.writeHead(200, { "Content-Type": "application/json" });
+    res.end(`{"clock": ${clock},"frequency": ${frequency}}`);
+  } else {
+    res.writeHesad(400, { "Content-Type": "text/html" });
+    res.end(`Please send an id as query to get results`);
+  }
 });
 
-app.post("/postData", async (req, res) => {
+app.post("/post", async (req, res) => {
   const uid = req.query.uid;
 
   const val = JSON.parse(JSON.stringify(req.body));
@@ -90,16 +62,14 @@ app.post("/postData", async (req, res) => {
 
   const jsonData = JSON.parse(val.input);
 
-  const lengthData = jsonData.data.length ?? 0;
-
-  for (var i = 0; i < lengthData; i++) {
+  for (var i = 0; i < jsonData.data.length ?? 0; i++) {
     const value = jsonData.data[i];
     const timestamp = value.timestamp * 1000;
     console.log(value);
     console.log(timestamp);
     await admin
       .firestore()
-      .collection("users")
+      .collection("devices")
       .doc(uid)
       .collection("logs")
       .doc(`${timestamp}`)

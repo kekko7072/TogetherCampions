@@ -70,29 +70,29 @@ class _AddEditSessionState extends State<AddEditSession> {
                     ),
                   ),
                   const SizedBox(height: 10),
-                  if (widget.isEdit) ...[
-                    Padding(
-                      padding: const EdgeInsets.only(left: 20.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const Text(
-                            'Inizio sessione: ',
-                          ),
-                          CupertinoButton(
-                            child: Text(
-                                '${start.hour}:${start.minute}   ${start.day}/${start.month}/${start.year}'),
-                            onPressed: () async {
-                              DateTime value = await _selectDateTime(
-                                  context: context, input: start);
-                              setState(() {
-                                start = value;
-                              });
-                            },
-                          ),
-                        ],
-                      ),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 20.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          'Inizio sessione: ',
+                        ),
+                        CupertinoButton(
+                          child: Text(
+                              '${start.hour}:${start.minute}   ${start.day}/${start.month}/${start.year}'),
+                          onPressed: () async {
+                            DateTime value = await _selectDateTime(
+                                context: context, input: start);
+                            setState(() {
+                              start = value;
+                            });
+                          },
+                        ),
+                      ],
                     ),
+                  ),
+                  if (widget.isEdit) ...[
                     Padding(
                       padding: const EdgeInsets.only(left: 20.0),
                       child: Row(
@@ -167,7 +167,10 @@ class _AddEditSessionState extends State<AddEditSession> {
                                 isCreate: true,
                                 uid: widget.uid,
                                 session: Session(
-                                    name: name.text, start: start, end: end))
+                                    name: name.text,
+                                    start: start,
+                                    end: end.add(
+                                        Duration(seconds: durationInMinutes))))
                             .then((value) {
                           setState(() => showLoading = false);
                           Navigator.of(context).pop();

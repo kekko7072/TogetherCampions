@@ -13,12 +13,21 @@ class DatabaseUser {
         'surname': userData.profile.surname,
         'email': userData.profile.email,
       },
-      'devices': isEdit ? userData.devices : [kDefaultDeviceId],
+      'devices': userData.devices,
       'sessions': isEdit ? userData.sessions : [],
     };
     return isEdit
         ? await userCollection.doc(userData.uid).update(value)
         : await userCollection.doc(userData.uid).set(value);
+  }
+
+  ///DEVICES
+  Future devicesCreateRemove(
+      {required bool isCreate, required String uid, required String id}) async {
+    return await userCollection.doc(uid).update({
+      'devices':
+          isCreate ? FieldValue.arrayUnion([id]) : FieldValue.arrayRemove([id])
+    });
   }
 
   ///SESSION

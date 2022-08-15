@@ -34,7 +34,7 @@ class MyApp extends StatelessWidget {
               primarySwatch: AppStyle.primaryMaterialColor,
               primaryColor: AppStyle.primaryColor,
             ),
-            home: AppDirector(),
+            home: const AppDirector(),
           )),
     );
   }

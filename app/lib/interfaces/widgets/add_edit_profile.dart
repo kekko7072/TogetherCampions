@@ -3,7 +3,9 @@ import 'package:app/services/imports.dart';
 class AddEditProfile extends StatelessWidget {
   const AddEditProfile({
     Key? key,
+    required this.userData,
   }) : super(key: key);
+  final UserData userData;
 
   @override
   Widget build(BuildContext context) {
@@ -22,9 +24,14 @@ class AddEditProfile extends StatelessWidget {
                       style: Theme.of(context).textTheme.titleLarge,
                     ),
                     Text(
-                      'UID: ',
+                      'Nome: ${userData.profile.name}',
                     ),
-
+                    Text(
+                      'Cognome:  ${userData.profile.surname}',
+                    ),
+                    Text(
+                      'Email:  ${userData.profile.email}',
+                    ),
                   ],
                 ),
               ),

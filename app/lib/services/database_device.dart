@@ -4,35 +4,22 @@ class DatabaseDevice {
   static CollectionReference<Map<String, dynamic>> deviceCollection =
       FirebaseFirestore.instance.collection('devices');
 
-  Future create({required UserData userData}) async {
+  Future create({required bool isEdit, required Device device}) async {
     Map<String, dynamic> value = {
-      'sessions': null,
+      'name': device.name,
+      'uid': device.uid,
+      'clock': device.clock,
+      'frequency': device.frequency,
     };
-    return await deviceCollection.doc(userData.uid).set(value);
+    return isEdit
+        ? await deviceCollection.doc(device.id).update(value)
+        : await deviceCollection.doc(device.id).set(value);
   }
 
-  ///SESSION
-  Future sessionCreateRemove(
-      {required bool isCreate,
-      required String uid,
-      required Session session}) async {
-    return await deviceCollection.doc(uid).update({
-      'sessions': isCreate
-          ? FieldValue.arrayUnion([
-              {
-                'name': session.name,
-                'start': session.start,
-                'end': session.end,
-              }
-            ])
-          : FieldValue.arrayRemove([
-              {
-                'name': session.name,
-                'start': session.start,
-                'end': session.end,
-              }
-            ])
-    });
+  Future delete({required String id, required String uid}) async {
+    await DatabaseUser().devicesCreateRemove(isCreate: false, uid: uid, id: id);
+
+    return await deviceCollection.doc(id).delete();
   }
 
   Future sessionEdit(
@@ -71,11 +58,18 @@ class DatabaseDevice {
     );
   }
 
-  List<Device> userDataListFromSnapshot(
+  List<Device> deviceListFromSnapshot(
           QuerySnapshot<Map<String, dynamic>> snapshot) =>
       snapshot.docs.map((snapshot) => deviceFromSnapshot(snapshot)).toList();
 
   Stream<Device> device({required String id}) {
     return deviceCollection.doc(id).snapshots().map(deviceFromSnapshot);
+  }
+
+  Stream<List<Device>> allDevices({required String uid}) {
+    return deviceCollection
+        .where('uid', isEqualTo: uid)
+        .snapshots()
+        .map(deviceListFromSnapshot);
   }
 }
