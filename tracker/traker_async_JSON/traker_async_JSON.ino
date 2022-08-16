@@ -4,8 +4,8 @@
   
   Device: ARDUINO MKR 1400 GSM + GPS MODULE
   Version:  1.0.0 BETA
-  Description:  This software is designed to solve all the relaiability problems given by the usage of JSON as object,
-                as mentioned here[https://arduinojson.org/v6/issues/memory-leak/#why-does-this-happen] so replace it with arrays.
+  Description:  This software is designed to fetch asyncronally the data from the GPS. This is a fine solution 
+                for all the scenarios where GSMR is available otherwise it will fail fetching.
 
 */
 
@@ -22,6 +22,14 @@
 String device_id = "RA207twQF5LawcErH8j";
 
 
+
+/*
+  CLOCK: Is the time the code run in loop fetching data from GPS to SERVER [aproximatly]. 
+    Ex. clock = 60  Means run 60 times then data are send
+*/
+int clock = 6;
+
+
 /*
   FREQUENCY: Is the time between each savings of data from GPS in seconds [aproximatly].
     Ex. frequency = 10  Means run 1 clock every 10 seconds
@@ -30,17 +38,18 @@ int frequency = 10;
 
 
 /*
-  Here are defined all the arrays used to store the datas.
+  The system use 144 byte for a single log.
+    Bytes = 144 * n°clock
+  Replace bytes in StaticJsonDocument<BYTES> doc and remember to keep some margin (ex. for 6640 put 9000).
+  NOTE: Never use more than 10000 bytes for storage or system will fail afther some executions.
+  BEST PARCTICE: Keep bytes low so the client request will be short on time.
 */
-int timestamp[CLOCK];
-float battery[CLOCK];
-float latitude[CLOCK];
-float longitude[CLOCK];
-float altitude[CLOCK];
-float speed[CLOCK];
-float course[CLOCK];
-int satellites[CLOCK];
+StaticJsonDocument<10000> doc;
 
+/*
+  This is the document to create the JSON file to store the data given by the GPS.
+*/
+JsonArray array = doc.to<JsonArray>();
 
 /*
   This is the document to deserialize the JSON file to given by the device settings.
@@ -54,6 +63,10 @@ StaticJsonDocument<64> doc_settings;
 GSMClient gsmClient;
 GPRS gprs;
 GSM gsmAccess;
+const char PINNUMBER[] = SECRET_PINNUMBER;
+const char GPRS_APN[] = SECRET_GPRS_APN;
+const char GPRS_LOGIN[] = SECRET_GPRS_LOGIN;
+const char GPRS_PASSWORD[] = SECRET_GPRS_PASSWORD;
 
 
 /*
@@ -62,7 +75,7 @@ GSM gsmAccess;
 */
 char server[] = "together-champions.ew.r.appspot.com";
 String path_settings = "/settings?id=";
-String path_post = "/post?id=";
+String path_post = "/postJSON?id=";
 int port = 80;
 
 
@@ -76,11 +89,9 @@ HttpClient http(gsmClient, server);
 /*
   Runtime code executions variables, helping with counting functions and memorizing led status.
 */
-int i = 0;
-int err = 0;
+int clock_counter = 1;
 PinStatus ledStatus = HIGH;
-String input_data = "";
-
+int err = 0;
 
 
 void setup() {
@@ -90,7 +101,7 @@ void setup() {
   bool connected = false;
 
   while (!connected) {
-    if ((gsmAccess.begin(SECRET_PINNUMBER) == GSM_READY) && (gprs.attachGPRS(SECRET_GPRS_APN, SECRET_GPRS_LOGIN, SECRET_GPRS_PASSWORD) == GPRS_READY)) {
+    if ((gsmAccess.begin(PINNUMBER) == GSM_READY) && (gprs.attachGPRS(GPRS_APN, GPRS_LOGIN, GPRS_PASSWORD) == GPRS_READY)) {
       connected = true;
     } else {
 
@@ -130,6 +141,7 @@ void setup() {
         Serial.println(error.c_str());
         return;
       }
+      clock = doc_settings["clock"];
       frequency = doc_settings["frequency"];
 
     } else {
@@ -153,7 +165,6 @@ void setup() {
       ;
   }
   Serial.print("OK");
-  Serial.println();
   ///
 }
 
@@ -166,12 +177,11 @@ void loop() {
 
   */
   while (GPS.available()) {
-
-    if (i < CLOCK) {
+    if (clock_counter <= clock) {
       digitalWrite(LED_BUILTIN, LOW);
 
       //AWAIT SYNC FROM FREQUENCY
-      for (int f = 0; f < frequency; f++) {
+      for (int i = 0; i < frequency; i++) {
 
         Serial.print(".");
 
@@ -183,54 +193,56 @@ void loop() {
       //SAVE DATA INTO JSON OBJECT
       digitalWrite(LED_BUILTIN, HIGH);
       Serial.println();
-      Serial.println("Saving data at cicle  " + String(i));
-
-      timestamp[i] = isnan(gsmAccess.getTime());
-      battery[i] = analogRead(ADC_BATTERY) * (4.3 / 1023.0);
-      latitude[i] = isnan(GPS.latitude()) ? 0.0 : GPS.latitude();
-      longitude[i] = isnan(GPS.longitude()) ? 0.0 : GPS.longitude();
-      altitude[i] = isnan(GPS.altitude()) ? 0.0 : GPS.altitude();
-      speed[i] = isnan(GPS.speed()) ? 0.0 : GPS.speed();
-      course[i] = isnan(GPS.course()) ? 0.0 : GPS.course();
-      satellites[i] = isnan(GPS.satellites()) ? 0.0 : GPS.satellites();
-      input_data = input_data + "&timestamp=" + String(timestamp[i]) + "&battery=" + String(battery[i]) + "&latitude=" + String(latitude[i], 7) + "&longitude=" + String(longitude[i], 7) + "&altitude=" + String(altitude[i], 7) + "&speed=" + String(speed[i], 7) + "&course=" + String(course[i], 7) + "&satellites=" + String(satellites[i]);
-
-      Serial.println(input_data);
-
-      i++;
-    } else {
-
+      Serial.println("Saving data at cicle  " + String(clock_counter));
+      JsonObject nested = array.createNestedObject();
+      nested["timestamp"] = gsmAccess.getTime();
+      nested["battery"] = analogRead(ADC_BATTERY) * (4.3 / 1023.0);
+      nested["latitude"] = GPS.latitude();
+      nested["longitude"] = GPS.longitude();
+      nested["altitude"] = GPS.altitude();
+      nested["speed"] = GPS.speed();
+      nested["course"] = GPS.course();
+      nested["satellites"] = GPS.satellites();
+      serializeJson(array, Serial);
       Serial.println();
-      Serial.println("Duration cicle: " + String(CLOCK * frequency) + " s");
-      Serial.println("Logs saved: " + String(CLOCK));
+
+      //INCREASE CLOCK
+      ++clock_counter;
+    } else {
+      Serial.println();
+      Serial.println("Duration cicle: " + String(clock_counter * frequency) + " s");
+      Serial.println("Memory used: " + String(array.memoryUsage()));
+      Serial.println("Logs saved: " + String(array.size()));
+      serializeJson(array, Serial);
       Serial.println();
 
       //PREPARE DATA TO SEND TO SERVER
-      String content_type = "application/x-www-form-urlencoded";
-      String post_data = "clock=" + String(CLOCK) + "&frequency=" + String(frequency) + input_data;
+      String contentType = "application/x-www-form-urlencoded";
+      String inputJSON = "";
+      serializeJson(array, inputJSON);
+      String postData = "input={\"data\":" + inputJSON + "}&frequency=" + frequency;
 
       Serial.println();
       Serial.println("Making POST request");
-      Serial.println(post_data);
+      Serial.println(postData);
       Serial.println();
 
       //POST DATA
-      err = http.post(path_post + String(device_id), content_type, post_data);
+      err = http.post(path_post + String(device_id), contentType, postData);
       if (err == 0) {
         Serial.println("Started POST ok");
         //READ RESPONSE
-        int status_code = http.responseStatusCode();
+        int statusCode = http.responseStatusCode();
         String response = http.responseBody();
 
         Serial.println();
-        Serial.println("Status code: " + String(status_code));
+        Serial.println("Status code: " + String(statusCode));
         Serial.println("Response: " + String(response));
         Serial.println();
 
-        if (status_code == 200) {
-          Serial.println("Data send sucessfully");
-          i = 0;
-          input_data = "";
+        if (statusCode == 200) {
+          doc.clear();
+          clock_counter = 1;
         } else {
           Serial.println("Getting response failed: " + String(err));
         }

@@ -54,11 +54,51 @@ app.get("/settings", async (req, res) => {
 });
 
 app.post("/post", async (req, res) => {
+  try {
+    const id = req.query.id;
+
+    const value = JSON.parse(JSON.stringify(req.body));
+    console.log("FREQUENCY: " + value.frequency);
+    console.log("CLOCK: " + value.clock);
+
+    console.log(req.body);
+
+    for (var i = 0; i < value.clock ?? 0; i++) {
+      //UNFORTIUNATLY ON THINGSMOBILE SIM THE TIMESTAM IS WRONG...
+      //const time = value.timestamp[i] * 1000;
+      const time = Date.now() + i * value.frequency * 1000;
+
+      await admin
+        .firestore()
+        .collection("devices")
+        .doc(id)
+        .collection("logs")
+        .doc(`${time}`)
+        .set({
+          timestamp: Timestamp.fromMillis(time),
+          battery: parseFloat(value.battery[i]),
+          gps: {
+            latitude: parseFloat(value.latitude[i]),
+            longitude: parseFloat(value.longitude[i]),
+            altitude: parseFloat(value.altitude[i]),
+            speed: parseFloat(value.speed[i]),
+            course:
+              value.course[i] != null ? parseFloat(value.course[i]) : null,
+            satellites: parseInt(value.satellites[i]),
+          },
+        });
+    }
+    res.sendStatus(200);
+  } catch (e) {
+    console.log(e);
+    res.sendStatus(500);
+  }
+});
+
+app.post("/postJSON", async (req, res) => {
   const id = req.query.id;
 
   const val = JSON.parse(JSON.stringify(req.body));
-  console.log("INPUT: " + val.input);
-  console.log("FREQUENCY: " + val.frequency);
 
   const jsonData = JSON.parse(val.input);
 
@@ -67,8 +107,8 @@ app.post("/post", async (req, res) => {
     //UNFORTIUNATLY IN TM SIM THE TIMESTAM IS WRONG...
     //const timestamp = value.timestamp * 1000;
     const timestamp = Date.now() + i * val.frequency * 1000;
-    console.log(value);
-    console.log(timestamp);
+    //console.log(value);
+    //console.log(timestamp);
     await admin
       .firestore()
       .collection("devices")
