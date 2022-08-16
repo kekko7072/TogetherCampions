@@ -151,8 +151,7 @@ class _AddEditSessionState extends State<AddEditSession> {
                     onPressed: () async {
                       setState(() => showLoading = true);
                       if (widget.isEdit) {
-                        await DatabaseUser()
-                            .sessionEdit(
+                        await DatabaseUser.sessionEdit(
                                 uid: widget.uid,
                                 oldSession: widget.session!,
                                 newSession: Session(
@@ -162,15 +161,14 @@ class _AddEditSessionState extends State<AddEditSession> {
                           Navigator.of(context).pop();
                         });
                       } else {
-                        await DatabaseUser()
-                            .sessionCreateRemove(
+                        await DatabaseUser.sessionCreateRemove(
                                 isCreate: true,
                                 uid: widget.uid,
                                 session: Session(
                                     name: name.text,
                                     start: start,
-                                    end: end.add(
-                                        Duration(seconds: durationInMinutes))))
+                                    end: start.add(
+                                        Duration(minutes: durationInMinutes))))
                             .then((value) {
                           setState(() => showLoading = false);
                           Navigator.of(context).pop();

@@ -17,7 +17,7 @@ class DatabaseDevice {
   }
 
   Future delete({required String id, required String uid}) async {
-    await DatabaseUser().devicesCreateRemove(isCreate: false, uid: uid, id: id);
+    await DatabaseUser.devicesCreateRemove(isCreate: false, uid: uid, id: id);
 
     return await deviceCollection.doc(id).delete();
   }

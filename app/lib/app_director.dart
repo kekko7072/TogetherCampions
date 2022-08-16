@@ -14,7 +14,7 @@ class AppDirector extends StatelessWidget {
         : MultiProvider(
             providers: [
               StreamProvider<UserData?>.value(
-                value: DatabaseUser().userData(uid: user!.uid!),
+                value: DatabaseUser.userData(uid: user!.uid!),
                 initialData: null,
               ),
             ],

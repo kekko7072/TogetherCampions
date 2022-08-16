@@ -184,20 +184,18 @@ class _RegistrationState extends State<Registration> {
                               }
                               setState(() => showLoading = true);
                               if (widget.isEdit) {
-                                await DatabaseUser()
-                                    .createEdit(
-                                        isEdit: widget.isEdit,
-                                        userData: UserData(
-                                          uid: widget.userData!.uid,
-                                          profile: Profile(
-                                            name: name.text,
-                                            surname: surname.text,
-                                            email: email.text,
-                                          ),
-                                          devices: widget.userData!.devices,
-                                          sessions: widget.userData!.sessions,
-                                        ))
-                                    .then((message) {
+                                await DatabaseUser.createEdit(
+                                    isEdit: widget.isEdit,
+                                    userData: UserData(
+                                      uid: widget.userData!.uid,
+                                      profile: Profile(
+                                        name: name.text,
+                                        surname: surname.text,
+                                        email: email.text,
+                                      ),
+                                      devices: widget.userData!.devices,
+                                      sessions: widget.userData!.sessions,
+                                    )).then((message) {
                                   setState(() => showLoading = false);
 
                                   Navigator.of(context).pop();

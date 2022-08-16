@@ -31,7 +31,7 @@ class AuthService {
         devices: [],
         sessions: [],
       );
-      await DatabaseUser().createEdit(isEdit: false, userData: userData);
+      await DatabaseUser.createEdit(isEdit: false, userData: userData);
 
       return _userFromFirebase(user);
     } on FirebaseAuthException catch (e) {

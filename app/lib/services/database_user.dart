@@ -1,12 +1,11 @@
 import 'imports.dart';
 
 class DatabaseUser {
-  DatabaseUser();
-
   static CollectionReference<Map<String, dynamic>> userCollection =
       FirebaseFirestore.instance.collection('users');
 
-  Future createEdit({required bool isEdit, required UserData userData}) async {
+  static Future createEdit(
+      {required bool isEdit, required UserData userData}) async {
     Map<String, dynamic> value = {
       'profile': {
         'name': userData.profile.name,
@@ -22,7 +21,7 @@ class DatabaseUser {
   }
 
   ///DEVICES
-  Future devicesCreateRemove(
+  static Future devicesCreateRemove(
       {required bool isCreate, required String uid, required String id}) async {
     return await userCollection.doc(uid).update({
       'devices':
@@ -31,10 +30,11 @@ class DatabaseUser {
   }
 
   ///SESSION
-  Future sessionCreateRemove(
+  static Future sessionCreateRemove(
       {required bool isCreate,
       required String uid,
       required Session session}) async {
+    print(session.end);
     return await userCollection.doc(uid).update({
       'sessions': isCreate
           ? FieldValue.arrayUnion([
@@ -54,7 +54,7 @@ class DatabaseUser {
     });
   }
 
-  Future sessionEdit(
+  static Future sessionEdit(
       {required String uid,
       required Session oldSession,
       required Session newSession}) async {
@@ -108,11 +108,11 @@ class DatabaseUser {
     );
   }
 
-  List<UserData> userDataListFromSnapshot(
+  static List<UserData> userDataListFromSnapshot(
           QuerySnapshot<Map<String, dynamic>> snapshot) =>
       snapshot.docs.map((snapshot) => userDataFromSnapshot(snapshot)).toList();
 
-  Stream<UserData> userData({required String uid}) {
+  static Stream<UserData> userData({required String uid}) {
     return userCollection.doc(uid).snapshots().map(userDataFromSnapshot);
   }
 }

@@ -19,15 +19,11 @@ class DatabaseLog {
     }
   }
 
-  Future deleteSession({required String session}) async {
+  Future<DateTime> lastLogTimestamp() async {
     List<Log> allLogs = DatabaseLog.logListFromSnapshot(
-        await DatabaseLog(id: id)
-            .logCollection
-            .where('session', isEqualTo: session)
-            .get());
-    for (Log log in allLogs) {
-      await logCollection.doc(log.id).delete();
-    }
+        await DatabaseLog(id: id).logCollection.get());
+
+    return allLogs.last.timestamp;
   }
 
   ///SERIALIZATION

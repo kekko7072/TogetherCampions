@@ -16,49 +16,49 @@
 #include "arduino_secrets.h"
 
 /*
-  Set a new device_id unique for every new device released using https://www.uuidgenerator.net/version1 
+  Set a new device_id unique for every new device released using https://www.uuidgenerator.net/version1 .
   The device_id should be printed and given to the user to configure the device for his account.
 */
 String device_id = "RA207twQF5LawcErH8j";
 
 
-/*
-  Set DEBUG_MODE to
-    TRUE: When debugging with serial monitor
-    FALSE: When launcing code for stand alone usage
-*/
-bool DEBUG_MODE = false;
-
 
 /*
-  You can programm the duration of CLOCK and the FREQUENCY:
-    CLOCK: Is the time the code run in loop fetching data from GPS to SERVER [aproximatly]. 
-      Ex. clock = 60  Means run 60 times then data are send
-    FREQUENCY: Is the time between each savings of data from GPS in seconds [aproximatly].
-      Ex. frequency = 10  Means run 1 clock every 10 seconds
-  Calculate time of code:
-    Time of execution = clock * frequency;  
+  CLOCK: Is the time the code run in loop fetching data from GPS to SERVER [aproximatly]. 
+    Ex. clock = 60  Means run 60 times then data are send
 */
 int clock = 6;
+
+
+/*
+  FREQUENCY: Is the time between each savings of data from GPS in seconds [aproximatly].
+    Ex. frequency = 10  Means run 1 clock every 10 seconds
+*/
 int frequency = 10;
 
 
 /*
-  The system use 144 byte for a single log. The max is 2200 bytes it means 152 logs.
-  Calculate number of logs use this formula:
-    N°logs = clock 
-  Calculate bytes using tthis formula:
-    Bytes = 144 * n°logs
+  The system use 144 byte for a single log.
+    Bytes = 144 * n°clock
   Replace bytes in StaticJsonDocument<BYTES> doc and remember to keep some margin (ex. for 6640 put 9000).
+  NOTE: Never use more than 10000 bytes for storage or system will fail afther some executions.
+  BEST PARCTICE: Keep bytes low so the client request will be short on time.
 */
-StaticJsonDocument<22000> doc;
-JsonArray array = doc.to<JsonArray>();
-
-StaticJsonDocument<64> doc_settings;
-
+StaticJsonDocument<10000> doc;
 
 /*
-  Cellular module connection and settings.
+  This is the document to create the JSON file to store the data given by the GPS.
+*/
+JsonArray array = doc.to<JsonArray>();
+
+/*
+  This is the document to deserialize the JSON file to given by the device settings.
+*/
+StaticJsonDocument<64> doc_settings;
+
+/*
+  Cellular module classes.
+  NOTE: Cellular line works within 2 nautic miles from shore.
 */
 GSMClient gsmClient;
 GPRS gprs;
@@ -82,7 +82,7 @@ int port = 80;
 /*
   HTTP clients used as protocols to connect to the server.
 */
-HttpClient client = HttpClient(gsmClient, server, port);
+//HttpClient client = HttpClient(gsmClient, server, port);
 HttpClient http(gsmClient, server);
 
 
@@ -97,12 +97,6 @@ int err = 0;
 void setup() {
   //Initialize serial and wait for port to open:
   Serial.begin(9600);
-
-  if (DEBUG_MODE) {
-    while (!Serial) {
-      ;  // wait for serial port to connect. Needed for native USB port only
-    }
-  }
 
   bool connected = false;
 
@@ -122,14 +116,14 @@ void setup() {
         ++duration;
       }
     }
-    Serial.println("connected");
+    Serial.println("Connected");
   }
 
   ///LOAD SETTINGS
   Serial.println("Initializing settings...");
   err = http.get(path_settings + String(device_id));
   if (err == 0) {
-    Serial.println("startedRequest ok");
+    Serial.println("Started GET ok");
 
     err = http.responseStatusCode();
     if (err >= 0) {
@@ -150,17 +144,14 @@ void setup() {
       clock = doc_settings["clock"];
       frequency = doc_settings["frequency"];
 
-      Serial.println("  clock:  " + String(clock));
-      Serial.println("  frequency:  " + String(frequency));
-
     } else {
-      Serial.print("Getting response failed: ");
-      Serial.println(err);
+      Serial.print("Getting response failed: " + String(err));
     }
   } else {
     Serial.print("Connect failed: ");
     Serial.println(err);
   }
+  doc_settings.clear();
   http.stop();
   ///
 
@@ -169,15 +160,11 @@ void setup() {
   Serial.print("Intializing  GPS:  ");
 
   if (!GPS.begin()) {
-    if (DEBUG_MODE) {
-      Serial.println("Failed to initialize GPS!");
-    }
+    Serial.println("Failed to initialize GPS!");
     while (1)
       ;
   }
-  if (DEBUG_MODE) {
-    Serial.print("OK");
-  }
+  Serial.print("OK");
   ///
 }
 
@@ -191,7 +178,6 @@ void loop() {
   */
   while (GPS.available()) {
     if (clock_counter <= clock) {
-
       digitalWrite(LED_BUILTIN, LOW);
 
       //AWAIT SYNC FROM FREQUENCY
@@ -206,10 +192,8 @@ void loop() {
 
       //SAVE DATA INTO JSON OBJECT
       digitalWrite(LED_BUILTIN, HIGH);
-
       Serial.println();
       Serial.println("Saving data at cicle  " + String(clock_counter));
-
       JsonObject nested = array.createNestedObject();
       nested["timestamp"] = gsmAccess.getTime();
       nested["battery"] = analogRead(ADC_BATTERY) * (4.3 / 1023.0);
@@ -219,18 +203,17 @@ void loop() {
       nested["speed"] = GPS.speed();
       nested["course"] = GPS.course();
       nested["satellites"] = GPS.satellites();
-
       serializeJson(array, Serial);
       Serial.println();
 
       //INCREASE CLOCK
       ++clock_counter;
     } else {
-
       Serial.println();
       Serial.println("Duration cicle: " + String(clock_counter * frequency) + " s");
       Serial.println("Memory used: " + String(array.memoryUsage()));
       Serial.println("Logs saved: " + String(array.size()));
+      serializeJson(array, Serial);
       Serial.println();
 
       //PREPARE DATA TO SEND TO SERVER
@@ -240,40 +223,41 @@ void loop() {
       String postData = "input={\"data\":" + inputJSON + "}&frequency=" + frequency;
 
       Serial.println();
-      Serial.println("making POST request");
+      Serial.println("Making POST request");
       Serial.println(postData);
       Serial.println();
 
       //POST DATA
-      client.post(path_post + String(device_id), contentType, postData);
+      err = http.post(path_post + String(device_id), contentType, postData);
+      if (err == 0) {
+        Serial.println("Started POST ok");
+        //READ RESPONSE
+        int statusCode = http.responseStatusCode();
+        String response = http.responseBody();
 
-      //READ RESPONSE
-      int statusCode = client.responseStatusCode();
-      String response = client.responseBody();
+        Serial.println();
+        Serial.println("Status code: " + String(statusCode));
+        Serial.println("Response: " + String(response));
+        Serial.println();
 
-      Serial.println();
-      Serial.println("Status code: " + String(statusCode));
-      Serial.println("Response: " + String(response));
-      Serial.println();
-
-      if (statusCode == 200) {
-        //RESET JSON AND COUNTER TO RESTART
-        doc.clear();
-        clock_counter = 1;
+        if (statusCode == 200) {
+          doc.clear();
+          clock_counter = 1;
+        } else {
+          Serial.println("Getting response failed: " + String(err));
+        }
 
       } else {
-
-        //LOPING TO SHOW ERROR
+        Serial.println("Connect failed: " + String(err));
         ledStatus = HIGH;
         for (int i = 0; i < 10; i++) {
-
           Serial.print(".");
-
           digitalWrite(LED_BUILTIN, ledStatus);
           delay(1000);
           ledStatus = ledStatus == HIGH ? LOW : HIGH;
         }
       }
+      http.stop();
     }
   }
 }

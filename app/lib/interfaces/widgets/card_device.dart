@@ -3,11 +3,28 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 
 import 'add_edit_device.dart';
 
-class CardDevice extends StatelessWidget {
+class CardDevice extends StatefulWidget {
   const CardDevice({Key? key, required this.device, required this.uid})
       : super(key: key);
   final Device device;
   final String uid;
+
+  @override
+  State<CardDevice> createState() => _CardDeviceState();
+}
+
+class _CardDeviceState extends State<CardDevice> {
+  DateTime timestamp = DateTime.now();
+  @override
+  void initState() {
+    super.initState();
+    loadTimestampLastLog();
+  }
+
+  void loadTimestampLastLog() async {
+    DateTime value = await DatabaseLog(id: widget.device.id).lastLogTimestamp();
+    setState(() => timestamp = value);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -19,8 +36,8 @@ class CardDevice extends StatelessWidget {
           motion: const ScrollMotion(),
           children: [
             SlidableAction(
-              onPressed: (con) async =>
-                  await DatabaseDevice().delete(id: device.id, uid: uid),
+              onPressed: (con) async => await DatabaseDevice()
+                  .delete(id: widget.device.id, uid: widget.uid),
               backgroundColor: const Color(0xFFFE4A49),
               foregroundColor: Colors.black,
               icon: Icons.delete,
@@ -34,8 +51,8 @@ class CardDevice extends StatelessWidget {
                 isDismissible: true,
                 builder: (context) => AddEditDevice(
                   isEdit: true,
-                  uid: uid,
-                  device: device,
+                  uid: widget.uid,
+                  device: widget.device,
                 ),
               ),
               backgroundColor: AppStyle.primaryColor,
@@ -50,7 +67,8 @@ class CardDevice extends StatelessWidget {
             child: Card(
               margin: EdgeInsets.zero,
               child: Padding(
-                padding: const EdgeInsets.all(10.0),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 15, vertical: 10.0),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -63,18 +81,67 @@ class CardDevice extends StatelessWidget {
                     )),
                     Center(
                       child: Text(
-                        device.name,
+                        widget.device.name,
                         style: Theme.of(context)
                             .textTheme
                             .titleLarge!
                             .copyWith(fontWeight: FontWeight.bold),
                       ),
                     ),
-                    Text('Id: ${device.id}'),
-                    Text('Clock: ${device.clock}'),
-                    Text('Frequenza: ${device.frequency} s'),
-                    Text(
-                        'Sincronizzazione dati: ${CalculationService.formatTime(seconds: device.clock * device.frequency)}'),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'ID',
+                          style: Theme.of(context).textTheme.titleSmall,
+                        ),
+                        Text(widget.device.id),
+                      ],
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'CLOCK',
+                          style: Theme.of(context).textTheme.titleSmall,
+                        ),
+                        Text(
+                          '${widget.device.clock}',
+                        ),
+                      ],
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'FREQUENZA',
+                          style: Theme.of(context).textTheme.titleSmall,
+                        ),
+                        Text('${widget.device.frequency} s'),
+                      ],
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'SINCRONIZZAZIONE DATI',
+                          style: Theme.of(context).textTheme.titleSmall,
+                        ),
+                        Text(
+                            '${CalculationService.formatTime(seconds: widget.device.clock * widget.device.frequency)}'),
+                      ],
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'ULTIMA CONNESSIONE',
+                          style: Theme.of(context).textTheme.titleSmall,
+                        ),
+                        Text(CalculationService.formatDate(
+                            date: timestamp, seconds: true)),
+                      ],
+                    ),
                   ],
                 ),
               ),
@@ -86,7 +153,7 @@ class CardDevice extends StatelessWidget {
                   isDismissible: true,
                   builder: (context) => Dismissible(
                       key: UniqueKey(),
-                      child: ListLogs(id: device.id, isSession: false)),
+                      child: ListLogs(id: widget.device.id, isSession: false)),
                 )),
       ),
     );

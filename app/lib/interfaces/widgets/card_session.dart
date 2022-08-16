@@ -24,9 +24,8 @@ class CardSession extends StatelessWidget {
           motion: const ScrollMotion(),
           children: [
             SlidableAction(
-              onPressed: (con) async => await DatabaseUser()
-                  .sessionCreateRemove(
-                      isCreate: false, uid: userData.uid, session: session),
+              onPressed: (con) async => await DatabaseUser.sessionCreateRemove(
+                  isCreate: false, uid: userData.uid, session: session),
               backgroundColor: const Color(0xFFFE4A49),
               foregroundColor: Colors.black,
               icon: Icons.delete,
