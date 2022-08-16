@@ -64,7 +64,9 @@ app.post("/post", async (req, res) => {
 
   for (var i = 0; i < jsonData.data.length ?? 0; i++) {
     const value = jsonData.data[i];
-    const timestamp = value.timestamp * 1000;
+    //UNFORTIUNATLY IN TM SIM THE TIMESTAM IS WRONG...
+    //const timestamp = value.timestamp * 1000;
+    const timestamp = Date.now() + i * val.frequency * 1000;
     console.log(value);
     console.log(timestamp);
     await admin

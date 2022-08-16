@@ -159,4 +159,13 @@ class CalculationService {
     double oneRadian = 180 / (pi);
     return (oneRadian * radian);
   }
+
+  static formatTime({required int seconds}) {
+    if (seconds < 60) {
+      return '$seconds s';
+    } else {
+      double minutes = seconds / 60;
+      return '$minutes min';
+    }
+  }
 }

@@ -1,13 +1,23 @@
+/*
+  
+  Tracker Operative System - TOS
+  
+  Device: ARDUINO MKR 1400 GSM + GPS MODULE
+  Version:  1.0.0 BETA
+  Description:  This software is designed to fetch asyncronally the data from the GPS. This is a fine solution 
+                for all the scenarios where GSMR is available otherwise it will fail fetching.
+
+*/
+
 #include <ArduinoHttpClient.h>
 #include <MKRGSM.h>
 #include <Arduino_MKRGPS.h>
 #include <ArduinoJson.h>
 #include "arduino_secrets.h"
 
-
 /*
-  Set a device_id unique for every new device released
-  should be a string
+  Set a new device_id unique for every new device released using https://www.uuidgenerator.net/version1 
+  The device_id should be printed and given to the user to configure the device for his account.
 */
 String device_id = "RA207twQF5LawcErH8j";
 
@@ -17,20 +27,15 @@ String device_id = "RA207twQF5LawcErH8j";
     TRUE: When debugging with serial monitor
     FALSE: When launcing code for stand alone usage
 */
-bool DEBUG_MODE = true;
+bool DEBUG_MODE = false;
 
 
 /*
   You can programm the duration of CLOCK and the FREQUENCY:
-
     CLOCK: Is the time the code run in loop fetching data from GPS to SERVER [aproximatly]. 
       Ex. clock = 60  Means run 60 times then data are send
-
     FREQUENCY: Is the time between each savings of data from GPS in seconds [aproximatly].
       Ex. frequency = 10  Means run 1 clock every 10 seconds
-
-  Remember to balance between CLOCK and FREQUENCY to optimize the code execuition.
-  Ideal for debugging is CLOCK = 6 and FREQUENCY = 10 .
   Calculate time of code:
     Time of execution = clock * frequency;  
 */
@@ -40,59 +45,63 @@ int frequency = 10;
 
 /*
   The system use 144 byte for a single log. The max is 2200 bytes it means 152 logs.
-
   Calculate number of logs use this formula:
     N°logs = clock 
-
   Calculate bytes using tthis formula:
     Bytes = 144 * n°logs
-
   Replace bytes in StaticJsonDocument<BYTES> doc and remember to keep some margin (ex. for 6640 put 9000).
 */
-StaticJsonDocument<2200> doc;
+StaticJsonDocument<22000> doc;
 JsonArray array = doc.to<JsonArray>();
 
 StaticJsonDocument<64> doc_settings;
 
-///TODO STORAGE https://github.com/cmaglie/FlashStorage
 
-///***///
-
-
-//SERVER https://console.cloud.google.com/appengine?project=together-champions&supportedpurview=project&serviceId=default
-char server[] = "together-champions.ew.r.appspot.com";
-String path_settings = "/settings?id=";
-String path_post = "/post?id=";
-int port = 80;
-
-
-//GSM
+/*
+  Cellular module connection and settings.
+*/
 GSMClient gsmClient;
 GPRS gprs;
 GSM gsmAccess;
-HttpClient client = HttpClient(gsmClient, server, port);
-HttpClient http(gsmClient, server);
-
-
 const char PINNUMBER[] = SECRET_PINNUMBER;
 const char GPRS_APN[] = SECRET_GPRS_APN;
 const char GPRS_LOGIN[] = SECRET_GPRS_LOGIN;
 const char GPRS_PASSWORD[] = SECRET_GPRS_PASSWORD;
 
 
-//HELPERS
+/*
+  Server are used to store data on the cloud.
+  Link to dashboard: https://console.cloud.google.com/appengine?project=together-champions&supportedpurview=project&serviceId=default
+*/
+char server[] = "together-champions.ew.r.appspot.com";
+String path_settings = "/settings?id=";
+String path_post = "/post?id=";
+int port = 80;
+
+
+/*
+  HTTP clients used as protocols to connect to the server.
+*/
+HttpClient client = HttpClient(gsmClient, server, port);
+HttpClient http(gsmClient, server);
+
+
+/*
+  Runtime code executions variables, helping with counting functions and memorizing led status.
+*/
 int clock_counter = 1;
 PinStatus ledStatus = HIGH;
 int err = 0;
-
-///***///
 
 
 void setup() {
   //Initialize serial and wait for port to open:
   Serial.begin(9600);
-  while (!Serial) {
-    ;  // wait for serial port to connect. Needed for native USB port only
+
+  if (DEBUG_MODE) {
+    while (!Serial) {
+      ;  // wait for serial port to connect. Needed for native USB port only
+    }
   }
 
   bool connected = false;
@@ -195,12 +204,12 @@ void loop() {
         ledStatus = ledStatus == HIGH ? LOW : HIGH;
       }
 
+      //SAVE DATA INTO JSON OBJECT
       digitalWrite(LED_BUILTIN, HIGH);
 
       Serial.println();
       Serial.println("Saving data at cicle  " + String(clock_counter));
 
-      //SAVE DATA INTO JSON OBJECT
       JsonObject nested = array.createNestedObject();
       nested["timestamp"] = gsmAccess.getTime();
       nested["battery"] = analogRead(ADC_BATTERY) * (4.3 / 1023.0);
@@ -237,7 +246,6 @@ void loop() {
 
       //POST DATA
       client.post(path_post + String(device_id), contentType, postData);
-      //TODO MANAGE TO SEND ALSO THE SAVED DATA IF NEEDED TO UPLOAD AGAIN
 
       //READ RESPONSE
       int statusCode = client.responseStatusCode();

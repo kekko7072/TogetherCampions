@@ -22,7 +22,7 @@ class Sessions extends StatelessWidget {
                             .titleLarge!
                             .copyWith(fontWeight: FontWeight.bold),
                       ),
-                      for(String id in userData.devices)...[
+                      for (String id in userData.devices) ...[
                         ListView.builder(
                             shrinkWrap: true,
                             physics: const NeverScrollableScrollPhysics(),
@@ -30,22 +30,22 @@ class Sessions extends StatelessWidget {
                             reverse: true,
                             itemBuilder: (context, index) =>
                                 StreamBuilder<List<Log>>(
-                                    stream: DatabaseLog(id: id)
-                                        .sessionLogs(
+                                    stream: DatabaseLog(id: id).sessionLogs(
                                         session: userData.sessions[index]),
                                     builder: (context, snapshot) {
                                       if (!snapshot.hasData) {
-                                        return const Text('Caricamento');
+                                        return Text(
+                                            'Caricamento: ${snapshot.error}');
                                       }
 
                                       return CardSession(
                                         userData: userData,
+                                        id: id,
                                         session: userData.sessions[index],
                                         logs: snapshot.data!,
                                       );
                                     }))
                       ]
-
                     ],
                   ),
                 ),

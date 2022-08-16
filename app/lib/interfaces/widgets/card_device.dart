@@ -46,40 +46,48 @@ class CardDevice extends StatelessWidget {
           ],
         ),
         child: GestureDetector(
-          behavior: HitTestBehavior.opaque,
-          child: Card(
-            margin: EdgeInsets.zero,
-            child: Padding(
-              padding: const EdgeInsets.all(10.0),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Center(
-                      child: Image(
-                    image: AssetImage('assets/tracker_image.png'),
-                    height: 150,
-                  )),
-                  Center(
-                    child: Text(
-                      device.name,
-                      style: Theme.of(context)
-                          .textTheme
-                          .titleLarge!
-                          .copyWith(fontWeight: FontWeight.bold),
+            behavior: HitTestBehavior.opaque,
+            child: Card(
+              margin: EdgeInsets.zero,
+              child: Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Center(
+                        child: Image(
+                      image: AssetImage('assets/tracker_image.png'),
+                      height: 150,
+                    )),
+                    Center(
+                      child: Text(
+                        device.name,
+                        style: Theme.of(context)
+                            .textTheme
+                            .titleLarge!
+                            .copyWith(fontWeight: FontWeight.bold),
+                      ),
                     ),
-                  ),
-                  Text('Id: ${device.id}'),
-                  Text(
-                      'Durata sincronizzazione dati: ${device.clock * device.frequency} s'),
-                  Text('Clock: ${device.clock}'),
-                  Text('Frequency: ${device.frequency}'),
-                ],
+                    Text('Id: ${device.id}'),
+                    Text('Clock: ${device.clock}'),
+                    Text('Frequenza: ${device.frequency} s'),
+                    Text(
+                        'Sincronizzazione dati: ${CalculationService.formatTime(seconds: device.clock * device.frequency)}'),
+                  ],
+                ),
               ),
             ),
-          ),
-        ),
+            onTap: () => showModalBottomSheet(
+                  context: context,
+                  shape: AppStyle.kModalBottomStyle,
+                  isScrollControlled: true,
+                  isDismissible: true,
+                  builder: (context) => Dismissible(
+                      key: UniqueKey(),
+                      child: ListLogs(id: device.id, isSession: false)),
+                )),
       ),
     );
   }

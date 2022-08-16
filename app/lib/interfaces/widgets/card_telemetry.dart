@@ -4,12 +4,14 @@ import 'package:flutter/cupertino.dart';
 class CardTelemetry extends StatelessWidget {
   const CardTelemetry({
     Key? key,
-    required this.logs,
     required this.telemetry,
+    required this.id,
+    required this.session,
   }) : super(key: key);
 
-  final List<Log> logs;
   final Telemetry telemetry;
+  final String id;
+  final Session session;
 
   @override
   Widget build(BuildContext context) {
@@ -158,7 +160,8 @@ class CardTelemetry extends StatelessWidget {
                         isDismissible: true,
                         builder: (context) => Dismissible(
                             key: UniqueKey(),
-                            child: ListLogsSession(logs: logs)),
+                            child: ListLogs(
+                                id: id, isSession: true, session: session)),
                       ))
             ],
           ),

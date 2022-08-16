@@ -46,7 +46,7 @@ export 'package:app/interfaces/widgets/add_edit_session.dart';
 export 'package:app/interfaces/widgets/card_info.dart';
 export 'package:app/interfaces/widgets/card_session.dart';
 export 'package:app/interfaces/widgets/add_edit_profile.dart';
-export 'package:app/interfaces/widgets/list_logs_session.dart';
+export 'package:app/interfaces/widgets/list_logs.dart';
 export 'package:app/interfaces/widgets/card_log.dart';
 
 ///MODELS

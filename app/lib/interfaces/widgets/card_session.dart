@@ -5,10 +5,12 @@ class CardSession extends StatelessWidget {
   const CardSession(
       {Key? key,
       required this.userData,
+      required this.id,
       required this.session,
       required this.logs})
       : super(key: key);
   final UserData userData;
+  final String id;
   final Session session;
   final List<Log> logs;
 
@@ -103,6 +105,7 @@ class CardSession extends StatelessWidget {
                   context,
                   MaterialPageRoute(
                       builder: (context) => TrackMap(
+                            id: id,
                             session: session,
                             logs: logs,
                           )),

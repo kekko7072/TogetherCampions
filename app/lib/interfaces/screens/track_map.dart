@@ -2,8 +2,10 @@ import 'package:app/services/imports.dart';
 import 'package:flutter/cupertino.dart';
 
 class TrackMap extends StatefulWidget {
-  const TrackMap({Key? key, required this.session, required this.logs})
+  const TrackMap(
+      {Key? key, required this.id, required this.session, required this.logs})
       : super(key: key);
+  final String id;
   final Session session;
   final List<Log> logs;
 
@@ -54,8 +56,9 @@ class TrackMapState extends State<TrackMap> {
           if (telemetry != null) ...[
             SafeArea(
               child: CardTelemetry(
-                logs: widget.logs,
+                id: widget.id,
                 telemetry: telemetry!,
+                session: widget.session,
               ),
             ),
             SafeArea(

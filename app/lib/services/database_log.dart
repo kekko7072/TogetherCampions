@@ -10,6 +10,7 @@ class DatabaseLog {
           .collection('devices')
           .doc(id)
           .collection('logs');
+
   Future delete() async {
     List<Log> allLogs = DatabaseLog.logListFromSnapshot(
         await DatabaseLog(id: id).logCollection.get());
@@ -38,12 +39,25 @@ class DatabaseLog {
             : DateTime.now(),
         battery: snapshot.data()?['battery'].toDouble() ?? 0.0,
         gps: GPS(
-          latLng: LatLng(snapshot.data()?['gps']?['latitude'].toDouble() ?? 0.0,
-              snapshot.data()?['gps']?['longitude'].toDouble() ?? 0.0),
-          altitude: snapshot.data()?['gps']?['altitude'].toDouble() ?? 0.0,
-          speed: snapshot.data()?['gps']?['speed'].toDouble() ?? 0.0,
-          course: snapshot.data()?['gps']?['course'].toDouble() ?? 0.0,
-          satellites: snapshot.data()?['gps']?['satellites'].toInt() ?? 0,
+          latLng: LatLng(
+              '${snapshot.data()?['gps']?['latitude']}' != 'NaN'
+                  ? snapshot.data()?['gps']?['latitude']?.toDouble() ?? 0.0
+                  : 0.0,
+              '${snapshot.data()?['gps']?['longitude']}' != 'NaN'
+                  ? snapshot.data()?['gps']?['longitude']?.toDouble() ?? 0.0
+                  : 0.0),
+          altitude: '${snapshot.data()?['gps']?['altitude']}' != 'NaN'
+              ? snapshot.data()?['gps']?['altitude']?.toDouble() ?? 0.0
+              : 0.0,
+          speed: '${snapshot.data()?['gps']?['speed']}' != 'NaN'
+              ? snapshot.data()?['gps']?['speed']?.toDouble() ?? 0.0
+              : 0.0,
+          course: '${snapshot.data()?['gps']?['course']}' != 'NaN'
+              ? snapshot.data()?['gps']?['course']?.toDouble() ?? 0.0
+              : 0.0,
+          satellites: '${snapshot.data()?['gps']?['satellites']}' != 'NaN'
+              ? snapshot.data()?['gps']?['satellites']?.toInt() ?? 0
+              : 0,
         ));
   }
 
