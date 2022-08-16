@@ -3,28 +3,11 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 
 import 'add_edit_device.dart';
 
-class CardDevice extends StatefulWidget {
+class CardDevice extends StatelessWidget {
   const CardDevice({Key? key, required this.device, required this.uid})
       : super(key: key);
   final Device device;
   final String uid;
-
-  @override
-  State<CardDevice> createState() => _CardDeviceState();
-}
-
-class _CardDeviceState extends State<CardDevice> {
-  DateTime timestamp = DateTime.now();
-  @override
-  void initState() {
-    super.initState();
-    loadTimestampLastLog();
-  }
-
-  void loadTimestampLastLog() async {
-    DateTime value = await DatabaseLog(id: widget.device.id).lastLogTimestamp();
-    setState(() => timestamp = value);
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,8 +19,8 @@ class _CardDeviceState extends State<CardDevice> {
           motion: const ScrollMotion(),
           children: [
             SlidableAction(
-              onPressed: (con) async => await DatabaseDevice()
-                  .delete(id: widget.device.id, uid: widget.uid),
+              onPressed: (con) async =>
+                  await DatabaseDevice().delete(id: device.id, uid: uid),
               backgroundColor: const Color(0xFFFE4A49),
               foregroundColor: Colors.black,
               icon: Icons.delete,
@@ -51,8 +34,8 @@ class _CardDeviceState extends State<CardDevice> {
                 isDismissible: true,
                 builder: (context) => AddEditDevice(
                   isEdit: true,
-                  uid: widget.uid,
-                  device: widget.device,
+                  uid: uid,
+                  device: device,
                 ),
               ),
               backgroundColor: AppStyle.primaryColor,
@@ -81,7 +64,7 @@ class _CardDeviceState extends State<CardDevice> {
                     )),
                     Center(
                       child: Text(
-                        widget.device.name,
+                        device.name,
                         style: Theme.of(context)
                             .textTheme
                             .titleLarge!
@@ -95,7 +78,7 @@ class _CardDeviceState extends State<CardDevice> {
                           'ID',
                           style: Theme.of(context).textTheme.titleSmall,
                         ),
-                        Text(widget.device.id),
+                        Text(device.id),
                       ],
                     ),
                     Row(
@@ -106,7 +89,7 @@ class _CardDeviceState extends State<CardDevice> {
                           style: Theme.of(context).textTheme.titleSmall,
                         ),
                         Text(
-                          '${widget.device.clock}',
+                          '${device.clock}',
                         ),
                       ],
                     ),
@@ -117,7 +100,7 @@ class _CardDeviceState extends State<CardDevice> {
                           'FREQUENZA',
                           style: Theme.of(context).textTheme.titleSmall,
                         ),
-                        Text('${widget.device.frequency} s'),
+                        Text('${device.frequency} s'),
                       ],
                     ),
                     Row(
@@ -128,7 +111,7 @@ class _CardDeviceState extends State<CardDevice> {
                           style: Theme.of(context).textTheme.titleSmall,
                         ),
                         Text(
-                            '${CalculationService.formatTime(seconds: widget.device.clock * widget.device.frequency)}'),
+                            '${CalculationService.formatTime(seconds: device.clock * device.frequency)}'),
                       ],
                     ),
                     Row(
@@ -138,8 +121,15 @@ class _CardDeviceState extends State<CardDevice> {
                           'ULTIMA CONNESSIONE',
                           style: Theme.of(context).textTheme.titleSmall,
                         ),
-                        Text(CalculationService.formatDate(
-                            date: timestamp, seconds: true)),
+                        StreamBuilder<List<Log>>(
+                            stream: DatabaseLog(id: device.id).lastLog,
+                            builder: (context, snapshot) {
+                              return Text(snapshot.hasData
+                                  ? CalculationService.formatDate(
+                                      date: snapshot.data!.first.timestamp,
+                                      seconds: true)
+                                  : '....');
+                            }),
                       ],
                     ),
                   ],
@@ -153,7 +143,7 @@ class _CardDeviceState extends State<CardDevice> {
                   isDismissible: true,
                   builder: (context) => Dismissible(
                       key: UniqueKey(),
-                      child: ListLogs(id: widget.device.id, isSession: false)),
+                      child: ListLogs(id: device.id, isSession: false)),
                 )),
       ),
     );

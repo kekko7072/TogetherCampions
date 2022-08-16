@@ -19,13 +19,6 @@ class DatabaseLog {
     }
   }
 
-  Future<DateTime> lastLogTimestamp() async {
-    List<Log> allLogs = DatabaseLog.logListFromSnapshot(
-        await DatabaseLog(id: id).logCollection.get());
-
-    return allLogs.last.timestamp;
-  }
-
   ///SERIALIZATION
   static Log logFromSnapshot(DocumentSnapshot<Map<String, dynamic>?> snapshot) {
     return Log(
@@ -74,4 +67,7 @@ class DatabaseLog {
 
   Stream<List<Log>> get allLogs =>
       logCollection.snapshots().map(logListFromSnapshot);
+
+  Stream<List<Log>> get lastLog =>
+      logCollection.limitToLast(1).snapshots().map(logListFromSnapshot);
 }
