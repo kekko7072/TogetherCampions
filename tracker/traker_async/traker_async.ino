@@ -14,6 +14,7 @@
 #include <Arduino_MKRGPS.h>
 #include <ArduinoJson.h>
 #include "configuration.h"
+#include "helpers.h"
 
 /*
   Set a new device_id unique for every new device released using https://www.uuidgenerator.net/version1 .
@@ -78,9 +79,6 @@ HttpClient http(gsmClient, server);
 */
 int i = 0;
 int err = 0;
-PinStatus ledStatus = HIGH;
-String input_data = "";
-
 
 
 void setup() {
@@ -95,15 +93,8 @@ void setup() {
     } else {
 
       Serial.println("Not connected");
-      delay(1000);
-
-      int duration = 0;
-      while (duration <= 100) {
-        digitalWrite(LED_BUILTIN, HIGH);
-        delay(100);
-        digitalWrite(LED_BUILTIN, LOW);
-        ++duration;
-      }
+      
+      await_seconds(10);
     }
     Serial.println("Connected");
   }
@@ -171,14 +162,7 @@ void loop() {
       digitalWrite(LED_BUILTIN, LOW);
 
       //AWAIT SYNC FROM FREQUENCY
-      for (int f = 0; f < frequency; f++) {
-
-        Serial.print(".");
-
-        digitalWrite(LED_BUILTIN, ledStatus);
-        delay(1000);
-        ledStatus = ledStatus == HIGH ? LOW : HIGH;
-      }
+      await_seconds(frequency);
 
       //SAVE DATA INTO JSON OBJECT
       digitalWrite(LED_BUILTIN, HIGH);
@@ -193,9 +177,6 @@ void loop() {
       speed[i] = isnan(GPS.speed()) ? 0.0 : GPS.speed();
       course[i] = isnan(GPS.course()) ? 0.0 : GPS.course();
       satellites[i] = isnan(GPS.satellites()) ? 0.0 : GPS.satellites();
-      input_data = input_data + "&timestamp=" + String(timestamp[i]) + "&battery=" + String(battery[i]) + "&latitude=" + String(latitude[i], 7) + "&longitude=" + String(longitude[i], 7) + "&altitude=" + String(altitude[i], 7) + "&speed=" + String(speed[i], 7) + "&course=" + String(course[i], 7) + "&satellites=" + String(satellites[i]);
-
-      Serial.println(input_data);
 
       i++;
     } else {
@@ -205,8 +186,15 @@ void loop() {
       Serial.println("Logs saved: " + String(CLOCK));
       Serial.println();
 
+      String input_data;
+      for (int k = 0; k < CLOCK; k++) {
+        input_data = input_data + "&timestamp=" + String(timestamp[k]) + "&battery=" + String(battery[k]) + "&latitude=" + String(latitude[k], 7) + "&longitude=" + String(longitude[k], 7) + "&altitude=" + String(altitude[k], 7) + "&speed=" + String(speed[k], 7) + "&course=" + String(course[k], 7) + "&satellites=" + String(satellites[k]);
+      }
+      Serial.println(input_data);
+      display_freeram();
+
       //PREPARE DATA TO SEND TO SERVER
-      String content_type = "application/x-www-form-urlencoded";
+      char content_type[] = "application/x-www-form-urlencoded";
       String post_data = "clock=" + String(CLOCK) + "&frequency=" + String(frequency) + input_data;
 
       Serial.println();
@@ -237,13 +225,7 @@ void loop() {
 
       } else {
         Serial.println("Connect failed: " + String(err));
-        ledStatus = HIGH;
-        for (int i = 0; i < 10; i++) {
-          Serial.print(".");
-          digitalWrite(LED_BUILTIN, ledStatus);
-          delay(1000);
-          ledStatus = ledStatus == HIGH ? LOW : HIGH;
-        }
+        await_seconds(10);
       }
       http.stop();
     }

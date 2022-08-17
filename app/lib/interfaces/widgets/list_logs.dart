@@ -29,9 +29,13 @@ class ListLogs extends StatelessWidget {
                             ? DatabaseLog(id: id).sessionLogs(session: session!)
                             : DatabaseLog(id: id).allLogs,
                         builder: (context, snapshot) {
-                          if (!snapshot.hasData) {
+                          if (snapshot.hasError) {
                             return Center(
                               child: Text('No logs: ${snapshot.error}'),
+                            );
+                          } else if (!snapshot.hasData) {
+                            return const Center(
+                              child: CircularProgressIndicator(),
                             );
                           }
                           List<Log> logs = snapshot.data ?? [];

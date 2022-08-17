@@ -69,10 +69,22 @@ class CalculationService {
         distance = newDistance;
       }
     }
+    double zoom = 0.0;
+    if (distance < 10) {
+      if (isPreview) {
+        zoom = 18.5 - 1.6 * distance;
+      } else {
+        zoom = 18.5 - 1.35 * distance;
+      }
+    } else if (distance < 20) {
+      zoom = 12.5;
+    } else if (distance < 30) {
+      zoom = 11.5;
+    } else {
+      zoom = 10.5;
+    }
 
-    return CameraPosition(
-        target: findCenter(start, end),
-        zoom: 18.5 - (isPreview ? (1.6 * distance) : (1.35 * distance)));
+    return CameraPosition(target: findCenter(start, end), zoom: zoom);
   }
 
   static Telemetry telemetry({
