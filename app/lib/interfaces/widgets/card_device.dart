@@ -45,9 +45,10 @@ class _CardDeviceState extends State<CardDevice> {
           if (snapshot.hasData) {
             logs = snapshot.data!;
           }
-          bool connected = DateTime.now().isBefore(logs.last.timestamp.add(
-              Duration(
-                  seconds: widget.device.clock * widget.device.frequency)));
+          bool connected = logs.isNotEmpty
+              ? DateTime.now().isBefore(logs.last.timestamp.add(Duration(
+                  seconds: widget.device.clock * widget.device.frequency)))
+              : false;
 
           return Padding(
             padding: const EdgeInsets.all(5.0),
@@ -297,7 +298,7 @@ class _CardDeviceState extends State<CardDevice> {
                               )),
                         ),
                         const Padding(
-                          padding: EdgeInsets.symmetric(vertical: 5.0),
+                          padding: EdgeInsets.only(top: 5.0),
                           child: Center(
                               child: Image(
                             image: AssetImage('assets/tracker_image.png'),
