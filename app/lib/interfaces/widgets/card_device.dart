@@ -19,8 +19,8 @@ class CardDevice extends StatelessWidget {
           motion: const ScrollMotion(),
           children: [
             SlidableAction(
-              onPressed: (con) async =>
-                  await DatabaseDevice().delete(id: device.id, uid: uid),
+              onPressed: (con) async => await DatabaseDevice()
+                  .delete(id: device.serialNumber, uid: uid),
               backgroundColor: const Color(0xFFFE4A49),
               foregroundColor: Colors.black,
               icon: Icons.delete,
@@ -78,7 +78,7 @@ class CardDevice extends StatelessWidget {
                           'ID',
                           style: Theme.of(context).textTheme.titleSmall,
                         ),
-                        Text(device.id),
+                        Text(device.serialNumber),
                       ],
                     ),
                     Row(
@@ -122,7 +122,8 @@ class CardDevice extends StatelessWidget {
                           style: Theme.of(context).textTheme.titleSmall,
                         ),
                         StreamBuilder<List<Log>>(
-                            stream: DatabaseLog(id: device.id).lastLog,
+                            stream:
+                                DatabaseLog(id: device.serialNumber).lastLog,
                             builder: (context, snapshot) {
                               return Text(snapshot.hasData
                                   ? CalculationService.formatDate(
@@ -143,7 +144,8 @@ class CardDevice extends StatelessWidget {
                   isDismissible: true,
                   builder: (context) => Dismissible(
                       key: UniqueKey(),
-                      child: ListLogs(id: device.id, isSession: false)),
+                      child:
+                          ListLogs(id: device.serialNumber, isSession: false)),
                 )),
       ),
     );

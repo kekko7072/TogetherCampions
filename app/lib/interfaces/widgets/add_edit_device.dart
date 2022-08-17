@@ -21,6 +21,7 @@ class _AddEditDeviceState extends State<AddEditDevice> {
   bool showLoading = false;
 
   TextEditingController id = TextEditingController();
+  TextEditingController model = TextEditingController();
   TextEditingController name = TextEditingController();
   int clock = 6;
   int frequency = 10;
@@ -29,7 +30,7 @@ class _AddEditDeviceState extends State<AddEditDevice> {
   void initState() {
     super.initState();
     if (widget.isEdit && widget.device != null) {
-      id.text = widget.device!.id;
+      id.text = widget.device!.serialNumber;
       name.text = widget.device!.name;
       clock = widget.device!.clock;
       frequency = widget.device!.frequency;
@@ -66,10 +67,22 @@ class _AddEditDeviceState extends State<AddEditDevice> {
                       padding: const EdgeInsets.symmetric(
                           vertical: 5.0, horizontal: 20),
                       child: TextFormField(
+                        controller: model,
+                        textAlign: TextAlign.center,
+                        decoration: AppStyle().kTextFieldDecoration(
+                            icon: Icons.settings,
+                            hintText: 'Enter device model number'),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 5.0, horizontal: 20),
+                      child: TextFormField(
                         controller: id,
                         textAlign: TextAlign.center,
                         decoration: AppStyle().kTextFieldDecoration(
-                            icon: Icons.settings, hintText: 'Enter device id'),
+                            icon: Icons.settings,
+                            hintText: 'Enter device serial number'),
                       ),
                     ),
                   ],
@@ -161,7 +174,8 @@ class _AddEditDeviceState extends State<AddEditDevice> {
                           .create(
                               isEdit: widget.isEdit,
                               device: Device(
-                                id: id.text,
+                                serialNumber: id.text,
+                                modelNumber: model.text,
                                 uid: widget.uid,
                                 name: name.text,
                                 clock: clock,

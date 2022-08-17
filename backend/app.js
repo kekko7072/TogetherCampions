@@ -33,29 +33,38 @@ admin.initializeApp({
 admin.firestore().settings({ ignoreUndefinedProperties: true });
 
 app.get("/settings", async (req, res) => {
-  let id = req.query.id;
+  try {
+    const SERIAL_NUMBER = req.query.serialNumber;
+    const MODEL_NUMBER = req.query.modelNumber;
+    const CLOCK = req.query.clock;
 
-  if (id != null) {
-    var documentSnapshot = await admin
+    const document = await admin
       .firestore()
       .collection("devices")
-      .doc(id)
+      .doc(SERIAL_NUMBER)
       .get();
+    if (document.exists) {
+      await document.ref.update({
+        modelNumber: MODEL_NUMBER,
+        clock: parseInt(CLOCK),
+      });
 
-    const clock = documentSnapshot.data().clock;
-    const frequency = documentSnapshot.data().frequency;
+      const frequency = document.data().frequency;
 
-    res.writeHead(200, { "Content-Type": "application/json" });
-    res.end(`{"clock": ${clock},"frequency": ${frequency}}`);
-  } else {
-    res.writeHesad(400, { "Content-Type": "text/html" });
-    res.end(`Please send an id as query to get results`);
+      res.writeHead(200, { "Content-Type": "application/json" });
+      res.end(`{"frequency": ${frequency}}`);
+    } else {
+      res.sendStatus(404);
+    }
+  } catch (e) {
+    console.log(e);
+    res.sendStatus(400);
   }
 });
 
 app.post("/post", async (req, res) => {
   try {
-    const id = req.query.id;
+    const SERIAL_NUMBER = req.query.serialNumber;
 
     const value = JSON.parse(JSON.stringify(req.body));
     console.log("FREQUENCY: " + value.frequency);
@@ -71,7 +80,7 @@ app.post("/post", async (req, res) => {
       await admin
         .firestore()
         .collection("devices")
-        .doc(id)
+        .doc(SERIAL_NUMBER)
         .collection("logs")
         .doc(`${time}`)
         .set({
@@ -91,44 +100,8 @@ app.post("/post", async (req, res) => {
     res.sendStatus(200);
   } catch (e) {
     console.log(e);
-    res.sendStatus(500);
+    res.sendStatus(400);
   }
-});
-
-app.post("/postJSON", async (req, res) => {
-  const id = req.query.id;
-
-  const val = JSON.parse(JSON.stringify(req.body));
-
-  const jsonData = JSON.parse(val.input);
-
-  for (var i = 0; i < jsonData.data.length ?? 0; i++) {
-    const value = jsonData.data[i];
-    //UNFORTIUNATLY IN TM SIM THE TIMESTAM IS WRONG...
-    //const timestamp = value.timestamp * 1000;
-    const timestamp = Date.now() + i * val.frequency * 1000;
-    //console.log(value);
-    //console.log(timestamp);
-    await admin
-      .firestore()
-      .collection("devices")
-      .doc(id)
-      .collection("logs")
-      .doc(`${timestamp}`)
-      .set({
-        timestamp: Timestamp.fromMillis(timestamp),
-        battery: parseFloat(value.battery),
-        gps: {
-          latitude: parseFloat(value.latitude),
-          longitude: parseFloat(value.longitude),
-          altitude: parseFloat(value.altitude),
-          speed: parseFloat(value.speed),
-          course: value.course != null ? parseFloat(value.course) : null,
-          satellites: parseInt(value.satellites),
-        },
-      });
-  }
-  res.sendStatus(200);
 });
 
 const PORT = parseInt(process.env.PORT) || 8080;

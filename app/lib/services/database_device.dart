@@ -12,8 +12,8 @@ class DatabaseDevice {
       'frequency': device.frequency,
     };
     return isEdit
-        ? await deviceCollection.doc(device.id).update(value)
-        : await deviceCollection.doc(device.id).set(value);
+        ? await deviceCollection.doc(device.serialNumber).update(value)
+        : await deviceCollection.doc(device.serialNumber).set(value);
   }
 
   Future delete({required String id, required String uid}) async {
@@ -50,7 +50,8 @@ class DatabaseDevice {
   static Device deviceFromSnapshot(
       DocumentSnapshot<Map<String, dynamic>> snapshot) {
     return Device(
-      id: snapshot.id,
+      serialNumber: snapshot.id,
+      modelNumber: snapshot.data()?['modelNumber'] ?? '',
       uid: snapshot.data()?['uid'] ?? '',
       name: snapshot.data()?['name'] ?? '',
       clock: snapshot.data()?['clock'] ?? 0,
