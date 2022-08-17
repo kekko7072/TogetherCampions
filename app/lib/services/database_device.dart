@@ -22,27 +22,10 @@ class DatabaseDevice {
     return await deviceCollection.doc(id).delete();
   }
 
-  Future sessionEdit(
-      {required String uid,
-      required Session oldSession,
-      required Session newSession}) async {
-    await deviceCollection.doc(uid).update({
-      'sessions': FieldValue.arrayRemove([
-        {
-          'name': oldSession.name,
-          'start': oldSession.start,
-          'end': oldSession.end,
-        },
-      ]),
-    });
-    return await deviceCollection.doc(uid).update({
-      'sessions': FieldValue.arrayUnion([
-        {
-          'name': newSession.name,
-          'start': newSession.start,
-          'end': newSession.end,
-        },
-      ]),
+  Future editFrequency(
+      {required String serialNumber, required int frequency}) async {
+    return await deviceCollection.doc(serialNumber).update({
+      'frequency': frequency,
     });
   }
 
@@ -50,13 +33,16 @@ class DatabaseDevice {
   static Device deviceFromSnapshot(
       DocumentSnapshot<Map<String, dynamic>> snapshot) {
     return Device(
-      serialNumber: snapshot.id,
-      modelNumber: snapshot.data()?['modelNumber'] ?? '',
-      uid: snapshot.data()?['uid'] ?? '',
-      name: snapshot.data()?['name'] ?? '',
-      clock: snapshot.data()?['clock'] ?? 0,
-      frequency: snapshot.data()?['frequency'] ?? 0,
-    );
+        serialNumber: snapshot.id,
+        modelNumber: snapshot.data()?['modelNumber'] ?? '',
+        uid: snapshot.data()?['uid'] ?? '',
+        name: snapshot.data()?['name'] ?? '',
+        clock: snapshot.data()?['clock'] ?? 0,
+        frequency: snapshot.data()?['frequency'] ?? 0,
+        software: Software(
+          name: snapshot.data()?['software']?['name'] ?? '',
+          version: snapshot.data()?['software']?['version'] ?? '',
+        ));
   }
 
   List<Device> deviceListFromSnapshot(

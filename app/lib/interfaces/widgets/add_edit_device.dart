@@ -174,13 +174,13 @@ class _AddEditDeviceState extends State<AddEditDevice> {
                           .create(
                               isEdit: widget.isEdit,
                               device: Device(
-                                serialNumber: id.text,
-                                modelNumber: model.text,
-                                uid: widget.uid,
-                                name: name.text,
-                                clock: clock,
-                                frequency: frequency,
-                              ))
+                                  serialNumber: id.text,
+                                  modelNumber: model.text,
+                                  uid: widget.uid,
+                                  name: name.text,
+                                  clock: clock,
+                                  frequency: frequency,
+                                  software: Software(name: '', version: '')))
                           .then((value) {
                         setState(() => showLoading = false);
                         Navigator.of(context).pop();

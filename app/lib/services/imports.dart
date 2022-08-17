@@ -31,6 +31,8 @@ export 'package:google_maps_flutter/google_maps_flutter.dart';
 
 ///Design
 export 'package:flutter_svg/flutter_svg.dart';
+export 'package:battery_indicator/battery_indicator.dart';
+export 'package:flutter_easyloading/flutter_easyloading.dart';
 
 ///INTERFACE
 ///##Pages

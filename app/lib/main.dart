@@ -35,6 +35,7 @@ class MyApp extends StatelessWidget {
               primaryColor: AppStyle.primaryColor,
             ),
             home: const AppDirector(),
+            builder: EasyLoading.init(),
           )),
     );
   }

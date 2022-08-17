@@ -5,7 +5,7 @@ void initializationGPRS(GSM gsm, GPRS gprs) {
   bool connected = false;
 
   while (!connected) {
-    if ((gsm.begin(SECRET_PINNUMBER) == GSM_READY) && (gprs.attachGPRS(SECRET_GPRS_APN, SECRET_GPRS_LOGIN, SECRET_GPRS_PASSWORD) == GPRS_READY)) {
+    if ((gsm.begin(SIM_PIN) == GSM_READY) && (gprs.attachGPRS(SIM_APN, SIM_LOGIN, SIM_PASSWORD) == GPRS_READY)) {
       connected = true;
     } else {
 
@@ -27,7 +27,7 @@ int initializationSETTINGS(HttpClient http, int default_value) {
   int frequency = default_value;
 
   Serial.println("Initializing settings...");
-  err = http.get(String(SERVER_SETTINGS) + String(SERIAL_NUMBER) + "&modelNumber=" + String(MODEL_NUMBER) + "&clock=" + String(CLOCK));
+  err = http.get(String(SERVER_SETTINGS) + String(DEVICE_SERIAL_NUMBER) + "&modelNumber=" + String(DEVICE_MODEL_NUMBER) + "&clock=" + String(DEVICE_CLOCK) + "&softwareName" + String(SOFTWARE_NAME) + "&softwareVersion" + String(SOFTWARE_VERSION));
   if (err == 0) {
     Serial.println("Started GET ok");
 
@@ -49,7 +49,7 @@ int initializationSETTINGS(HttpClient http, int default_value) {
         }
 
       } else if (err == 404) {
-        Serial.println("Device " + String(SERIAL_NUMBER) + "not registered in app, please register it on the official app before powring on again");
+        Serial.println("Device " + String(DEVICE_SERIAL_NUMBER) + "not registered in app, please register it on the official app before powring on again");
         PinStatus pinStatus = HIGH;
         //Show led blinking forevere
         while (true) {

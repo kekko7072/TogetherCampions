@@ -38,6 +38,9 @@ app.get("/settings", async (req, res) => {
     const MODEL_NUMBER = req.query.modelNumber;
     const CLOCK = req.query.clock;
 
+    const SOFTWARE_NAME = req.query.softwareName;
+    const SOFTWARE_VERSION = req.query.softwareVersion;
+
     const document = await admin
       .firestore()
       .collection("devices")
@@ -47,6 +50,10 @@ app.get("/settings", async (req, res) => {
       await document.ref.update({
         modelNumber: MODEL_NUMBER,
         clock: parseInt(CLOCK),
+        software: {
+          name: SOFTWARE_NAME,
+          version: SOFTWARE_VERSION,
+        },
       });
 
       const frequency = document.data().frequency;

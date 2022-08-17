@@ -101,7 +101,7 @@ class TrackMapState extends State<TrackMap> {
         infoWindow: InfoWindow(
           title: 'Start',
           snippet: CalculationService.formatDate(
-              date: start.timestamp, seconds: true),
+              date: start.timestamp, year: true, seconds: true),
         ),
       ));
       _markers.add(Marker(
@@ -110,8 +110,8 @@ class TrackMapState extends State<TrackMap> {
         position: end.gps.latLng,
         infoWindow: InfoWindow(
           title: 'End',
-          snippet:
-              CalculationService.formatDate(date: end.timestamp, seconds: true),
+          snippet: CalculationService.formatDate(
+              date: end.timestamp, year: true, seconds: true),
         ),
       ));
 

@@ -54,9 +54,9 @@ class CardInfo extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     Text(CalculationService.formatDate(
-                        date: session.start, seconds: true)),
+                        date: session.start, year: true, seconds: true)),
                     Text(CalculationService.formatDate(
-                        date: session.end, seconds: true)),
+                        date: session.end, year: true, seconds: true)),
                     Text('$battery Volts'),
                   ],
                 ),

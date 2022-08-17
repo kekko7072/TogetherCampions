@@ -6,6 +6,7 @@ class Device {
     required this.name,
     required this.clock,
     required this.frequency,
+    required this.software,
   });
 
   final String serialNumber;
@@ -14,4 +15,14 @@ class Device {
   final String name;
   final int clock;
   final int frequency;
+  final Software software;
+}
+
+class Software {
+  Software({
+    required this.name,
+    required this.version,
+  });
+  final String name;
+  final String version;
 }

@@ -51,8 +51,9 @@ class CalculationService {
     return double.parse(number.toStringAsFixed(decimal));
   }
 
-  static String formatDate({required DateTime date, required bool seconds}) {
-    return '${date.hour < 10 ? '0${date.hour}' : date.hour}:${date.minute < 10 ? '0${date.minute}' : date.minute}${seconds ? ':${date.second < 10 ? '0${date.second}' : date.second}' : ''}   ${date.day}/${date.month}/${date.year}';
+  static String formatDate(
+      {required DateTime date, required bool year, required bool seconds}) {
+    return '${date.hour < 10 ? '0${date.hour}' : date.hour}:${date.minute < 10 ? '0${date.minute}' : date.minute}${seconds ? ':${date.second < 10 ? '0${date.second}' : date.second}' : ''}   ${date.day}/${date.month < 9 ? '0${date.month}' : date.month}${year ? '/${date.year}' : ''}';
   }
 
   static initialCameraPosition(
@@ -173,11 +174,15 @@ class CalculationService {
   }
 
   static formatTime({required int seconds}) {
-    if (seconds < 60) {
+    if (seconds <= 60) {
       return '$seconds s';
     } else {
-      double minutes = seconds / 60;
-      return '$minutes min';
+      Duration time = Duration(seconds: seconds);
+      return '${time.inMinutes} min  ${time.inSeconds - 60 * time.inMinutes} s';
     }
+  }
+
+  static int calculateBatteryPercent({required double volts}) {
+    return (100 * volts ~/ 4.2);
   }
 }

@@ -1,14 +1,3 @@
-/*
-  
-  Operative System
-  
-  Model number: TKR1A1
-  Version:  1.0.0 Beta
-  Description:  This software is designed to solve all the relaiability problems given by the usage of JSON as object in traker_async_JSON.ino,
-                as mentioned in this doc https://arduinojson.org/v6/issues/memory-leak/#why-does-this-happen so are replaced with arrays.
-
-*/
-
 
 #include <ArduinoHttpClient.h>
 #include <MKRGSM.h>
@@ -29,14 +18,14 @@ int frequency = 10;
 /*
   Here are defined all the arrays used to store the datas.
 */
-int timestamp[CLOCK];
-float battery[CLOCK];
-float latitude[CLOCK];
-float longitude[CLOCK];
-float altitude[CLOCK];
-float speed[CLOCK];
-float course[CLOCK];
-int satellites[CLOCK];
+int timestamp[DEVICE_CLOCK];
+float battery[DEVICE_CLOCK];
+float latitude[DEVICE_CLOCK];
+float longitude[DEVICE_CLOCK];
+float altitude[DEVICE_CLOCK];
+float speed[DEVICE_CLOCK];
+float course[DEVICE_CLOCK];
+int satellites[DEVICE_CLOCK];
 
 
 /*
@@ -85,7 +74,7 @@ void loop() {
   */
   while (GPS.available()) {
 
-    if (i < CLOCK) {
+    if (i < DEVICE_CLOCK) {
       digitalWrite(LED_BUILTIN, LOW);
 
       //AWAIT SYNC FROM FREQUENCY
@@ -109,12 +98,12 @@ void loop() {
     } else {
 
       Serial.println();
-      Serial.println("Duration cicle: " + String(CLOCK * frequency) + " s");
-      Serial.println("Logs saved: " + String(CLOCK));
+      Serial.println("Duration cicle: " + String(i * frequency) + " s");
+      Serial.println("Logs saved: " + String(i));
       Serial.println();
 
       String input_data;
-      for (int k = 0; k < CLOCK; k++) {
+      for (int k = 0; k < i; k++) {
         input_data = input_data + "&timestamp=" + String(timestamp[k]) + "&battery=" + String(battery[k]) + "&latitude=" + String(latitude[k], 7) + "&longitude=" + String(longitude[k], 7) + "&altitude=" + String(altitude[k], 7) + "&speed=" + String(speed[k], 7) + "&course=" + String(course[k], 7) + "&satellites=" + String(satellites[k]);
       }
       Serial.println(input_data);
@@ -122,7 +111,7 @@ void loop() {
 
       //PREPARE DATA TO SEND TO SERVER
       char content_type[] = "application/x-www-form-urlencoded";
-      String post_data = "clock=" + String(CLOCK) + "&frequency=" + String(frequency) + input_data;
+      String post_data = "clock=" + String(i) + "&frequency=" + String(frequency) + input_data;
 
       Serial.println();
       Serial.println("Making POST request");
@@ -130,7 +119,7 @@ void loop() {
       Serial.println();
 
       //POST DATA
-      err = http.post(String(SERVER_POST) + String(SERIAL_NUMBER), content_type, post_data);
+      err = http.post(String(SERVER_POST) + String(DEVICE_SERIAL_NUMBER), content_type, post_data);
       if (err == 0) {
         Serial.println("Started POST ok");
         //READ RESPONSE

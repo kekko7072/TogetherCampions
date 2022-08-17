@@ -75,7 +75,7 @@ class CardSession extends StatelessWidget {
                       children: [
                         const Text('Inizio:'),
                         Text(CalculationService.formatDate(
-                            date: session.start, seconds: false)),
+                            date: session.start, year: true, seconds: false)),
                       ],
                     ),
                     Row(
@@ -83,7 +83,7 @@ class CardSession extends StatelessWidget {
                       children: [
                         const Text('Fine:'),
                         Text(CalculationService.formatDate(
-                            date: session.end, seconds: false)),
+                            date: session.end, year: true, seconds: false)),
                       ],
                     ),
                     const SizedBox(height: 5),

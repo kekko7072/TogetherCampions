@@ -21,8 +21,8 @@ class CardLog extends StatelessWidget {
           ),
         ],
       ),
-      title: Text(
-          CalculationService.formatDate(date: log.timestamp, seconds: true)),
+      title: Text(CalculationService.formatDate(
+          date: log.timestamp, year: true, seconds: true)),
       subtitle: Wrap(
         spacing: 10,
         children: [
