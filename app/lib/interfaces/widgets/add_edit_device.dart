@@ -84,35 +84,37 @@ class _AddEditDeviceState extends State<AddEditDevice> {
                           icon: Icons.person, hintText: 'Enter device name'),
                     ),
                   ),
-                  Row(
-                    children: [
-                      Expanded(
-                        flex: 1,
-                        child: CupertinoButton(
-                          onPressed: clock == kClockMin
-                              ? null
-                              : () => setState(() => --clock),
-                          child: const Icon(CupertinoIcons.minus_circle),
+                  if (!widget.isEdit) ...[
+                    Row(
+                      children: [
+                        Expanded(
+                          flex: 1,
+                          child: CupertinoButton(
+                            onPressed: clock == kClockMin
+                                ? null
+                                : () => setState(() => --clock),
+                            child: const Icon(CupertinoIcons.minus_circle),
+                          ),
                         ),
-                      ),
-                      Expanded(
-                        flex: 2,
-                        child: Text(
-                          'Clock: $clock',
-                          textAlign: TextAlign.center,
+                        Expanded(
+                          flex: 2,
+                          child: Text(
+                            'Clock: $clock',
+                            textAlign: TextAlign.center,
+                          ),
                         ),
-                      ),
-                      Expanded(
-                        flex: 1,
-                        child: CupertinoButton(
-                          onPressed: clock == kClockMax
-                              ? null
-                              : () => setState(() => ++clock),
-                          child: const Icon(CupertinoIcons.add_circled),
+                        Expanded(
+                          flex: 1,
+                          child: CupertinoButton(
+                            onPressed: clock == kClockMax
+                                ? null
+                                : () => setState(() => ++clock),
+                            child: const Icon(CupertinoIcons.add_circled),
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
+                      ],
+                    ),
+                  ],
                   Row(
                     children: [
                       Expanded(
@@ -134,8 +136,10 @@ class _AddEditDeviceState extends State<AddEditDevice> {
                       Expanded(
                         flex: 1,
                         child: CupertinoButton(
+                          onPressed: clock == kFrequencyMax
+                              ? null
+                              : () => setState(() => ++frequency),
                           child: const Icon(CupertinoIcons.add_circled),
-                          onPressed: () => setState(() => ++frequency),
                         ),
                       ),
                     ],

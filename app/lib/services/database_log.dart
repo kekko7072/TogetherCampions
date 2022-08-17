@@ -65,8 +65,11 @@ class DatabaseLog {
       .snapshots()
       .map(logListFromSnapshot);
 
-  Stream<List<Log>> get allLogs =>
-      logCollection.snapshots().map(logListFromSnapshot);
+  Stream<List<Log>> get allLogs => logCollection
+      .orderBy('timestamp', descending: false)
+      .limitToLast(100)
+      .snapshots()
+      .map(logListFromSnapshot);
 
   Stream<List<Log>> get lastLog => logCollection
       .orderBy('timestamp', descending: false)

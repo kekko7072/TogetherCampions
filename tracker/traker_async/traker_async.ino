@@ -164,7 +164,7 @@ void loop() {
       //AWAIT SYNC FROM FREQUENCY
       await_seconds(frequency);
 
-      //SAVE DATA INTO JSON OBJECT
+      //SAVE DATA INTO ARRAYS
       digitalWrite(LED_BUILTIN, HIGH);
       Serial.println();
       Serial.println("Saving data at cicle  " + String(i));
