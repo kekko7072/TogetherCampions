@@ -9,13 +9,13 @@
 */
 //SOFTWARE
 /*
-  Software release name
+  Software release name, is used as query so remember to insert no space
 */
-#define SOFTWARE_NAME "Tracker OS"
+#define SOFTWARE_NAME "TrackerOS"
 /*
-  Software version
+  Software version, is used as query so remember to insert no space
 */
-#define SOFTWARE_VERSION "1.0.0 Beta"
+#define SOFTWARE_VERSION "1.0.0"
 
 //DEVICE
 /*

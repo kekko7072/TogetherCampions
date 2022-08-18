@@ -27,7 +27,7 @@ int initializationSETTINGS(HttpClient http, int default_value) {
   int frequency = default_value;
 
   Serial.println("Initializing settings...");
-  err = http.get(String(SERVER_SETTINGS) + String(DEVICE_SERIAL_NUMBER) + "&modelNumber=" + String(DEVICE_MODEL_NUMBER) + "&clock=" + String(DEVICE_CLOCK) + "&softwareName" + String(SOFTWARE_NAME) + "&softwareVersion" + String(SOFTWARE_VERSION));
+  err = http.get(String(SERVER_SETTINGS) + String(DEVICE_SERIAL_NUMBER) + "&modelNumber=" + String(DEVICE_MODEL_NUMBER) + "&clock=" + String(DEVICE_CLOCK) + "&softwareName=" + String(SOFTWARE_NAME) + "&softwareVersion=" + String(SOFTWARE_VERSION));
   if (err == 0) {
     Serial.println("Started GET ok");
 

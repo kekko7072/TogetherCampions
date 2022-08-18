@@ -46,6 +46,7 @@ app.get("/settings", async (req, res) => {
       .collection("devices")
       .doc(SERIAL_NUMBER)
       .get();
+
     if (document.exists) {
       await document.ref.update({
         modelNumber: MODEL_NUMBER,
