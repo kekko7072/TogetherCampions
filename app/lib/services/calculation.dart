@@ -182,7 +182,7 @@ class CalculationService {
     }
   }
 
-  static int calculateBatteryPercent({required double volts}) {
+  static int calculateBatteryPercentage({required double volts}) {
     return (100 * volts ~/ 4.2);
   }
 }

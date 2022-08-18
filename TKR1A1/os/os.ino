@@ -7,6 +7,8 @@
 #include "helpers.h"
 #include "initialization.h"
 
+///TODO add SD support for the data logging.
+//https://docs.arduino.cc/tutorials/mkr-sd-proto-shield/mkr-sd-proto-shield-data-logger
 
 /*
   FREQUENCY: Is the time between each savings of data from GPS in seconds [aproximatly].

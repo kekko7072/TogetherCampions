@@ -129,7 +129,7 @@ class _CardDeviceState extends State<CardDevice> {
                                   BatteryIndicator(
                                     batteryFromPhone: false,
                                     batteryLevel: CalculationService
-                                        .calculateBatteryPercent(
+                                        .calculateBatteryPercentage(
                                             volts: snapshot.data!.last.battery),
                                     style: BatteryIndicatorStyle.skeumorphism,
                                     colorful: true,
@@ -140,7 +140,7 @@ class _CardDeviceState extends State<CardDevice> {
                                   ),
                                   const SizedBox(width: 10),
                                   Text(
-                                    "${CalculationService.calculateBatteryPercent(volts: snapshot.data!.last.battery)} %",
+                                    "${CalculationService.calculateBatteryPercentage(volts: snapshot.data!.last.battery)} %",
                                     style: Theme.of(context)
                                         .textTheme
                                         .titleMedium!
@@ -263,7 +263,7 @@ class _CardDeviceState extends State<CardDevice> {
                                                                         .w500),
                                                       ),
                                                       Text(
-                                                        "1.0.0 Beta    Tracker OS",
+                                                        "${widget.device.software.version}    ${widget.device.software.name}",
                                                         style: Theme.of(context)
                                                             .textTheme
                                                             .titleMedium,
