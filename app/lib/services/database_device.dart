@@ -29,7 +29,24 @@ class DatabaseDevice {
     });
   }
 
+  Future editMode({required String serialNumber, required Mode mode}) async {
+    return await deviceCollection.doc(serialNumber).update({
+      'mode': mode.toString(),
+    });
+  }
+
   ///SERIALIZATION
+  static Mode modeParser(String snapshot) {
+    switch (snapshot) {
+      case 'Mode.cloud':
+        return Mode.cloud;
+      case 'Mode.sdCard':
+        return Mode.sdCard;
+      default:
+        return Mode.cloud;
+    }
+  }
+
   static Device deviceFromSnapshot(
       DocumentSnapshot<Map<String, dynamic>> snapshot) {
     return Device(
@@ -39,6 +56,7 @@ class DatabaseDevice {
         name: snapshot.data()?['name'] ?? '',
         clock: snapshot.data()?['clock'] ?? 0,
         frequency: snapshot.data()?['frequency'] ?? 0,
+        mode: modeParser(snapshot.data()?['mode'] ?? ''),
         software: Software(
           name: snapshot.data()?['software']?['name'] ?? '',
           version: snapshot.data()?['software']?['version'] ?? '',

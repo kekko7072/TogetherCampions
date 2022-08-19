@@ -14,14 +14,14 @@ dependencies:
 
 
   #Server
-  firebase_core: ^1.20.1
-  firebase_auth: ^3.6.3
-  cloud_firestore: ^3.4.4
-  cloud_functions: ^3.3.4
-  firebase_storage: ^10.3.5
-  firebase_app_check: ^0.0.6+19
-  firebase_messaging: ^12.0.2
-  firebase_crashlytics: ^2.8.7
+  firebase_core: ^1.21.0
+  firebase_auth: ^3.6.4
+  cloud_firestore: ^3.4.5
+  cloud_functions: ^3.3.5
+  firebase_storage: ^10.3.6
+  firebase_app_check: ^0.0.6+20
+  firebase_messaging: ^12.0.3
+  firebase_crashlytics: ^2.8.8
 
   #Basic
   intl: ^0.17.0
@@ -36,6 +36,8 @@ dependencies:
   flutter_svg: ^1.1.4
   battery_indicator: ^0.1.1
   flutter_easyloading: ^3.0.5
+  graphic: ^0.10.6
+  compass_icon: ^1.0.4
 
 
 dev_dependencies:

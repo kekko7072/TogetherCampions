@@ -1,4 +1,8 @@
-import 'package:app/services/imports.dart';
+enum TelemetryViewLive {
+  speed,
+  altitude,
+  course,
+}
 
 class Telemetry {
   Telemetry({

@@ -33,14 +33,16 @@ export 'package:google_maps_flutter/google_maps_flutter.dart';
 export 'package:flutter_svg/flutter_svg.dart';
 export 'package:battery_indicator/battery_indicator.dart';
 export 'package:flutter_easyloading/flutter_easyloading.dart';
+export 'package:graphic/graphic.dart';
 
 ///INTERFACE
 ///##Pages
 export 'package:app/interfaces/pages/sessions.dart';
 export 'package:app/interfaces/pages/devices.dart';
+export 'package:app/interfaces/pages/live.dart';
 
 ///##Screens
-export 'package:app/interfaces/screens/track_map.dart';
+export 'package:app/interfaces/screens/session_map.dart';
 
 ///##Widgets
 export 'package:app/interfaces/widgets/card_telemetry.dart';
@@ -50,6 +52,8 @@ export 'package:app/interfaces/widgets/card_session.dart';
 export 'package:app/interfaces/widgets/add_edit_profile.dart';
 export 'package:app/interfaces/widgets/list_logs.dart';
 export 'package:app/interfaces/widgets/card_log.dart';
+export 'package:app/interfaces/widgets/card_device.dart';
+export 'package:app/interfaces/widgets/add_edit_device.dart';
 
 ///MODELS
 export 'package:app/models/device.dart';

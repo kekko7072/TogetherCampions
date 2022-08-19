@@ -2,8 +2,6 @@ import 'package:app/services/imports.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 
-import 'add_edit_device.dart';
-
 class CardDevice extends StatefulWidget {
   const CardDevice({Key? key, required this.device, required this.uid})
       : super(key: key);
@@ -16,24 +14,31 @@ class CardDevice extends StatefulWidget {
 
 class _CardDeviceState extends State<CardDevice> {
   int frequency = 0;
+  Mode mode = Mode.cloud;
   @override
   void initState() {
     super.initState();
     frequency = widget.device.frequency;
+    mode = widget.device.mode;
   }
 
   bool showHelper = false;
   Timer? timer;
 
-  Timer toastHelper(bool connected) =>
+  Timer toastHelper(bool connected, bool isFrequency) =>
       Timer(const Duration(seconds: 3), () async {
-        if (connected) {
-          EasyLoading.showToast(
-              'Ricordati di riavviare ${widget.device.name} per applicare le modifice.',
-              duration: const Duration(seconds: 7));
+        //if (connected) {
+        EasyLoading.showToast(
+            'Ricordati di spegnere e riaccendere ${widget.device.name} per applicare le modifice.',
+            duration: const Duration(seconds: 7));
+        //}
+        if (isFrequency) {
+          await DatabaseDevice().editFrequency(
+              serialNumber: widget.device.serialNumber, frequency: frequency);
+        } else {
+          await DatabaseDevice()
+              .editMode(serialNumber: widget.device.serialNumber, mode: mode);
         }
-        await DatabaseDevice().editFrequency(
-            serialNumber: widget.device.serialNumber, frequency: frequency);
       });
 
   @override
@@ -349,7 +354,7 @@ class _CardDeviceState extends State<CardDevice> {
                                             onPressed:
                                                 frequency == kFrequencyMin
                                                     ? null
-                                                    : () async {
+                                                    : () {
                                                         if (timer != null &&
                                                             timer!.isActive) {
                                                           timer!.cancel();
@@ -357,7 +362,7 @@ class _CardDeviceState extends State<CardDevice> {
                                                         setState(() {
                                                           --frequency;
                                                           timer = toastHelper(
-                                                              connected);
+                                                              connected, true);
                                                         });
                                                       },
                                             child: const Icon(
@@ -377,7 +382,7 @@ class _CardDeviceState extends State<CardDevice> {
                                                         setState(() {
                                                           ++frequency;
                                                           timer = toastHelper(
-                                                              connected);
+                                                              connected, true);
                                                         });
                                                       },
                                             child: const Icon(
@@ -419,6 +424,92 @@ class _CardDeviceState extends State<CardDevice> {
                                               return const Text('Mappa..');
                                             }
                                           }),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            Card(
+                              child: Padding(
+                                padding: const EdgeInsets.all(10.0),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          'Modalità',
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .titleMedium,
+                                        ),
+                                      ],
+                                    ),
+                                    Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Card(
+                                          color: connected && mode == Mode.cloud
+                                              ? CupertinoColors.activeGreen
+                                              : Colors.grey.shade400,
+                                          child: CupertinoButton(
+                                            onPressed: !connected
+                                                ? null
+                                                : () async {
+                                                    if (timer != null &&
+                                                        timer!.isActive) {
+                                                      timer!.cancel();
+                                                    }
+                                                    setState(() {
+                                                      mode = Mode.cloud;
+                                                      timer = toastHelper(
+                                                          connected, false);
+                                                    });
+                                                  },
+                                            child: Text(
+                                              'CLOUD',
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .titleLarge!
+                                                  .copyWith(
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                            ),
+                                          ),
+                                        ),
+                                        Card(
+                                          color:
+                                              connected && mode == Mode.sdCard
+                                                  ? CupertinoColors.systemYellow
+                                                  : Colors.grey.shade400,
+                                          child: CupertinoButton(
+                                            onPressed: !connected
+                                                ? null
+                                                : () {
+                                                    if (timer != null &&
+                                                        timer!.isActive) {
+                                                      timer!.cancel();
+                                                    }
+                                                    setState(() {
+                                                      mode = Mode.sdCard;
+                                                      timer = toastHelper(
+                                                          connected, false);
+                                                    });
+                                                  },
+                                            child: Text(
+                                              'SD CARD',
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .titleLarge!
+                                                  .copyWith(
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                            ),
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ],
                                 ),

@@ -76,4 +76,17 @@ class DatabaseLog {
       .limitToLast(1)
       .snapshots()
       .map(logListFromSnapshot);
+
+  Stream<List<Log>> liveLog({required int addTime}) => logCollection
+      .where('timestamp',
+          isLessThan: Timestamp.fromDate(DateTime.now()),
+          isGreaterThan: Timestamp.fromDate(DateTime(
+            DateTime.now().year,
+            DateTime.now().month,
+            DateTime.now().day,
+            DateTime.now().hour,
+            DateTime.now().minute - addTime,
+          )))
+      .snapshots()
+      .map(logListFromSnapshot);
 }

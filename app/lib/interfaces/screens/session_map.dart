@@ -49,6 +49,7 @@ class TrackMapState extends State<TrackMap> {
             polylines: _polyline,
             markers: _markers,
             onMapCreated: _onMapCreated,
+            zoomControlsEnabled: false,
             mapType: MapType.satellite,
             initialCameraPosition: CalculationService.initialCameraPosition(
                 list: segment, isPreview: false),
@@ -83,7 +84,7 @@ class TrackMapState extends State<TrackMap> {
                 onTap: () => Navigator.of(context).pop(),
               ),
             ),
-          )
+          ),
         ],
       ),
     );

@@ -12,6 +12,7 @@ class MenuState extends State<Menu> {
   int currentPage = 0;
   List<Widget> pages = const [
     Sessions(),
+    Live(),
     Devices(),
   ];
 
@@ -56,6 +57,10 @@ class MenuState extends State<Menu> {
                         ),
                         NavigationRailDestination(
                           icon: Icon(CupertinoIcons.app_badge),
+                          label: Text('Live'),
+                        ),
+                        NavigationRailDestination(
+                          icon: Icon(CupertinoIcons.settings),
                           label: Text('Dispositivi'),
                         ),
                       ],
@@ -83,6 +88,9 @@ class MenuState extends State<Menu> {
                               label: 'Sessioni'),
                           NavigationDestination(
                               icon: Icon(CupertinoIcons.app_badge),
+                              label: 'Live'),
+                          NavigationDestination(
+                              icon: Icon(CupertinoIcons.settings),
                               label: 'Dispositivi'),
                         ]),
                   ),

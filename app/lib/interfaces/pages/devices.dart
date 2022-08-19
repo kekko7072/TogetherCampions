@@ -1,7 +1,4 @@
-import 'package:app/interfaces/widgets/add_edit_device.dart';
 import 'package:app/services/imports.dart';
-
-import '../widgets/card_device.dart';
 
 class Devices extends StatelessWidget {
   const Devices({Key? key}) : super(key: key);
@@ -60,24 +57,14 @@ class Devices extends StatelessWidget {
                 ),
               ),
               child: Card(
+                  margin: EdgeInsets.zero,
                   color: Theme.of(context).primaryColor,
-                  child: Padding(
-                    padding: const EdgeInsets.all(10.0),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: const [
-                        SizedBox(width: 7),
-                        Text(
-                          'Nuovo dispositivo',
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold, color: Colors.black),
-                        ),
-                        SizedBox(width: 5),
-                        Icon(
-                          Icons.add,
-                          color: Colors.black,
-                        ),
-                      ],
+                  child: const Padding(
+                    padding: EdgeInsets.all(10.0),
+                    child: Icon(
+                      Icons.add,
+                      color: Colors.black,
+                      size: 30,
                     ),
                   )),
             ),

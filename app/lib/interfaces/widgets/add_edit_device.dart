@@ -21,7 +21,7 @@ class _AddEditDeviceState extends State<AddEditDevice> {
   bool showLoading = false;
 
   TextEditingController id = TextEditingController();
-  TextEditingController model = TextEditingController();
+  TextEditingController model = TextEditingController(text: 'TKR1A1');
   TextEditingController name = TextEditingController();
   int clock = 6;
   int frequency = 10;
@@ -63,16 +63,23 @@ class _AddEditDeviceState extends State<AddEditDevice> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   if (!widget.isEdit) ...[
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 5.0, horizontal: 20),
-                      child: TextFormField(
-                        controller: model,
-                        textAlign: TextAlign.center,
-                        decoration: AppStyle().kTextFieldDecoration(
-                            icon: Icons.settings,
-                            hintText: 'Enter device model number'),
-                      ),
+                    Wrap(
+                      spacing: 10,
+                      children: [
+                        FilterChip(
+                            backgroundColor: model.text == 'TKR1A1'
+                                ? AppStyle.primaryColor
+                                : Colors.black12,
+                            label: Text(
+                              'TKR1A1',
+                              style: TextStyle(
+                                  fontWeight: model.text == 'TKR1A1'
+                                      ? FontWeight.bold
+                                      : FontWeight.normal),
+                            ),
+                            onSelected: (value) =>
+                                setState(() => model.text = 'TKR1A1')),
+                      ],
                     ),
                     Padding(
                       padding: const EdgeInsets.symmetric(
@@ -180,6 +187,7 @@ class _AddEditDeviceState extends State<AddEditDevice> {
                                   name: name.text,
                                   clock: clock,
                                   frequency: frequency,
+                                  mode: Mode.cloud,
                                   software: Software(name: '', version: '')))
                           .then((value) {
                         setState(() => showLoading = false);

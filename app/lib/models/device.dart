@@ -1,3 +1,5 @@
+enum Mode { cloud, sdCard }
+
 class Device {
   Device({
     required this.serialNumber,
@@ -6,6 +8,7 @@ class Device {
     required this.name,
     required this.clock,
     required this.frequency,
+    required this.mode,
     required this.software,
   });
 
@@ -15,6 +18,7 @@ class Device {
   final String name;
   final int clock;
   final int frequency;
+  final Mode mode;
   final Software software;
 }
 
