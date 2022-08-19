@@ -1,20 +1,23 @@
-
-#include <ArduinoHttpClient.h>
 #include <MKRGSM.h>
+#include <ArduinoHttpClient.h>
+#include <SPI.h>
+#include <SD.h>
 #include <Arduino_MKRGPS.h>
 #include <ArduinoJson.h>
 #include "configuration.h"
-#include "helpers.h"
+#include "general_helper.h"
+#include "cloud_helper.h"
+#include "sdcard_helper.h"
 #include "initialization.h"
 
 ///TODO add SD support for the data logging.
 //https://docs.arduino.cc/tutorials/mkr-sd-proto-shield/mkr-sd-proto-shield-data-logger
 
 /*
-  FREQUENCY: Is the time between each savings of data from GPS in seconds [aproximatly].
+  S: Is the time between each savings of data from GPS in seconds [aproximatly].
     Ex. frequency = 10  Means run 1 clock every 10 seconds
 */
-int frequency = 10;
+Settings settings;
 
 
 /*
@@ -42,7 +45,12 @@ GSMClient gsmClient;
 /*
   HTTP clients used as protocols to connect to the server.
 */
-HttpClient http(gsmClient, SERVER_ADDRESS);
+const HttpClient http(gsmClient, SERVER_ADDRESS);
+
+/*
+  SD CARD chip protocol
+*/
+const int chipSelect = 4;
 
 
 /*
@@ -60,10 +68,15 @@ void setup() {
   initializationGPRS(gsm, gprs);
 
   ///SETTINGS
-  frequency = initializationSETTINGS(http, frequency);
+  settings = initializationSETTINGS(http);
 
   ///GPS
   initializationGPS();
+
+  //SD CARD
+  if (settings.mode == sdCard) {
+    initializationSDCARD(chipSelect);
+  }
 }
 
 void loop() {
@@ -80,7 +93,7 @@ void loop() {
       digitalWrite(LED_BUILTIN, LOW);
 
       //AWAIT SYNC FROM FREQUENCY
-      await_seconds(frequency);
+      await_seconds(settings.frequency);
 
       //SAVE DATA INTO ARRAYS
       digitalWrite(LED_BUILTIN, HIGH);
@@ -100,7 +113,7 @@ void loop() {
     } else {
 
       Serial.println();
-      Serial.println("Duration cicle: " + String(i * frequency) + " s");
+      Serial.println("Duration cicle: " + String(i * settings.frequency) + " s");
       Serial.println("Logs saved: " + String(i));
       Serial.println();
 
@@ -111,41 +124,26 @@ void loop() {
       Serial.println(input_data);
       display_freeram();
 
-      //PREPARE DATA TO SEND TO SERVER
-      char content_type[] = "application/x-www-form-urlencoded";
-      String post_data = "clock=" + String(i) + "&frequency=" + String(frequency) + input_data;
-
-      Serial.println();
-      Serial.println("Making POST request");
-      Serial.println(post_data);
-      Serial.println();
-
-      //POST DATA
-      err = http.post(String(SERVER_POST) + String(DEVICE_SERIAL_NUMBER), content_type, post_data);
-      if (err == 0) {
-        Serial.println("Started POST ok");
-        //READ RESPONSE
-        int status_code = http.responseStatusCode();
-        String response = http.responseBody();
-
-        Serial.println();
-        Serial.println("Status code: " + String(status_code));
-        Serial.println("Response: " + String(response));
-        Serial.println();
-
-        if (status_code == 200) {
-          Serial.println("Data send sucessfully");
-          i = 0;
-          input_data = "";
-        } else {
-          Serial.println("Getting response failed: " + String(err));
-        }
-
-      } else {
-        Serial.println("Connect failed: " + String(err));
-        await_seconds(10);
+      switch (settings.mode) {
+        case cloud:
+          {
+            if (cloud_save(http, settings, input_data)) {
+              i = 0;
+              input_data = "";
+            } else {
+              Serial.print("Cloud save Returned false");
+            }
+          }
+        case sdCard:
+          {
+            if (sdcard_save(input_data)) {
+              i = 0;
+              input_data = "";
+            } else {
+              Serial.print("SD card helper returned false");
+            }
+          }
       }
-      http.stop();
     }
   }
 }

@@ -17,14 +17,19 @@ void initializationGPRS(GSM gsm, GPRS gprs) {
   }
 }
 
+
 /* 
   GET settings from server
 */
-int initializationSETTINGS(HttpClient http, int default_value) {
+struct Settings initializationSETTINGS(HttpClient http) {
 
   StaticJsonDocument<64> doc_settings;
   int err = 0;
-  int frequency = default_value;
+  struct Settings set;
+
+  //Set default value
+  set.mode = cloud;
+  set.frequency = 10;
 
   Serial.println("Initializing settings...");
   err = http.get(String(SERVER_SETTINGS) + String(DEVICE_SERIAL_NUMBER) + "&modelNumber=" + String(DEVICE_MODEL_NUMBER) + "&clock=" + String(DEVICE_CLOCK) + "&softwareName=" + String(SOFTWARE_NAME) + "&softwareVersion=" + String(SOFTWARE_VERSION));
@@ -45,7 +50,8 @@ int initializationSETTINGS(HttpClient http, int default_value) {
           Serial.print("deserializeJson() failed: ");
           Serial.println(error.c_str());
         } else {
-          frequency = doc_settings["frequency"];
+          set.mode = mode_serializer(doc_settings["mode"]);
+          set.frequency = doc_settings["frequency"];
         }
 
       } else if (err == 404) {
@@ -67,7 +73,7 @@ int initializationSETTINGS(HttpClient http, int default_value) {
   }
   doc_settings.clear();
   http.stop();
-  return frequency;
+  return set;
 }
 
 /* 
@@ -81,6 +87,21 @@ void initializationGPS() {
     Serial.println("Failed to initialize GPS!");
     while (1)
       ;
+  }
+  Serial.print("OK");
+  Serial.println();
+}
+
+/* 
+  SD CARD 
+*/
+
+void initializationSDCARD(int chipSelect) {
+  Serial.print("Intializing  SD CARD:  ");
+
+  // see if the card is present and can be initialized:
+  if (!SD.begin(chipSelect)) {
+    Serial.println("Card failed, or not present");
   }
   Serial.print("OK");
   Serial.println();

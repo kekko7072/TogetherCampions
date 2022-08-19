@@ -2,6 +2,30 @@
   This file is for the helpers of the code
 */
 
+//Mode
+enum Mode {
+  unknown,
+  cloud,
+  sdCard
+};
+
+Mode mode_serializer(String value) {
+  if (value == "Mode.cloud") {
+    return cloud;
+  } else if (value == "Mode.sdCard") {
+    return sdCard;
+  } else {
+    return unknown;
+  }
+}
+
+//Settings
+struct Settings {
+  Mode mode;
+  int frequency;
+};
+
+
 //Await some seconds
 void await_seconds(int frequency) {
   PinStatus ledStatus = HIGH;
@@ -12,6 +36,7 @@ void await_seconds(int frequency) {
     ledStatus = ledStatus == HIGH ? LOW : HIGH;
   }
 }
+
 
 //Print available ram memory https://docs.arduino.cc/learn/programming/memory-guide#flash-memory-measurement
 extern "C" char* sbrk(int incr);

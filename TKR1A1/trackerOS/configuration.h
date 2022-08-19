@@ -2,7 +2,7 @@
   
   Tracker Operative System [Tracker OS]
   
-  Version:  1.0.0 Beta
+  Version:  1.0.0
   Description:  This software is designed to solve all the relaiability problems given by the usage of JSON as object in traker_async_JSON.ino,
                 as mentioned in this doc https://arduinojson.org/v6/issues/memory-leak/#why-does-this-happen so are replaced with arrays.
 
@@ -11,7 +11,7 @@
 /*
   Software release name, is used as query so remember to insert no space
 */
-#define SOFTWARE_NAME "TrackerOS"
+#define SOFTWARE_NAME "trackerOS"
 /*
   Software version, is used as query so remember to insert no space
 */
@@ -38,7 +38,7 @@
 /* 
   Sim parameters for connction of GPRS service
 */
-#define SIM_PIN "1503"  //1503
+#define SIM_PIN "1503"   //1503
 #define SIM_APN "TM"     // internet.it
 #define SIM_LOGIN ""     // replace with your GPRS login
 #define SIM_PASSWORD ""  // replace with your GPRS password

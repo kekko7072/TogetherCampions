@@ -57,10 +57,11 @@ app.get("/settings", async (req, res) => {
         },
       });
 
+      const mode = document.data().mode;
       const frequency = document.data().frequency;
 
       res.writeHead(200, { "Content-Type": "application/json" });
-      res.end(`{"frequency": ${frequency}}`);
+      res.end(`{"mode": "${mode}","frequency": ${frequency}}`);
     } else {
       res.sendStatus(404);
     }
