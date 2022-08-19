@@ -1,8 +1,8 @@
 import 'package:app/services/imports.dart';
 import 'package:flutter/cupertino.dart';
 
-class TrackMap extends StatefulWidget {
-  const TrackMap(
+class SessionMap extends StatefulWidget {
+  const SessionMap(
       {Key? key, required this.id, required this.session, required this.logs})
       : super(key: key);
   final String id;
@@ -10,10 +10,10 @@ class TrackMap extends StatefulWidget {
   final List<Log> logs;
 
   @override
-  State<TrackMap> createState() => TrackMapState();
+  State<SessionMap> createState() => SessionMapState();
 }
 
-class TrackMapState extends State<TrackMap> {
+class SessionMapState extends State<SessionMap> {
   late GoogleMapController controller;
   final Set<Marker> _markers = {};
   final Set<Polyline> _polyline = {};

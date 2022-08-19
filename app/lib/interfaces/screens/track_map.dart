@@ -1,16 +1,16 @@
 import 'package:app/services/imports.dart';
 
-class LiveMap extends StatefulWidget {
-  const LiveMap({Key? key, required this.id, required this.logs})
+class TrackMap extends StatefulWidget {
+  const TrackMap({Key? key, required this.id, required this.logs})
       : super(key: key);
   final String id;
   final List<Log> logs;
 
   @override
-  State<LiveMap> createState() => LiveMapState();
+  State<TrackMap> createState() => TrackMapState();
 }
 
-class LiveMapState extends State<LiveMap> {
+class TrackMapState extends State<TrackMap> {
   late GoogleMapController controller;
   final Set<Marker> _markers = {};
   final Set<Polyline> _polyline = {};
@@ -19,8 +19,6 @@ class LiveMapState extends State<LiveMap> {
   late Log end;
 
   List<LatLng> segment = [];
-
-  Telemetry? telemetry;
 
   TelemetryViewLive telemetryViewLive = TelemetryViewLive.speed;
 
@@ -33,9 +31,6 @@ class LiveMapState extends State<LiveMap> {
     for (Log log in widget.logs) {
       segment.add(log.gps.latLng);
     }
-
-    telemetry =
-        CalculationService.telemetry(logs: widget.logs, segment: segment);
   }
 
   @override
@@ -46,6 +41,7 @@ class LiveMapState extends State<LiveMap> {
           polylines: _polyline,
           markers: _markers,
           onMapCreated: _onMapCreated,
+          zoomControlsEnabled: false,
           mapType: MapType.satellite,
           initialCameraPosition: CalculationService.initialCameraPosition(
               list: segment, isPreview: false),
@@ -61,7 +57,7 @@ class LiveMapState extends State<LiveMap> {
                       topRight: Radius.circular(30))),
               child: Padding(
                 padding:
-                    const EdgeInsets.symmetric(horizontal: 15.0, vertical: 5),
+                    const EdgeInsets.symmetric(horizontal: 20.0, vertical: 5),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -190,8 +186,7 @@ class LiveMapState extends State<LiveMap> {
                             'timestamp': Variable(
                               accessor: (Log log) => log.timestamp,
                               scale: TimeScale(
-                                  formatter: (date) =>
-                                      '${date.hour}:${date.minute < 9 ? '0${date.minute}' : date.minute}'),
+                                  formatter: (date) => ''), //Show nothing
                             ),
                             'course': Variable(
                                 accessor: (Log log) => log.gps.course,

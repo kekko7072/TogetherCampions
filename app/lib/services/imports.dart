@@ -39,10 +39,11 @@ export 'package:graphic/graphic.dart';
 ///##Pages
 export 'package:app/interfaces/pages/sessions.dart';
 export 'package:app/interfaces/pages/devices.dart';
-export 'package:app/interfaces/pages/live.dart';
+export 'package:app/interfaces/pages/track.dart';
 
 ///##Screens
 export 'package:app/interfaces/screens/session_map.dart';
+export 'package:app/interfaces/screens/track_map.dart';
 
 ///##Widgets
 export 'package:app/interfaces/widgets/card_telemetry.dart';

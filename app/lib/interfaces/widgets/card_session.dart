@@ -103,7 +103,7 @@ class CardSession extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => TrackMap(
+                      builder: (context) => SessionMap(
                             id: id,
                             session: session,
                             logs: logs,

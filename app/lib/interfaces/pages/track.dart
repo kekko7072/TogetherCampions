@@ -1,16 +1,13 @@
 import 'package:app/services/imports.dart';
-import 'package:flutter/cupertino.dart';
 
-import '../screens/live_map.dart';
-
-class Live extends StatefulWidget {
-  const Live({Key? key}) : super(key: key);
+class Track extends StatefulWidget {
+  const Track({Key? key}) : super(key: key);
 
   @override
-  State<Live> createState() => _LiveState();
+  State<Track> createState() => _TrackState();
 }
 
-class _LiveState extends State<Live> {
+class _TrackState extends State<Track> {
   int time = 10;
   @override
   Widget build(BuildContext context) {
@@ -30,7 +27,7 @@ class _LiveState extends State<Live> {
 
                   return Stack(
                     children: [
-                      LiveMap(
+                      TrackMap(
                         id: userData.devices.first,
                         logs: data,
                       ),
