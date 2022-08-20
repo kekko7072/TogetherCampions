@@ -53,7 +53,7 @@ bool cloud_register_device(HttpClient http, Settings settings, bool sdCard_avail
   char content_type[] = "application/x-www-form-urlencoded";
   String sdCardAvailable = sdCard_available ? "true" : "false";
   String post_data = "modelNumber=" + String(DEVICE_MODEL_NUMBER) + "&clock=" + String(DEVICE_CLOCK) + "&frequency=" + String(settings.frequency)
-                     + "&sdCardAvailable=" + sdCardAvailable + "&mode=Mode." + String(settings.mode) + "&softwareName=" + String(SOFTWARE_NAME)
+                     + "&sdCardAvailable=" + sdCardAvailable + "&mode=" + mode_deserializer(settings.mode) + "&softwareName=" + String(SOFTWARE_NAME)
                      + "&softwareVersion=" + String(SOFTWARE_VERSION);
 
   Serial.println();
@@ -65,7 +65,7 @@ bool cloud_register_device(HttpClient http, Settings settings, bool sdCard_avail
   int err = http.post(String(SERVER_INITIALIZE) + String(DEVICE_SERIAL_NUMBER), content_type, post_data);
   if (err == 0) {
     Serial.println("Started POST ok");
-    
+
     //READ RESPONSE
     int status_code = http.responseStatusCode();
     String response = http.responseBody();
