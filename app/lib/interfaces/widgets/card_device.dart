@@ -523,14 +523,15 @@ class _CardDeviceState extends State<CardDevice> {
                                                         .textTheme
                                                         .titleLarge!
                                                         .copyWith(
-                                                            fontWeight:
-                                                                FontWeight.bold,
-                                                            color:
-                                                                Colors.white),
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                        ),
                                                   )
                                                 : const Text(
                                                     'inserisci\nSD CARD',
                                                     textAlign: TextAlign.center,
+                                                    style: TextStyle(
+                                                        color: Colors.white60),
                                                   ),
                                           ),
                                         ),

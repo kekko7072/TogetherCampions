@@ -67,16 +67,14 @@ void setup() {
   ///GPRS
   initializationGPRS(gsm, gprs);
 
+  //SD CARD
+  bool sdCard_available = initializationSDCARD(chipSelect);
+
   ///SETTINGS
-  settings = initializationSETTINGS(http);
+  settings = initializationSETTINGS(http, sdCard_available);
 
   ///GPS
   initializationGPS();
-
-  //SD CARD
-  if (settings.mode == sdCard) {
-    initializationSDCARD(chipSelect);
-  }
 }
 
 void loop() {

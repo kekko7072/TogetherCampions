@@ -1,3 +1,8 @@
+/*
+  Function to save data on SD CARD, returns:
+    true: data saved successfully
+    false: data not saved
+*/
 bool sdcard_save(String input_data) {
   // Open the file. 
   //  note that only one file can be open at a time,  so you have to close this one before opening another.

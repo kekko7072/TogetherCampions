@@ -55,19 +55,21 @@ class _TrackState extends State<Track> {
 
                       List<Log> data = snapshot.data!;
                       if (data.isEmpty) {
-                        return Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            const Icon(
-                              CupertinoIcons.loop,
-                              size: 200,
-                            ),
-                            Text(
-                              'Disositivo non connesso.',
-                              style: Theme.of(context).textTheme.titleLarge,
-                              textAlign: TextAlign.center,
-                            ),
-                          ],
+                        return Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              const Icon(
+                                CupertinoIcons.loop,
+                                size: 200,
+                              ),
+                              Text(
+                                'Dispositivo non connesso.',
+                                style: Theme.of(context).textTheme.titleLarge,
+                                textAlign: TextAlign.center,
+                              ),
+                            ],
+                          ),
                         );
                       } else {
                         return Stack(

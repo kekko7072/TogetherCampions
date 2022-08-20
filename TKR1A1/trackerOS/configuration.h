@@ -27,7 +27,7 @@
   Set a new device_id unique for every new device released using AAAA0000AAAA scheme (URL ENDPOINT TO GENERATE).
   The SERIAL_NUMBER should be printed and given to the user to configure the device for his account.
 */
-#define DEVICE_SERIAL_NUMBER "RA207twQF5LawcErH8j"
+#define DEVICE_SERIAL_NUMBER "AAAA0000AAAA"
 
 /*
   CLOCK: Is the time the code run in loop fetching data from GPS to SERVER [aproximatly]. 
@@ -53,4 +53,5 @@
 */
 #define SERVER_ADDRESS "together-champions.ew.r.appspot.com"
 #define SERVER_SETTINGS "/settings?serialNumber="
+#define SERVER_INITIALIZE "/initialize?serialNumber="
 #define SERVER_POST "/post?serialNumber="

@@ -21,7 +21,7 @@ void initializationGPRS(GSM gsm, GPRS gprs) {
 /* 
   GET settings from server
 */
-struct Settings initializationSETTINGS(HttpClient http) {
+struct Settings initializationSETTINGS(HttpClient http, bool sdCard_available) {
 
   StaticJsonDocument<64> doc_settings;
   int err = 0;
@@ -32,7 +32,10 @@ struct Settings initializationSETTINGS(HttpClient http) {
   set.frequency = 10;
 
   Serial.println("Initializing settings...");
-  err = http.get(String(SERVER_SETTINGS) + String(DEVICE_SERIAL_NUMBER) + "&modelNumber=" + String(DEVICE_MODEL_NUMBER) + "&clock=" + String(DEVICE_CLOCK) + "&softwareName=" + String(SOFTWARE_NAME) + "&softwareVersion=" + String(SOFTWARE_VERSION));
+  String sdCardAvailable = sdCard_available ? "true" : "false";
+  err = http.get(String(SERVER_SETTINGS) + String(DEVICE_SERIAL_NUMBER) + "&modelNumber=" + String(DEVICE_MODEL_NUMBER)
+                 + "&clock=" + String(DEVICE_CLOCK) + "&sdCardAvailable=" + sdCardAvailable + "&softwareName=" + String(SOFTWARE_NAME)
+                 + "&softwareVersion=" + String(SOFTWARE_VERSION));
   if (err == 0) {
     Serial.println("Started GET ok");
 
@@ -55,13 +58,16 @@ struct Settings initializationSETTINGS(HttpClient http) {
         }
 
       } else if (err == 404) {
-        Serial.println("Device " + String(DEVICE_SERIAL_NUMBER) + "not registered in app, please register it on the official app before powring on again");
-        PinStatus pinStatus = HIGH;
-        //Show led blinking forevere
-        while (true) {
-          digitalWrite(LED_BUILTIN, pinStatus);
-          delay(500);
-          pinStatus = pinStatus == HIGH ? LOW : HIGH;
+        Serial.println("Device " + String(DEVICE_SERIAL_NUMBER) + " not registered, registering first time now.");
+
+        if (!cloud_register_device(http, set, sdCard_available)) {
+          PinStatus pinStatus = HIGH;
+          //Show led blinking forevere
+          while (true) {
+            digitalWrite(LED_BUILTIN, pinStatus);
+            delay(500);
+            pinStatus = pinStatus == HIGH ? LOW : HIGH;
+          }
         }
       }
     } else {
@@ -96,13 +102,15 @@ void initializationGPS() {
   SD CARD 
 */
 
-void initializationSDCARD(int chipSelect) {
+bool initializationSDCARD(int chipSelect) {
   Serial.print("Intializing  SD CARD:  ");
 
-  // see if the card is present and can be initialized:
   if (!SD.begin(chipSelect)) {
     Serial.println("Card failed, or not present");
+    return false;
+  } else {
+    Serial.print("OK");
+    Serial.println();
+    return true;
   }
-  Serial.print("OK");
-  Serial.println();
 }
