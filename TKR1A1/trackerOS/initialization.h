@@ -8,10 +8,7 @@ void initializationGPRS(GSM gsm, GPRS gprs) {
     if ((gsm.begin(SIM_PIN) == GSM_READY) && (gprs.attachGPRS(SIM_APN, SIM_LOGIN, SIM_PASSWORD) == GPRS_READY)) {
       connected = true;
     } else {
-
       Serial.println("Not connected");
-
-      await_seconds(10);
     }
     Serial.println("Connected");
   }

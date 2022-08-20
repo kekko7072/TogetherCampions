@@ -38,8 +38,8 @@
 /* 
   Sim parameters for connction of GPRS service
 */
-#define SIM_PIN "1503"   //1503
-#define SIM_APN "TM"     // internet.it
+#define SIM_PIN ""   //[WIND] "" || [THINGS MOBILE] 1503 
+#define SIM_APN "internet.it"     // [WIND] internet.it || [THINGS MOBILE] TM
 #define SIM_LOGIN ""     // replace with your GPRS login
 #define SIM_PASSWORD ""  // replace with your GPRS password
 

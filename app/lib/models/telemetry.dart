@@ -8,12 +8,14 @@ class Telemetry {
   Telemetry({
     required this.speed,
     required this.altitude,
+    required this.course,
     required this.distance,
     required this.battery,
   });
 
   final Range speed;
   final Range altitude;
+  final Range course;
   final double distance;
   final Battery battery;
 }

@@ -20,7 +20,8 @@ class TrackMapState extends State<TrackMap> {
 
   List<LatLng> segment = [];
 
-  TelemetryViewLive telemetryViewLive = TelemetryViewLive.speed;
+  TelemetryViewLive telemetryViewRange = TelemetryViewLive.speed;
+  TelemetryViewLive telemetryViewCharts = TelemetryViewLive.speed;
 
   @override
   void initState() {
@@ -35,6 +36,8 @@ class TrackMapState extends State<TrackMap> {
 
   @override
   Widget build(BuildContext context) {
+    Telemetry telemetry =
+        CalculationService.telemetry(logs: widget.logs, segment: segment);
     return Stack(
       children: [
         GoogleMap(
@@ -45,6 +48,115 @@ class TrackMapState extends State<TrackMap> {
           mapType: MapType.satellite,
           initialCameraPosition: CalculationService.initialCameraPosition(
               list: segment, isPreview: false),
+        ),
+        SafeArea(
+          child: Align(
+            alignment: Alignment.topLeft,
+            child: Container(
+              decoration: const BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.only(
+                      bottomLeft: Radius.circular(30),
+                      bottomRight: Radius.circular(30))),
+              child: Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        FilterChip(
+                            backgroundColor:
+                                telemetryViewRange == TelemetryViewLive.speed
+                                    ? AppStyle.primaryColor
+                                    : Colors.black12,
+                            label: Text(
+                              'Speed',
+                              style: TextStyle(
+                                  fontWeight: telemetryViewRange ==
+                                          TelemetryViewLive.speed
+                                      ? FontWeight.bold
+                                      : FontWeight.normal),
+                            ),
+                            onSelected: (value) => setState(() =>
+                                telemetryViewRange = TelemetryViewLive.speed)),
+                        FilterChip(
+                            backgroundColor:
+                                telemetryViewRange == TelemetryViewLive.altitude
+                                    ? AppStyle.primaryColor
+                                    : Colors.black12,
+                            label: Text(
+                              'Altitude',
+                              style: TextStyle(
+                                  fontWeight: telemetryViewRange ==
+                                          TelemetryViewLive.altitude
+                                      ? FontWeight.bold
+                                      : FontWeight.normal),
+                            ),
+                            onSelected: (value) => setState(() =>
+                                telemetryViewRange =
+                                    TelemetryViewLive.altitude)),
+                        FilterChip(
+                            backgroundColor:
+                                telemetryViewRange == TelemetryViewLive.course
+                                    ? AppStyle.primaryColor
+                                    : Colors.black12,
+                            label: Text(
+                              'Course',
+                              style: TextStyle(
+                                  fontWeight: telemetryViewRange ==
+                                          TelemetryViewLive.course
+                                      ? FontWeight.bold
+                                      : FontWeight.normal),
+                            ),
+                            onSelected: (value) => setState(() =>
+                                telemetryViewRange = TelemetryViewLive.course)),
+                      ],
+                    ),
+                    const SizedBox(width: 10),
+                    if (telemetryViewRange == TelemetryViewLive.speed) ...[
+                      SizedBox(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text('Medium: ${telemetry.speed.medium}'),
+                            Text('Max: ${telemetry.speed.max}'),
+                            Text('Min: ${telemetry.speed.min}'),
+                          ],
+                        ),
+                      ),
+                    ] else if (telemetryViewRange ==
+                        TelemetryViewLive.altitude) ...[
+                      SizedBox(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text('Medium: ${telemetry.altitude.medium}'),
+                            Text('Max: ${telemetry.altitude.max}'),
+                            Text('Min: ${telemetry.altitude.min}'),
+                          ],
+                        ),
+                      ),
+                    ] else if (telemetryViewRange ==
+                        TelemetryViewLive.course) ...[
+                      SizedBox(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text('Medium: ${telemetry.course.medium}'),
+                            Text('Max: ${telemetry.course.max}'),
+                            Text('Min: ${telemetry.course.min}'),
+                          ],
+                        ),
+                      ),
+                    ]
+                  ],
+                ),
+              ),
+            ),
+          ),
         ),
         SafeArea(
           child: Align(
@@ -66,53 +178,54 @@ class TrackMapState extends State<TrackMap> {
                       children: [
                         FilterChip(
                             backgroundColor:
-                                telemetryViewLive == TelemetryViewLive.speed
+                                telemetryViewCharts == TelemetryViewLive.speed
                                     ? AppStyle.primaryColor
                                     : Colors.black12,
                             label: Text(
                               'Speed',
                               style: TextStyle(
-                                  fontWeight: telemetryViewLive ==
+                                  fontWeight: telemetryViewCharts ==
                                           TelemetryViewLive.speed
                                       ? FontWeight.bold
                                       : FontWeight.normal),
                             ),
                             onSelected: (value) => setState(() =>
-                                telemetryViewLive = TelemetryViewLive.speed)),
+                                telemetryViewCharts = TelemetryViewLive.speed)),
                         FilterChip(
-                            backgroundColor:
-                                telemetryViewLive == TelemetryViewLive.altitude
-                                    ? AppStyle.primaryColor
-                                    : Colors.black12,
+                            backgroundColor: telemetryViewCharts ==
+                                    TelemetryViewLive.altitude
+                                ? AppStyle.primaryColor
+                                : Colors.black12,
                             label: Text(
                               'Altitude',
                               style: TextStyle(
-                                  fontWeight: telemetryViewLive ==
+                                  fontWeight: telemetryViewCharts ==
                                           TelemetryViewLive.altitude
                                       ? FontWeight.bold
                                       : FontWeight.normal),
                             ),
                             onSelected: (value) => setState(() =>
-                                telemetryViewLive =
+                                telemetryViewCharts =
                                     TelemetryViewLive.altitude)),
                         FilterChip(
                             backgroundColor:
-                                telemetryViewLive == TelemetryViewLive.course
+                                telemetryViewCharts == TelemetryViewLive.course
                                     ? AppStyle.primaryColor
                                     : Colors.black12,
                             label: Text(
                               'Course',
                               style: TextStyle(
-                                  fontWeight: telemetryViewLive ==
+                                  fontWeight: telemetryViewCharts ==
                                           TelemetryViewLive.course
                                       ? FontWeight.bold
                                       : FontWeight.normal),
                             ),
                             onSelected: (value) => setState(() =>
-                                telemetryViewLive = TelemetryViewLive.course)),
+                                telemetryViewCharts =
+                                    TelemetryViewLive.course)),
                       ],
                     ),
-                    if (telemetryViewLive == TelemetryViewLive.speed) ...[
+                    if (telemetryViewCharts == TelemetryViewLive.speed) ...[
                       SizedBox(
                         height: MediaQuery.of(context).size.height / 4,
                         width: MediaQuery.of(context).size.width,
@@ -125,7 +238,7 @@ class TrackMapState extends State<TrackMap> {
                               accessor: (Log log) => log.timestamp,
                               scale: TimeScale(
                                   formatter: (date) =>
-                                      '${date.hour}:${date.minute < 9 ? '0${date.minute}' : date.minute}:${date.second < 9 ? '0${date.second}' : date.second}'),
+                                      '${date.hour}:${date.minute < 10 ? '0${date.minute}' : date.minute}:${date.second < 10 ? '0${date.second}' : date.second}'),
                             ),
                             'speed': Variable(
                                 accessor: (Log log) => log.gps.speed,
@@ -142,7 +255,7 @@ class TrackMapState extends State<TrackMap> {
                           ],
                         ),
                       ),
-                    ] else if (telemetryViewLive ==
+                    ] else if (telemetryViewCharts ==
                         TelemetryViewLive.altitude) ...[
                       SizedBox(
                         height: MediaQuery.of(context).size.height / 4,
@@ -156,7 +269,7 @@ class TrackMapState extends State<TrackMap> {
                               accessor: (Log log) => log.timestamp,
                               scale: TimeScale(
                                   formatter: (date) =>
-                                      '${date.hour}:${date.minute < 9 ? '0${date.minute}' : date.minute}:${date.second < 9 ? '0${date.second}' : date.second}'),
+                                      '${date.hour}:${date.minute < 10 ? '0${date.minute}' : date.minute}:${date.second < 10 ? '0${date.second}' : date.second}'),
                             ),
                             'altitude': Variable(
                                 accessor: (Log log) => log.gps.altitude,
@@ -173,7 +286,7 @@ class TrackMapState extends State<TrackMap> {
                           ],
                         ),
                       ),
-                    ] else if (telemetryViewLive ==
+                    ] else if (telemetryViewCharts ==
                         TelemetryViewLive.course) ...[
                       SizedBox(
                         height: MediaQuery.of(context).size.height / 4,

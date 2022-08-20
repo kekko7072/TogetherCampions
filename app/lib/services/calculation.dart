@@ -100,11 +100,15 @@ class CalculationService {
     double altitudeMax = 0;
     double altitudeMin = 10000;
 
+    double courseMedium = 0;
+    double courseMax = 0;
+    double courseMin = 10000;
+
     double batteryMax = 0;
     double batteryMin = 10000;
 
     for (Log log in logs) {
-      //Speed
+      ///Speed
       speedMedium = speedMedium + log.gps.speed;
 
       if (speedMax < log.gps.speed) {
@@ -117,7 +121,7 @@ class CalculationService {
             CalculationService.roundDouble(number: log.gps.speed, decimal: 3);
       }
 
-      //Altitude
+      ///Altitude
       altitudeMedium = altitudeMedium + log.gps.altitude;
 
       if (altitudeMax < log.gps.altitude) {
@@ -130,7 +134,20 @@ class CalculationService {
             number: log.gps.altitude, decimal: 3);
       }
 
-      //Battery
+      ///Course
+      courseMedium = courseMedium + log.gps.course;
+
+      if (courseMax < log.gps.course) {
+        courseMax =
+            CalculationService.roundDouble(number: log.gps.course, decimal: 3);
+      }
+
+      if (courseMin > log.gps.course) {
+        courseMin =
+            CalculationService.roundDouble(number: log.gps.course, decimal: 3);
+      }
+
+      ///Battery
       if (batteryMax < log.battery) {
         batteryMax = log.battery;
       }
@@ -152,6 +169,12 @@ class CalculationService {
               number: altitudeMedium / logs.length, decimal: 3),
           max: altitudeMax,
           min: altitudeMin,
+        ),
+        course: Range(
+          medium: CalculationService.roundDouble(
+              number: courseMedium / logs.length, decimal: 3),
+          max: courseMax,
+          min: courseMin,
         ),
         distance:
             CalculationService.findDistanceFromList(segment).roundToDouble(),

@@ -20,12 +20,13 @@ Mode mode_serializer(String value) {
 }
 
 String mode_deserializer(Mode mode) {
-  switch (settings.mode) {
+  switch (mode) {
         case cloud:
           return "Mode.cloud";
         case sdCard:
           return "Mode.sdCard";
       }
+    
 }
 
 //Settings

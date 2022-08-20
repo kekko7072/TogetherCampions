@@ -64,6 +64,9 @@ void setup() {
   //Initialize serial and wait for port to open:
   Serial.begin(9600);
 
+  //Initialize digital pin LED_BUILTIN as an output.
+  pinMode(LED_BUILTIN, OUTPUT);
+
   ///GPRS
   initializationGPRS(gsm, gprs);
 
@@ -85,6 +88,7 @@ void loop() {
   AND THEN TO RECONNECT IT WILL NEED 3/4 MINUTES
 
   */
+  //TODO Segnalare il caso in cui il gps fatica a collegarsi.
   while (GPS.available()) {
 
     if (i < DEVICE_CLOCK) {
@@ -131,6 +135,7 @@ void loop() {
             } else {
               Serial.print("Cloud save Returned false");
             }
+            break;
           }
         case sdCard:
           {
@@ -140,6 +145,7 @@ void loop() {
             } else {
               Serial.print("SD card helper returned false");
             }
+            break;
           }
       }
     }
