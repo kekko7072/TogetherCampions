@@ -5,6 +5,7 @@ const { Timestamp } = require("firebase-admin/firestore");
 const express = require("express");
 const app = express();
 const cors = require("cors");
+const axios = require("axios");
 
 app.use(cors());
 app.use(express.urlencoded({ extended: false }));
@@ -37,6 +38,7 @@ app.get("/settings", async (req, res) => {
     const SERIAL_NUMBER = req.query.serialNumber;
     const MODEL_NUMBER = req.query.modelNumber;
     const CLOCK = req.query.clock;
+    const SD_CARD_AVAILABLE = req.query.sdCardAvailable;
 
     const SOFTWARE_NAME = req.query.softwareName;
     const SOFTWARE_VERSION = req.query.softwareVersion;
@@ -51,6 +53,7 @@ app.get("/settings", async (req, res) => {
       await document.ref.update({
         modelNumber: MODEL_NUMBER,
         clock: parseInt(CLOCK),
+        sdCardAvailable: SD_CARD_AVAILABLE == "true",
         software: {
           name: SOFTWARE_NAME,
           version: SOFTWARE_VERSION,
@@ -63,8 +66,38 @@ app.get("/settings", async (req, res) => {
       res.writeHead(200, { "Content-Type": "application/json" });
       res.end(`{"mode": "${mode}","frequency": ${frequency}}`);
     } else {
-      res.sendStatus(404);
+      res.writeHead(404, { "Content-Type": "plain/text" });
+      res.end("Device not found, please register it before turning on.");
     }
+  } catch (e) {
+    console.log(e);
+    res.sendStatus(400);
+  }
+});
+
+app.post("/initialize", async (req, res) => {
+  try {
+    const SERIAL_NUMBER = req.query.serialNumber;
+
+    const value = JSON.parse(JSON.stringify(req.body));
+
+    await admin
+      .firestore()
+      .collection("devices")
+      .doc(SERIAL_NUMBER)
+      .set({
+        modelNumber: value.modelNumber,
+        clock: parseInt(value.clock),
+        frequency: parseInt(value.frequency),
+        sdCardAvailable: value.sdCardAvailable == "true",
+        mode: value.mode,
+        software: {
+          name: value.softwareName,
+          version: value.softwareVersion,
+        },
+      });
+
+    res.sendStatus(200);
   } catch (e) {
     console.log(e);
     res.sendStatus(400);
@@ -100,13 +133,100 @@ app.post("/post", async (req, res) => {
             longitude: parseFloat(value.longitude[i]),
             altitude: parseFloat(value.altitude[i]),
             speed: parseFloat(value.speed[i]),
-            course:
-              value.course[i] != null ? parseFloat(value.course[i]) : null,
+            course: parseFloat(value.course[i]),
             satellites: parseInt(value.satellites[i]),
           },
         });
     }
     res.sendStatus(200);
+  } catch (e) {
+    console.log(e);
+    res.sendStatus(400);
+  }
+});
+
+app.get("/download", async (req, res) => {
+  try {
+    const SERIAL_NUMBER = req.query.serialNumber;
+    const START_TIMESTAMP = req.query.startTimestamp;
+    const END_TIMESTAMP = req.query.startTimestamp;
+    const COMBINE_WEATHER = req.query.combineWeatthr;
+
+    const device = await admin
+      .firestore()
+      .collection("devices")
+      .doc(SERIAL_NUMBER)
+      .get();
+
+    if (device.exists) {
+      const logs = await device.ref
+        .collection("logs")
+        .where(
+          "timestamp",
+          "<=",
+          Timestamp.fromMillis(END_TIMESTAMP),
+          ">=",
+          Timestamp.fromMillis(START_TIMESTAMP)
+        )
+        .get();
+
+      let output = {};
+      let i = 0;
+
+      //LIMIT to 100/month free then for each + 0,001 USD each other
+      console.log(logs.lenght);
+
+      for (i = 0; i < logs.lenght; i++) {
+        if (COMBINE_WEATHER) {
+          //TODO use this docs to develop https://rapidapi.com/darkskyapis/api/dark-sky/
+          const options = {
+            method: "GET",
+            url: "https://dark-sky.p.rapidapi.com/37.774929,-122.419418,2019-02-20T00:22:01",
+            headers: {
+              "X-RapidAPI-Key":
+                "5348a538e9mshde917c5524280abp1cc057jsn741def713239",
+              "X-RapidAPI-Host": "dark-sky.p.rapidapi.com",
+            },
+          };
+          axios
+            .request(options)
+            .then(function (response) {
+              console.log(response.data);
+            })
+            .catch(function (error) {
+              console.error(error);
+            });
+
+          axios
+            .request(options)
+            .then(function (response) {
+              console.log(response.data);
+            })
+            .catch(function (error) {
+              console.error(error);
+            });
+          await c;
+          output.add({
+            timestamp: logs[i].timestamp,
+            battery: logs[i].battery,
+            gps: {
+              latitude: logs[i][gps].latitude,
+              longitude: logs[i][gps].longitude,
+              altitude: logs[i][gps].altitude,
+              speed: logs[i][gps].speed,
+              course: logs[i][gps].course,
+              satellites: logs[i][gps].satellites,
+            },
+          });
+        } else {
+        }
+      }
+
+      res.writeHead(200, { "Content-Type": "application/json" });
+      res.end(output);
+    } else {
+      res.sendStatus(404);
+    }
   } catch (e) {
     console.log(e);
     res.sendStatus(400);

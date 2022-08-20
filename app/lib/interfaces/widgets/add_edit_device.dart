@@ -104,37 +104,6 @@ class _AddEditDeviceState extends State<AddEditDevice> {
                           icon: Icons.person, hintText: 'Enter device name'),
                     ),
                   ),
-                  if (!widget.isEdit) ...[
-                    Row(
-                      children: [
-                        Expanded(
-                          flex: 1,
-                          child: CupertinoButton(
-                            onPressed: clock == kClockMin
-                                ? null
-                                : () => setState(() => --clock),
-                            child: const Icon(CupertinoIcons.minus_circle),
-                          ),
-                        ),
-                        Expanded(
-                          flex: 2,
-                          child: Text(
-                            'Clock: $clock',
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                        Expanded(
-                          flex: 1,
-                          child: CupertinoButton(
-                            onPressed: clock == kClockMax
-                                ? null
-                                : () => setState(() => ++clock),
-                            child: const Icon(CupertinoIcons.add_circled),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
                   Row(
                     children: [
                       Expanded(
@@ -178,17 +147,12 @@ class _AddEditDeviceState extends State<AddEditDevice> {
                       setState(() => showLoading = true);
 
                       await DatabaseDevice()
-                          .create(
-                              isEdit: widget.isEdit,
-                              device: Device(
-                                  serialNumber: id.text,
-                                  modelNumber: model.text,
-                                  uid: widget.uid,
-                                  name: name.text,
-                                  clock: clock,
-                                  frequency: frequency,
-                                  mode: Mode.cloud,
-                                  software: Software(name: '', version: '')))
+                          .register(
+                        serialNumber: id.text,
+                        uid: widget.uid,
+                        name: name.text,
+                        frequency: frequency,
+                      )
                           .then((value) {
                         setState(() => showLoading = false);
                         Navigator.of(context).pop();
@@ -196,15 +160,13 @@ class _AddEditDeviceState extends State<AddEditDevice> {
                     },
                     child: Text(widget.isEdit ? 'Modifica' : 'Crea'),
                   ),
-                  if (widget.isEdit) ...[
-                    const Padding(
-                      padding: EdgeInsets.all(10),
-                      child: Text(
-                        'NOTA: Una volta salvate le modifiche via app riavvia il dispositivo per finalizzare le modifiche.',
-                        textAlign: TextAlign.center,
-                      ),
+                  const Padding(
+                    padding: EdgeInsets.all(10),
+                    child: Text(
+                      'NOTA: Una volta salvate le modifiche via app devi riavviare il dispositivo per applicarci le modifiche.',
+                      textAlign: TextAlign.center,
                     ),
-                  ]
+                  ),
                 ],
               ),
             )

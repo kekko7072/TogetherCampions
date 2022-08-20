@@ -417,11 +417,28 @@ class _CardDeviceState extends State<CardDevice> {
                                               .lastLog,
                                           builder: (context, snapshot) {
                                             if (snapshot.hasData) {
-                                              return DeviceLocation(
-                                                logs: snapshot.data!,
-                                              );
+                                              return snapshot.data!.isNotEmpty
+                                                  ? DeviceLocation(
+                                                      logs: snapshot.data!,
+                                                    )
+                                                  : const SizedBox(
+                                                      width: 100,
+                                                      height: 130,
+                                                      child: Text(
+                                                        'Mappa non dipsonibile',
+                                                        textAlign:
+                                                            TextAlign.center,
+                                                      ),
+                                                    );
                                             } else {
-                                              return const Text('Mappa..');
+                                              return const SizedBox(
+                                                width: 100,
+                                                height: 130,
+                                                child: Text(
+                                                  'Caricamento mappa',
+                                                  textAlign: TextAlign.center,
+                                                ),
+                                              );
                                             }
                                           }),
                                     ),
@@ -476,6 +493,7 @@ class _CardDeviceState extends State<CardDevice> {
                                                   .copyWith(
                                                       fontWeight:
                                                           FontWeight.bold),
+                                              textAlign: TextAlign.center,
                                             ),
                                           ),
                                         ),
@@ -498,15 +516,22 @@ class _CardDeviceState extends State<CardDevice> {
                                                           connected, false);
                                                     });
                                                   },
-                                            child: Text(
-                                              'SD CARD',
-                                              style: Theme.of(context)
-                                                  .textTheme
-                                                  .titleLarge!
-                                                  .copyWith(
-                                                      fontWeight:
-                                                          FontWeight.bold),
-                                            ),
+                                            child: widget.device.sdCardAvailable
+                                                ? Text(
+                                                    'SD CARD',
+                                                    style: Theme.of(context)
+                                                        .textTheme
+                                                        .titleLarge!
+                                                        .copyWith(
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                            color:
+                                                                Colors.white),
+                                                  )
+                                                : const Text(
+                                                    'inserisci\nSD CARD',
+                                                    textAlign: TextAlign.center,
+                                                  ),
                                           ),
                                         ),
                                       ],
