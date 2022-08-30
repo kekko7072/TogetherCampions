@@ -10,12 +10,9 @@
 #include "sdcard_helper.h"
 #include "initialization.h"
 
-///TODO add SD support for the data logging.
-//https://docs.arduino.cc/tutorials/mkr-sd-proto-shield/mkr-sd-proto-shield-data-logger
 
 /*
-  S: Is the time between each savings of data from GPS in seconds [aproximatly].
-    Ex. frequency = 10  Means run 1 clock every 10 seconds
+  Settings is the enum of parameters used as settings.
 */
 Settings settings;
 
@@ -23,14 +20,7 @@ Settings settings;
 /*
   Here are defined all the arrays used to store the datas.
 */
-int timestamp[DEVICE_CLOCK];
-float battery[DEVICE_CLOCK];
-float latitude[DEVICE_CLOCK];
-float longitude[DEVICE_CLOCK];
-float altitude[DEVICE_CLOCK];
-float speed[DEVICE_CLOCK];
-float course[DEVICE_CLOCK];
-int satellites[DEVICE_CLOCK];
+Input input;
 
 
 /*
@@ -54,6 +44,18 @@ const int chipSelect = 4;
 
 
 /*
+  LEDs state saver, each colors means something:
+    GREEN: Saving data on the cloud.
+    YELLOW: Saving data on the SD CARD.
+    RED: Errors, GPS not connecting.
+
+*/
+PinStatus ledGREEN = HIGH;
+PinStatus ledYELLOW = HIGH;
+PinStatus ledRED = HIGH;
+
+
+/*
   Runtime code executions variables, helping with counting functions and memorizing led status.
 */
 int i = 0;
@@ -64,8 +66,16 @@ void setup() {
   //Initialize serial and wait for port to open:
   Serial.begin(9600);
 
-  //Initialize digital pin LED_BUILTIN as an output.
-  pinMode(LED_BUILTIN, OUTPUT);
+  ///ONLY FOR DEBUG
+  /*
+  while (!Serial) {
+    ;  // wait for serial port to connect. Needed for native USB port only
+  }
+  Serial.println("Initialing device...");
+  Serial.println();
+  */
+  ///
+
 
   ///GPRS
   initializationGPRS(gsm, gprs);
@@ -81,72 +91,92 @@ void setup() {
 }
 
 void loop() {
-  /* 
+  if (settings.mode == sync) {
+    String input_data = sdcard_read();
+
+    Serial.println(input_data);
+    display_freeram();
+
+    if (cloud_save(http, settings, input_data)) {
+      ///LEAVE LED ON forever to report the uploading was successfull
+      digitalWrite(LED_BUILTIN, HIGH);
+    } else {
+      Serial.print("Cloud save returned false");
+    }
+
+  } else {
+    /* 
 
   NO CODE HERE BECAUSE IF YOU PUT LOGIC HERE, OUTSIIDE THE while (GPS.available()) LOOP,
   THE GPS WILL LOSE THE CONNECTION FROM THE SATELLITES 
-  AND THEN TO RECONNECT IT WILL NEED 3/4 MINUTES
+  AND THEN TO RECONNECT IT WILL NEED 3/4 MINUTES EACH TIMES
 
   */
-  //TODO Segnalare il caso in cui il gps fatica a collegarsi.
-  while (GPS.available()) {
+    while (GPS.available()) {
 
-    if (i < DEVICE_CLOCK) {
-      digitalWrite(LED_BUILTIN, LOW);
+      if (i < DEVICE_CLOCK) {
+        digitalWrite(LED_BUILTIN, LOW);
 
-      //AWAIT SYNC FROM FREQUENCY
-      await_seconds(settings.frequency);
+        //AWAIT SYNC FROM FREQUENCY
+        await_seconds(settings.frequency);
 
-      //SAVE DATA INTO ARRAYS
-      digitalWrite(LED_BUILTIN, HIGH);
-      Serial.println();
-      Serial.println("Saving data at cicle  " + String(i));
+        //SAVE DATA INTO ARRAYS
+        digitalWrite(LED_BUILTIN, HIGH);
+        Serial.println();
+        Serial.println("Saving data at cicle  " + String(i));
 
-      timestamp[i] = isnan(gsm.getTime());
-      battery[i] = analogRead(ADC_BATTERY) * (4.3 / 1023.0);
-      latitude[i] = isnan(GPS.latitude()) ? 0.0 : GPS.latitude();
-      longitude[i] = isnan(GPS.longitude()) ? 0.0 : GPS.longitude();
-      altitude[i] = isnan(GPS.altitude()) ? 0.0 : GPS.altitude();
-      speed[i] = isnan(GPS.speed()) ? 0.0 : GPS.speed();
-      course[i] = isnan(GPS.course()) ? 0.0 : GPS.course();
-      satellites[i] = isnan(GPS.satellites()) ? 0.0 : GPS.satellites();
+        input.timestamp[i] = isnan(gsm.getTime());
+        input.battery[i] = analogRead(ADC_BATTERY) * (4.3 / 1023.0);
+        input.latitude[i] = isnan(GPS.latitude()) ? 0.0 : GPS.latitude();
+        input.longitude[i] = isnan(GPS.longitude()) ? 0.0 : GPS.longitude();
+        input.altitude[i] = isnan(GPS.altitude()) ? 0.0 : GPS.altitude();
+        input.speed[i] = isnan(GPS.speed()) ? 0.0 : GPS.speed();
+        input.course[i] = isnan(GPS.course()) ? 0.0 : GPS.course();
+        input.satellites[i] = isnan(GPS.satellites()) ? 0.0 : GPS.satellites();
 
-      i++;
-    } else {
+        i++;
+      } else {
 
-      Serial.println();
-      Serial.println("Duration cicle: " + String(i * settings.frequency) + " s");
-      Serial.println("Logs saved: " + String(i));
-      Serial.println();
+        Serial.println();
+        Serial.println("Duration cicle: " + String(i * settings.frequency) + " s");
+        Serial.println("Logs saved: " + String(i));
+        Serial.println();
 
-      String input_data;
-      for (int k = 0; k < i; k++) {
-        input_data = input_data + "&timestamp=" + String(timestamp[k]) + "&battery=" + String(battery[k]) + "&latitude=" + String(latitude[k], 7) + "&longitude=" + String(longitude[k], 7) + "&altitude=" + String(altitude[k], 7) + "&speed=" + String(speed[k], 7) + "&course=" + String(course[k], 7) + "&satellites=" + String(satellites[k]);
-      }
-      Serial.println(input_data);
-      display_freeram();
+        String input_data;
+        for (int k = 0; k < i; k++) {
+          input_data = input_data + "&timestamp=" + String(input.timestamp[k]) + "&battery=" + String(input.battery[k])
+                       + "&latitude=" + String(input.latitude[k], 7) + "&longitude=" + String(input.longitude[k], 7)
+                       + "&altitude=" + String(input.altitude[k], 7) + "&speed=" + String(input.speed[k], 7) + "&course="
+                       + String(input.course[k], 7) + "&satellites=" + String(input.satellites[k]);
+        }
 
-      switch (settings.mode) {
-        case cloud:
-          {
-            if (cloud_save(http, settings, input_data)) {
-              i = 0;
-              input_data = "";
-            } else {
-              Serial.print("Cloud save Returned false");
+        Serial.println(input_data);
+        display_freeram();
+
+        switch (settings.mode) {
+          case realtime:
+            {
+              if (cloud_save(http, settings, input_data)) {
+                digitalWrite(LED_BUILTIN, LOW);
+                i = 0;
+                input_data = "";
+              } else {
+                Serial.print("Cloud save returned false");
+              }
+              break;
             }
-            break;
-          }
-        case sdCard:
-          {
-            if (sdcard_save(input_data)) {
-              i = 0;
-              input_data = "";
-            } else {
-              Serial.print("SD card helper returned false");
+          case record:
+            {
+              if (sdcard_save(input_data)) {
+                digitalWrite(LED_BUILTIN, LOW);
+                i = 0;
+                input_data = "";
+              } else {
+                Serial.print("SD card helper returned false");
+              }
+              break;
             }
-            break;
-          }
+        }
       }
     }
   }

@@ -121,9 +121,9 @@ class TrackMapState extends State<TrackMap> {
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Text('Medium: ${telemetry.speed.medium}'),
-                            Text('Max: ${telemetry.speed.max}'),
-                            Text('Min: ${telemetry.speed.min}'),
+                            Text('Medium: ${telemetry.speed.medium} km/h'),
+                            Text('Max: ${telemetry.speed.max} km/h'),
+                            Text('Min: ${telemetry.speed.min} km/h'),
                           ],
                         ),
                       ),
@@ -133,9 +133,9 @@ class TrackMapState extends State<TrackMap> {
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Text('Medium: ${telemetry.altitude.medium}'),
-                            Text('Max: ${telemetry.altitude.max}'),
-                            Text('Min: ${telemetry.altitude.min}'),
+                            Text('Medium: ${telemetry.altitude.medium} m'),
+                            Text('Max: ${telemetry.altitude.max} m'),
+                            Text('Min: ${telemetry.altitude.min} m'),
                           ],
                         ),
                       ),
@@ -145,9 +145,9 @@ class TrackMapState extends State<TrackMap> {
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Text('Medium: ${telemetry.course.medium}'),
-                            Text('Max: ${telemetry.course.max}'),
-                            Text('Min: ${telemetry.course.min}'),
+                            Text('Medium: ${telemetry.course.medium} deg'),
+                            Text('Max: ${telemetry.course.max} deg'),
+                            Text('Min: ${telemetry.course.min} deg'),
                           ],
                         ),
                       ),

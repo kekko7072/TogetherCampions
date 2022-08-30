@@ -42,12 +42,14 @@ class DatabaseDevice {
   ///SERIALIZATION
   static Mode modeParser(String snapshot) {
     switch (snapshot) {
-      case 'Mode.cloud':
-        return Mode.cloud;
-      case 'Mode.sdCard':
-        return Mode.sdCard;
+      case 'Mode.realtime':
+        return Mode.realtime;
+      case 'Mode.record':
+        return Mode.record;
+      case 'Mode.sync':
+        return Mode.sync;
       default:
-        return Mode.cloud;
+        return Mode.realtime;
     }
   }
 

@@ -1,5 +1,5 @@
 /*
-  Function to save data on CLOUD, returns:
+  Function to save data in the CLOUD, returns:
     true: data saved successfully
     false: data not saved
 */
@@ -47,6 +47,12 @@ bool cloud_save(HttpClient http, Settings settings, String input_data) {
   }
 }
 
+
+/*
+  Function to register device in the CLOUD, returns:
+    true: device registred successfully
+    false: data not registred
+*/
 bool cloud_register_device(HttpClient http, Settings settings, bool sdCard_available) {
 
   //PREPARE DATA TO SEND TO SERVER

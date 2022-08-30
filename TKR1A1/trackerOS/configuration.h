@@ -1,6 +1,6 @@
 /*
   
-  Tracker Operative System [Tracker OS]
+  Tracker Operative System [trackerOS]
   
   Version:  1.0.0
   Description:  This software is designed to solve all the relaiability problems given by the usage of JSON as object in traker_async_JSON.ino,
@@ -38,8 +38,8 @@
 /* 
   Sim parameters for connction of GPRS service
 */
-#define SIM_PIN ""   //[WIND] "" || [THINGS MOBILE] 1503 
-#define SIM_APN "internet.it"     // [WIND] internet.it || [THINGS MOBILE] TM
+#define SIM_PIN ""   //[WIND-TRE] "" || [TIM] "" || [THINGS MOBILE] 1503 not working
+#define SIM_APN "internet.it"     // [WIND-TRE] internet.it || [TIM] "ibox.tim.it" || [THINGS MOBILE] TM not working
 #define SIM_LOGIN ""     // replace with your GPRS login
 #define SIM_PASSWORD ""  // replace with your GPRS password
 

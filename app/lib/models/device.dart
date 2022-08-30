@@ -1,4 +1,4 @@
-enum Mode { cloud, sdCard }
+enum Mode { realtime, record, sync }
 
 class Device {
   Device({

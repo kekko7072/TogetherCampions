@@ -14,7 +14,7 @@ class CardDevice extends StatefulWidget {
 
 class _CardDeviceState extends State<CardDevice> {
   int frequency = 0;
-  Mode mode = Mode.cloud;
+  Mode mode = Mode.realtime;
   @override
   void initState() {
     super.initState();
@@ -464,13 +464,14 @@ class _CardDeviceState extends State<CardDevice> {
                                         ),
                                       ],
                                     ),
-                                    Row(
-                                      mainAxisSize: MainAxisSize.min,
+                                    Wrap(
+                                      direction: Axis.horizontal,
                                       children: [
                                         Card(
-                                          color: connected && mode == Mode.cloud
-                                              ? CupertinoColors.activeGreen
-                                              : Colors.grey.shade400,
+                                          color:
+                                              connected && mode == Mode.realtime
+                                                  ? CupertinoColors.activeGreen
+                                                  : Colors.grey.shade400,
                                           child: CupertinoButton(
                                             onPressed: !connected
                                                 ? null
@@ -480,13 +481,13 @@ class _CardDeviceState extends State<CardDevice> {
                                                       timer!.cancel();
                                                     }
                                                     setState(() {
-                                                      mode = Mode.cloud;
+                                                      mode = Mode.realtime;
                                                       timer = toastHelper(
                                                           connected, false);
                                                     });
                                                   },
                                             child: Text(
-                                              'CLOUD',
+                                              'Realtime',
                                               style: Theme.of(context)
                                                   .textTheme
                                                   .titleLarge!
@@ -497,44 +498,108 @@ class _CardDeviceState extends State<CardDevice> {
                                             ),
                                           ),
                                         ),
-                                        Card(
-                                          color:
-                                              connected && mode == Mode.sdCard
-                                                  ? CupertinoColors.systemYellow
-                                                  : Colors.grey.shade400,
-                                          child: CupertinoButton(
-                                            onPressed: !connected
-                                                ? null
-                                                : () {
-                                                    if (timer != null &&
-                                                        timer!.isActive) {
-                                                      timer!.cancel();
-                                                    }
-                                                    setState(() {
-                                                      mode = Mode.sdCard;
-                                                      timer = toastHelper(
-                                                          connected, false);
-                                                    });
-                                                  },
-                                            child: widget.device.sdCardAvailable
-                                                ? Text(
-                                                    'SD CARD',
-                                                    style: Theme.of(context)
-                                                        .textTheme
-                                                        .titleLarge!
-                                                        .copyWith(
-                                                          fontWeight:
-                                                              FontWeight.bold,
-                                                        ),
-                                                  )
-                                                : const Text(
-                                                    'inserisci\nSD CARD',
-                                                    textAlign: TextAlign.center,
-                                                    style: TextStyle(
-                                                        color: Colors.white60),
-                                                  ),
+                                        if (!widget.device.sdCardAvailable) ...[
+                                          Card(
+                                            color: Colors.grey.shade400,
+                                            child: CupertinoButton(
+                                              onPressed:
+                                                  !connected ? null : () {},
+                                              child: const Text(
+                                                'inserisci\nSD CARD',
+                                                textAlign: TextAlign.center,
+                                                style: TextStyle(
+                                                    color: Colors.white60),
+                                              ),
+                                            ),
                                           ),
-                                        ),
+                                        ] else ...[
+                                          Card(
+                                            color: connected &&
+                                                    widget.device
+                                                        .sdCardAvailable &&
+                                                    mode == Mode.record
+                                                ? CupertinoColors.systemYellow
+                                                : Colors.grey.shade400,
+                                            child: CupertinoButton(
+                                              onPressed: !connected
+                                                  ? null
+                                                  : () {
+                                                      if (timer != null &&
+                                                          timer!.isActive) {
+                                                        timer!.cancel();
+                                                      }
+                                                      setState(() {
+                                                        mode = Mode.record;
+                                                        timer = toastHelper(
+                                                            connected, false);
+                                                      });
+                                                    },
+                                              child: widget
+                                                      .device.sdCardAvailable
+                                                  ? Text(
+                                                      'Record',
+                                                      style: Theme.of(context)
+                                                          .textTheme
+                                                          .titleLarge!
+                                                          .copyWith(
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                          ),
+                                                    )
+                                                  : const Text(
+                                                      'inserisci\nSD CARD',
+                                                      textAlign:
+                                                          TextAlign.center,
+                                                      style: TextStyle(
+                                                          color:
+                                                              Colors.white60),
+                                                    ),
+                                            ),
+                                          ),
+                                          Card(
+                                            color: connected &&
+                                                    widget.device
+                                                        .sdCardAvailable &&
+                                                    mode == Mode.sync
+                                                ? CupertinoColors.systemBlue
+                                                : Colors.grey.shade400,
+                                            child: CupertinoButton(
+                                              onPressed: !connected
+                                                  ? null
+                                                  : () {
+                                                      if (timer != null &&
+                                                          timer!.isActive) {
+                                                        timer!.cancel();
+                                                      }
+                                                      setState(() {
+                                                        mode = Mode.sync;
+                                                        timer = toastHelper(
+                                                            connected, false);
+                                                      });
+                                                    },
+                                              child: widget
+                                                      .device.sdCardAvailable
+                                                  ? Text(
+                                                      'Sync',
+                                                      style: Theme.of(context)
+                                                          .textTheme
+                                                          .titleLarge!
+                                                          .copyWith(
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                          ),
+                                                    )
+                                                  : const Text(
+                                                      'inserisci\nSD CARD',
+                                                      textAlign:
+                                                          TextAlign.center,
+                                                      style: TextStyle(
+                                                          color:
+                                                              Colors.white60),
+                                                    ),
+                                            ),
+                                          ),
+                                        ],
                                       ],
                                     ),
                                   ],

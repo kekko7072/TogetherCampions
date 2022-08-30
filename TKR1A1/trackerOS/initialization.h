@@ -2,15 +2,19 @@
   GPRS initialization from SIM settings
 */
 void initializationGPRS(GSM gsm, GPRS gprs) {
+  Serial.print("Intializing  GPRS:  ");
   bool connected = false;
 
+  // After starting the modem with GSM.begin()
+  // attach the shield to the GPRS network with the APN, login and password
   while (!connected) {
     if ((gsm.begin(SIM_PIN) == GSM_READY) && (gprs.attachGPRS(SIM_APN, SIM_LOGIN, SIM_PASSWORD) == GPRS_READY)) {
       connected = true;
+      Serial.print("OK");
     } else {
       Serial.println("Not connected");
+      delay(1000);
     }
-    Serial.println("Connected");
   }
 }
 
@@ -25,7 +29,7 @@ struct Settings initializationSETTINGS(HttpClient http, bool sdCard_available) {
   struct Settings set;
 
   //Set default value
-  set.mode = cloud;
+  set.mode = realtime;
   set.frequency = 10;
 
   Serial.println("Initializing settings...");
@@ -85,7 +89,6 @@ struct Settings initializationSETTINGS(HttpClient http, bool sdCard_available) {
 void initializationGPS() {
   Serial.println();
   Serial.print("Intializing  GPS:  ");
-
   if (!GPS.begin()) {
     Serial.println("Failed to initialize GPS!");
     while (1)
@@ -100,10 +103,12 @@ void initializationGPS() {
 */
 
 bool initializationSDCARD(int chipSelect) {
+  Serial.println();
   Serial.print("Intializing  SD CARD:  ");
 
   if (!SD.begin(chipSelect)) {
-    Serial.println("Card failed, or not present");
+    Serial.print("Card failed, or not present");
+    Serial.println();
     return false;
   } else {
     Serial.print("OK");

@@ -115,9 +115,9 @@ app.post("/post", async (req, res) => {
     console.log(req.body);
 
     for (var i = 0; i < value.clock ?? 0; i++) {
+      const time = value.timestamp[i] * 1000;
       //UNFORTIUNATLY ON THINGSMOBILE SIM THE TIMESTAM IS WRONG...
-      //const time = value.timestamp[i] * 1000;
-      const time = Date.now() + i * value.frequency * 1000;
+      //const time = Date.now() + i * value.frequency * 1000;
 
       await admin
         .firestore()
