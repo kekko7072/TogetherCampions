@@ -270,7 +270,7 @@ class _AddEditSessionState extends State<AddEditSession> {
                               "Content-Type":
                                   "application/x-www-form-urlencoded"
                             }, //CLOCK AND FREQUENCY ARE NOW SAVED DIRECTLY ON SD CARD, before clock=6&frequency=10
-                            body: "clock=6&frequency=10$body",
+                            body: body,
                           );
                           print('Response status: ${response.statusCode}');
                           print('Response body: ${response.body}');
