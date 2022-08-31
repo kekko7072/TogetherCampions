@@ -259,22 +259,23 @@ class _AddEditSessionState extends State<AddEditSession> {
                         for (progress = 0;
                             progress < value.length;
                             progress++) {
-                          print("PROGRESS: $progress");
                           String body =
                               CalculationService.formatOutputWithNewTimestamp(
                                   input: value[progress], start: start);
                           Uri url = Uri.https(kServerAddress, 'post',
                               {'serialNumber': deviceId});
-                          var response = await post(url,
-                              body: "clock=6&frequency=10$body",
-                              headers: {
-                                "Content-Type":
-                                    "application/x-www-form-urlencoded"
-                              });
-                          print(url.path);
+                          var response = await post(
+                            url,
+                            headers: {
+                              "Content-Type":
+                                  "application/x-www-form-urlencoded"
+                            }, //CLOCK AND FREQUENCY ARE NOW SAVED DIRECTLY ON SD CARD, before clock=6&frequency=10
+                            body: "clock=6&frequency=10$body",
+                          );
                           print('Response status: ${response.statusCode}');
                           print('Response body: ${response.body}');
                           if (response.statusCode == 200) {
+                            //OK GO ON
                             setState(() => ++progress);
                           } else {
                             //RETRY WITH SAME LOG

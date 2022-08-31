@@ -150,23 +150,26 @@ class TrackPreviewState extends State<TrackPreview> {
   Widget build(BuildContext context) {
     return segment.isEmpty
         ? const Center(child: CircularProgressIndicator())
-        : IgnorePointer(
-            child: Container(
-              height: 100,
-              width: MediaQuery.of(context).size.width,
-              clipBehavior: Clip.hardEdge,
-              decoration: const BoxDecoration(
-                  borderRadius: BorderRadius.all(Radius.circular(20))),
-              child: GoogleMap(
-                polylines: _polyline,
-                markers: _markers,
-                onMapCreated: _onMapCreated,
-                scrollGesturesEnabled: false,
-                zoomControlsEnabled: false,
-                zoomGesturesEnabled: false,
-                mapType: MapType.satellite,
-                initialCameraPosition: CalculationService.initialCameraPosition(
-                    list: segment, isPreview: true),
+        : MouseRegion(
+            child: IgnorePointer(
+              child: Container(
+                height: 100,
+                width: MediaQuery.of(context).size.width,
+                clipBehavior: Clip.hardEdge,
+                decoration: const BoxDecoration(
+                    borderRadius: BorderRadius.all(Radius.circular(20))),
+                child: GoogleMap(
+                  polylines: _polyline,
+                  markers: _markers,
+                  onMapCreated: _onMapCreated,
+                  scrollGesturesEnabled: false,
+                  zoomControlsEnabled: false,
+                  zoomGesturesEnabled: false,
+                  mapType: MapType.satellite,
+                  initialCameraPosition:
+                      CalculationService.initialCameraPosition(
+                          list: segment, isPreview: true),
+                ),
               ),
             ),
           );

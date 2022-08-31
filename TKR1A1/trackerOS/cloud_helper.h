@@ -7,7 +7,7 @@ bool cloud_save(HttpClient http, Settings settings, String input_data) {
 
   //PREPARE DATA TO SEND TO SERVER
   char content_type[] = "application/x-www-form-urlencoded";
-  String post_data = "clock=" + String(DEVICE_CLOCK) + "&frequency=" + String(settings.frequency) + input_data;
+  //String post_data = "clock=" + String(DEVICE_CLOCK) + "&frequency=" + String(settings.frequency) + input_data;
 
   Serial.println();
   Serial.println("Making POST request");
@@ -15,7 +15,7 @@ bool cloud_save(HttpClient http, Settings settings, String input_data) {
   Serial.println();
 
   //POST DATA
-  int err = http.post(String(SERVER_POST) + String(DEVICE_SERIAL_NUMBER), content_type, post_data);
+  int err = http.post(String(SERVER_POST) + String(DEVICE_SERIAL_NUMBER), content_type, input_data);
   if (err == 0) {
     Serial.println("Started POST ok");
     //READ RESPONSE

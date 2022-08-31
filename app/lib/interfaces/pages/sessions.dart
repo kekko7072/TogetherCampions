@@ -15,13 +15,6 @@ class Sessions extends StatelessWidget {
                 child: SingleChildScrollView(
                   child: Column(
                     children: [
-                      Text(
-                        'Sessioni svolte',
-                        style: Theme.of(context)
-                            .textTheme
-                            .titleLarge!
-                            .copyWith(fontWeight: FontWeight.bold),
-                      ),
                       for (String id in userData.devices) ...[
                         ListView.builder(
                             shrinkWrap: true,

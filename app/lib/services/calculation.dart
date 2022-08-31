@@ -222,10 +222,10 @@ class CalculationService {
     ///SPLIT
     debugPrint("\nSPLIT");
     List<String> original = input.split("&");
-    debugPrint("$original");
+    //debugPrint("$original");
     List<String> originalTimestamp =
         original.where((el) => el.contains("timestamp=")).toList();
-    debugPrint("ORIGINAL TIMESTAMP: $originalTimestamp");
+    //debugPrint("ORIGINAL TIMESTAMP: $originalTimestamp");
 
     //New timestamp
     List<String> newTimestamp = [];
@@ -233,11 +233,11 @@ class CalculationService {
       newTimestamp.add(
           "timestamp=${(start.millisecondsSinceEpoch + int.parse(value.replaceAll("timestamp=", ""))) ~/ 1000}");
     }
-    debugPrint("NEW TIMESTAMP: $newTimestamp");
+    //debugPrint("NEW TIMESTAMP: $newTimestamp");
 
     //Remove old timestamp
     original.removeWhere((el) => el.contains("timestamp="));
-    debugPrint("$original");
+    //debugPrint("$original");
 
     ///RECOMBINE
     debugPrint("\nRECOMBINE");
