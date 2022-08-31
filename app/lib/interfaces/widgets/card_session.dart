@@ -1,5 +1,6 @@
 import 'package:app/services/imports.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:intl/intl.dart';
 
 class CardSession extends StatelessWidget {
   const CardSession(
@@ -38,7 +39,7 @@ class CardSession extends StatelessWidget {
                 isScrollControlled: true,
                 isDismissible: true,
                 builder: (context) => AddEditSession(
-                  uid: userData.uid,
+                  userData: userData,
                   isEdit: true,
                   session: session,
                 ),
@@ -183,7 +184,7 @@ class TrackPreviewState extends State<TrackPreview> {
         infoWindow: InfoWindow(
           title: 'Start',
           snippet:
-              'Started ${start.timestamp.day}/${start.timestamp.month}/${start.timestamp.year} at ${start.timestamp.hour}:${start.timestamp.minute}',
+              'Started ${DateFormat('dd/MM/yyyy').format(start.timestamp)} at ${DateFormat('kk:mm').format(start.timestamp)}',
         ),
       ));
       _markers.add(Marker(
@@ -193,7 +194,7 @@ class TrackPreviewState extends State<TrackPreview> {
         infoWindow: InfoWindow(
           title: 'End',
           snippet:
-              'Ended ${end.timestamp.day}/${end.timestamp.month}/${end.timestamp.year} at ${end.timestamp.hour}:${end.timestamp.minute}',
+              'Ended ${DateFormat('dd/MM/yyyy').format(end.timestamp)} at ${DateFormat('kk:mm').format(end.timestamp)}',
         ),
       ));
 

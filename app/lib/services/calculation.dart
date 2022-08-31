@@ -1,3 +1,5 @@
+import 'package:intl/intl.dart';
+
 import 'imports.dart';
 
 class CalculationService {
@@ -53,7 +55,11 @@ class CalculationService {
 
   static String formatDate(
       {required DateTime date, required bool year, required bool seconds}) {
-    return '${date.hour < 10 ? '0${date.hour}' : date.hour}:${date.minute < 10 ? '0${date.minute}' : date.minute}${seconds ? ':${date.second < 10 ? '0${date.second}' : date.second}' : ''}   ${date.day}/${date.month < 9 ? '0${date.month}' : date.month}${year ? '/${date.year}' : ''}';
+    if (year) {
+      return DateFormat('kk:mm   dd/MM/yyyy').format(date);
+    } else {
+      return DateFormat('kk:mm   dd/MM').format(date);
+    }
   }
 
   static initialCameraPosition(
@@ -207,5 +213,58 @@ class CalculationService {
 
   static int calculateBatteryPercentage({required double volts}) {
     return (100 * volts ~/ 4.2);
+  }
+
+  static String formatOutputWithNewTimestamp(
+      {required String input, required DateTime start}) {
+    debugPrint(input);
+
+    ///SPLIT
+    debugPrint("\nSPLIT");
+    List<String> original = input.split("&");
+    debugPrint("$original");
+    List<String> originalTimestamp =
+        original.where((el) => el.contains("timestamp=")).toList();
+    debugPrint("ORIGINAL TIMESTAMP: $originalTimestamp");
+
+    //New timestamp
+    List<String> newTimestamp = [];
+    for (String value in originalTimestamp) {
+      newTimestamp.add(
+          "timestamp=${(start.millisecondsSinceEpoch + int.parse(value.replaceAll("timestamp=", ""))) ~/ 1000}");
+    }
+    debugPrint("NEW TIMESTAMP: $newTimestamp");
+
+    //Remove old timestamp
+    original.removeWhere((el) => el.contains("timestamp="));
+    debugPrint("$original");
+
+    ///RECOMBINE
+    debugPrint("\nRECOMBINE");
+    original.addAll(newTimestamp);
+    String output = "";
+    for (String val in original) {
+      if (val != "") {
+        output = "$output&$val";
+      }
+    }
+    return output;
+  }
+
+  static DateTime getLastNewTimestamp(
+      {required String lastInput, required DateTime start}) {
+    debugPrint(lastInput);
+
+    ///SPLIT
+    debugPrint("\nSPLIT");
+    List<String> original = lastInput.split("&");
+    debugPrint("$original");
+    List<String> originalTimestamp =
+        original.where((el) => el.contains("timestamp=")).toList();
+    debugPrint("ORIGINAL TIMESTAMP: $originalTimestamp");
+
+    return start.add(Duration(
+        milliseconds:
+            int.parse(originalTimestamp.last.replaceAll("timestamp=", ""))));
   }
 }

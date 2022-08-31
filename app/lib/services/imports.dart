@@ -28,6 +28,8 @@ export 'package:firebase_crashlytics/firebase_crashlytics.dart';
 export 'package:provider/provider.dart';
 export 'package:uuid/uuid.dart';
 export 'package:google_maps_flutter/google_maps_flutter.dart';
+export 'package:file_picker/file_picker.dart';
+export 'package:http/http.dart';
 
 ///Design
 export 'package:flutter_svg/flutter_svg.dart';

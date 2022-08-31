@@ -16,6 +16,14 @@ struct Input {
   float course[DEVICE_CLOCK];
   int satellites[DEVICE_CLOCK];
 };
+/*
+  Manual switch used to set if using SIM or OFFLINE
+*/
+//Status 
+enum Status {
+  online,
+  offline
+};
 
 //Mode
 enum Mode {
@@ -47,6 +55,7 @@ String mode_deserializer(Mode mode) {
 
 //Settings
 struct Settings {
+  Status status;
   Mode mode;
   int frequency;
 };

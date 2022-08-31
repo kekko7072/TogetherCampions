@@ -29,6 +29,7 @@ struct Settings initializationSETTINGS(HttpClient http, bool sdCard_available) {
   struct Settings set;
 
   //Set default value
+  set.status = online;
   set.mode = realtime;
   set.frequency = 10;
 

@@ -58,7 +58,7 @@ class Sessions extends StatelessWidget {
                 isScrollControlled: true,
                 isDismissible: true,
                 builder: (context) => AddEditSession(
-                  uid: userData.uid,
+                  userData: userData,
                   isEdit: false,
                 ),
               ),

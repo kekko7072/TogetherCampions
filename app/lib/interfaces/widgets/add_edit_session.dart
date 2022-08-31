@@ -4,11 +4,11 @@ import 'package:app/services/imports.dart';
 class AddEditSession extends StatefulWidget {
   const AddEditSession({
     Key? key,
-    required this.uid,
+    required this.userData,
     required this.isEdit,
     this.session,
   }) : super(key: key);
-  final String uid;
+  final UserData userData;
   final bool isEdit;
   final Session? session;
 
@@ -18,18 +18,26 @@ class AddEditSession extends StatefulWidget {
 
 class _AddEditSessionState extends State<AddEditSession> {
   final formKey = GlobalKey<FormState>();
-  bool showLoading = false;
 
-  TextEditingController name = TextEditingController();
+  bool showLoading = false;
+  bool isOnline = true;
+
+  TextEditingController name = TextEditingController(text: 'Nuova sessione');
 
   DateTime start = DateTime.now();
   DateTime end = DateTime.now();
 
-  int durationInMinutes = 1;
+  FilePickerResult? result;
+  PlatformFile? file;
+  List<String> value = [];
+  int progress = 0;
+  String deviceId = '';
 
   @override
   void initState() {
     super.initState();
+    deviceId = widget.userData.devices.first;
+
     if (widget.isEdit && widget.session != null) {
       name.text = widget.session!.name;
       start = widget.session!.start;
@@ -44,13 +52,26 @@ class _AddEditSessionState extends State<AddEditSession> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(
-            '${widget.isEdit ? 'Modifica' : 'Avvia'} sessione',
-            style: Theme.of(context).textTheme.titleLarge,
-          ),
           if (showLoading) ...[
-            const CircularProgressIndicator()
+            Text(
+              'Caricamento dati',
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 15.0),
+                  child: CircularProgressIndicator(),
+                ),
+                if (!isOnline) Text("Progress: $progress/${value.length}"),
+              ],
+            )
           ] else ...[
+            Text(
+              '${widget.isEdit ? 'Modifica' : 'Avvia'} sessione',
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
             const SizedBox(height: 10),
             Form(
               key: formKey,
@@ -70,6 +91,40 @@ class _AddEditSessionState extends State<AddEditSession> {
                     ),
                   ),
                   const SizedBox(height: 10),
+                  if (!widget.isEdit) ...[
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        FilterChip(
+                            backgroundColor: isOnline
+                                ? AppStyle.primaryColor
+                                : Colors.black12,
+                            label: Text(
+                              'ONLINE',
+                              style: TextStyle(
+                                  fontWeight: isOnline
+                                      ? FontWeight.bold
+                                      : FontWeight.normal),
+                            ),
+                            onSelected: (value) =>
+                                setState(() => isOnline = true)),
+                        const SizedBox(width: 20),
+                        FilterChip(
+                            backgroundColor: !isOnline
+                                ? AppStyle.primaryColor
+                                : Colors.black12,
+                            label: Text(
+                              'SD CARD',
+                              style: TextStyle(
+                                  fontWeight: !isOnline
+                                      ? FontWeight.bold
+                                      : FontWeight.normal),
+                            ),
+                            onSelected: (value) =>
+                                setState(() => isOnline = false)),
+                      ],
+                    ),
+                  ],
                   Padding(
                     padding: const EdgeInsets.only(left: 20.0),
                     child: Row(
@@ -92,7 +147,7 @@ class _AddEditSessionState extends State<AddEditSession> {
                       ],
                     ),
                   ),
-                  if (widget.isEdit) ...[
+                  if (isOnline) ...[
                     Padding(
                       padding: const EdgeInsets.only(left: 20.0),
                       child: Row(
@@ -115,68 +170,138 @@ class _AddEditSessionState extends State<AddEditSession> {
                         ],
                       ),
                     ),
+                    CupertinoButton.filled(
+                      onPressed: () async {
+                        setState(() => showLoading = true);
+                        if (widget.isEdit) {
+                          await DatabaseUser.sessionEdit(
+                                  uid: widget.userData.uid,
+                                  oldSession: widget.session!,
+                                  newSession: Session(
+                                      name: name.text, start: start, end: end))
+                              .then((value) {
+                            setState(() => showLoading = false);
+                            Navigator.of(context).pop();
+                          });
+                        } else {
+                          await DatabaseUser.sessionCreateRemove(
+                                  isCreate: true,
+                                  uid: widget.userData.uid,
+                                  session: Session(
+                                      name: name.text, start: start, end: end))
+                              .then((value) {
+                            setState(() => showLoading = false);
+                            Navigator.of(context).pop();
+                          });
+                        }
+                      },
+                      child: Text(widget.isEdit ? 'Modifica' : 'Avvia'),
+                    ),
                   ] else ...[
-                    const Text(
-                      'Inserisci una durata approssimativa',
+                    for (String deviceID in widget.userData.devices) ...[
+                      Wrap(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.all(5.0),
+                            child: FilterChip(
+                                backgroundColor: deviceId == deviceID
+                                    ? AppStyle.primaryColor
+                                    : Colors.black12,
+                                label: Text(
+                                  deviceID,
+                                  style: TextStyle(
+                                      fontWeight: deviceId == deviceID
+                                          ? FontWeight.bold
+                                          : FontWeight.normal),
+                                ),
+                                onSelected: (value) =>
+                                    setState(() => deviceId = deviceID)),
+                          ),
+                        ],
+                      ),
+                    ],
+                    const SizedBox(height: 10),
+                    CupertinoButton.filled(
+                      onPressed: () async {
+                        result = await FilePicker.platform.pickFiles(
+                          dialogTitle:
+                              'Seleziona il file datalog.txt dalla sd card',
+                          type: FileType.custom,
+                          allowedExtensions: ['txt'],
+                        );
+
+                        if (result != null) {
+                          file = result!.files.first;
+
+                          print(file!.name);
+                          //print(file.bytes);
+                          print(file!.size);
+                          print(file!.extension);
+                          if (file!.bytes != null) {
+                            String convertedValue =
+                                String.fromCharCodes(file!.bytes!);
+                            setState(() => value = convertedValue.split(","));
+                            print(value.length);
+                          }
+                        } else {
+                          // User canceled the picker
+                        }
+                      },
+                      child: const Text('Carica file'),
                     ),
-                    Row(
-                      children: [
-                        Expanded(
-                          flex: 1,
-                          child: CupertinoButton(
-                            child: const Icon(CupertinoIcons.minus_circle),
-                            onPressed: () =>
-                                setState(() => --durationInMinutes),
-                          ),
-                        ),
-                        Expanded(
-                          flex: 2,
-                          child: Text(
-                            'Minuti: $durationInMinutes',
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                        Expanded(
-                          flex: 1,
-                          child: CupertinoButton(
-                            child: const Icon(CupertinoIcons.add_circled),
-                            onPressed: () =>
-                                setState(() => ++durationInMinutes),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                  CupertinoButton.filled(
-                    onPressed: () async {
-                      setState(() => showLoading = true);
-                      if (widget.isEdit) {
-                        await DatabaseUser.sessionEdit(
-                                uid: widget.uid,
-                                oldSession: widget.session!,
-                                newSession: Session(
-                                    name: name.text, start: start, end: end))
-                            .then((value) {
-                          setState(() => showLoading = false);
-                          Navigator.of(context).pop();
-                        });
-                      } else {
+                    const SizedBox(height: 10),
+                    Text('N° Log: ${value.length}'),
+                    const SizedBox(height: 10),
+                    CupertinoButton.filled(
+                      onPressed: () async {
+                        setState(() => showLoading = true);
+
+                        for (progress = 0;
+                            progress < value.length;
+                            progress++) {
+                          print("PROGRESS: $progress");
+                          String body =
+                              CalculationService.formatOutputWithNewTimestamp(
+                                  input: value[progress], start: start);
+                          Uri url = Uri.https(kServerAddress, 'post',
+                              {'serialNumber': deviceId});
+                          var response = await post(url,
+                              body: "clock=6&frequency=10$body",
+                              headers: {
+                                "Content-Type":
+                                    "application/x-www-form-urlencoded"
+                              });
+                          print(url.path);
+                          print('Response status: ${response.statusCode}');
+                          print('Response body: ${response.body}');
+                          if (response.statusCode == 200) {
+                            setState(() => ++progress);
+                          } else {
+                            //RETRY WITH SAME LOG
+                            setState(() => --progress);
+                          }
+                        }
+
                         await DatabaseUser.sessionCreateRemove(
                                 isCreate: true,
-                                uid: widget.uid,
+                                uid: widget.userData.uid,
                                 session: Session(
                                     name: name.text,
                                     start: start,
-                                    end: start.add(
-                                        Duration(minutes: durationInMinutes))))
+                                    end: CalculationService.getLastNewTimestamp(
+                                        lastInput: value
+                                            .where((element) =>
+                                                element.contains("timestamp="))
+                                            .last,
+                                        start: start)))
                             .then((value) {
                           setState(() => showLoading = false);
                           Navigator.of(context).pop();
                         });
-                      }
-                    },
-                    child: Text(widget.isEdit ? 'Modifica' : 'Avvia'),
-                  ),
+                      },
+                      child: Text(widget.isEdit ? 'Modifica' : 'Avvia'),
+                    ),
+                  ]
                 ],
               ),
             )

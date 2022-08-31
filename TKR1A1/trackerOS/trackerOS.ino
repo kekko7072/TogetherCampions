@@ -76,15 +76,29 @@ void setup() {
   */
   ///
 
+  //TODO manage the read button state: OFFLINE or ONLINE
+  //  OFFLINE: work only using sdcard and millis() as timestamp,
+  //  ONLINE: work with both sdcard and online realtime.
+  settings.status = offline;  //Al momento è manuale
 
-  ///GPRS
-  initializationGPRS(gsm, gprs);
 
-  //SD CARD
-  bool sdCard_available = initializationSDCARD(chipSelect);
+  if (settings.status == online) {
+    ///GPRS
+    initializationGPRS(gsm, gprs);
 
-  ///SETTINGS
-  settings = initializationSETTINGS(http, sdCard_available);
+    //SD CARD
+    bool sdCard_available = initializationSDCARD(chipSelect);
+
+    ///SETTINGS
+    settings = initializationSETTINGS(http, sdCard_available);
+  } else {
+    settings.status == offline;
+    settings.mode = record;
+    settings.frequency = 10;
+    //SD CARD
+    bool sdCard_available = initializationSDCARD(chipSelect);
+    Serial.print(sdCard_available);
+  }
 
   ///GPS
   initializationGPS();
@@ -107,9 +121,9 @@ void loop() {
   } else {
     /* 
 
-  NO CODE HERE BECAUSE IF YOU PUT LOGIC HERE, OUTSIIDE THE while (GPS.available()) LOOP,
+  NO CODE HERE BECAUSE IF YOU PUT LOGIC HERE, OUTSIIDE THE while(GPS.available()) LOOP,
   THE GPS WILL LOSE THE CONNECTION FROM THE SATELLITES 
-  AND THEN TO RECONNECT IT WILL NEED 3/4 MINUTES EACH TIMES
+  AND THEN TO RECONNECT IT WILL NEED 3/4 MINUTES EACH TIMES.
 
   */
     while (GPS.available()) {
@@ -125,7 +139,7 @@ void loop() {
         Serial.println();
         Serial.println("Saving data at cicle  " + String(i));
 
-        input.timestamp[i] = isnan(gsm.getTime());
+        input.timestamp[i] = settings.status == online ? gsm.getTime() : millis();
         input.battery[i] = analogRead(ADC_BATTERY) * (4.3 / 1023.0);
         input.latitude[i] = isnan(GPS.latitude()) ? 0.0 : GPS.latitude();
         input.longitude[i] = isnan(GPS.longitude()) ? 0.0 : GPS.longitude();
@@ -142,7 +156,7 @@ void loop() {
         Serial.println("Logs saved: " + String(i));
         Serial.println();
 
-        String input_data;
+        String input_data = "clock=" + String(DEVICE_CLOCK) + "&frequency=" + String(settings.frequency);
         for (int k = 0; k < i; k++) {
           input_data = input_data + "&timestamp=" + String(input.timestamp[k]) + "&battery=" + String(input.battery[k])
                        + "&latitude=" + String(input.latitude[k], 7) + "&longitude=" + String(input.longitude[k], 7)
