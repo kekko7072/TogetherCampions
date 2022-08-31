@@ -20,7 +20,7 @@ export 'package:firebase_auth/firebase_auth.dart';
 export 'package:cloud_firestore/cloud_firestore.dart';
 export 'package:cloud_functions/cloud_functions.dart';
 export 'package:firebase_app_check/firebase_app_check.dart';
-export 'package:firebase_messaging/firebase_messaging.dart';
+//export 'package:firebase_messaging/firebase_messaging.dart';
 export 'package:firebase_storage/firebase_storage.dart';
 export 'package:firebase_crashlytics/firebase_crashlytics.dart';
 
