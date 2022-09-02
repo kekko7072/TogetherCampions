@@ -647,7 +647,9 @@ class DeviceLocationState extends State<DeviceLocation> {
   @override
   void initState() {
     super.initState();
+
     start = widget.logs.first;
+
     _mapController = MapTileLayerController();
 
     _zoomPanBehavior = MapZoomPanBehavior(

@@ -165,13 +165,6 @@ class TrackPreviewState extends State<TrackPreview> {
                 child: SfMaps(
                   layers: <MapLayer>[
                     MapTileLayer(
-                      /// URL to request the tiles from the providers.
-                      ///
-                      /// The [urlTemplate] accepts the URL in WMTS format i.e. {z} —
-                      /// zoom level, {x} and {y} — tile coordinates.
-                      ///
-                      /// We will replace the {z}, {x}, {y} internally based on the
-                      /// current center point and the zoom level.
                       urlTemplate:
                           'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
                       zoomPanBehavior: _zoomPanBehavior,
@@ -213,7 +206,7 @@ class TrackPreviewState extends State<TrackPreview> {
                                           child: Column(
                                             children: [
                                               Text(
-                                                'Altitude: ${widget.logs[index].gps.altitude.roundToDouble()}',
+                                                'Altitude: ${widget.logs[index].gps.altitude.roundToDouble()} m',
                                                 style: const TextStyle(
                                                     fontSize: 10,
                                                     color: Colors.black),
@@ -250,7 +243,6 @@ class TrackPreviewState extends State<TrackPreview> {
                           ),
                         );
                       },
-
                       sublayers: <MapSublayer>[
                         MapPolylineLayer(
                             polylines: <MapPolyline>{

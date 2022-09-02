@@ -109,6 +109,7 @@ class CalculationService {
         minZoomLevel: 3,
         maxZoomLevel: 30,
         focalLatLng: findCenter(start, end),
+        showToolbar: !isPreview,
         toolbarSettings: const MapToolbarSettings(
             direction: Axis.vertical,
             position: MapToolbarPosition.bottomRight));
