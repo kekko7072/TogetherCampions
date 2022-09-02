@@ -21,13 +21,14 @@ export 'package:cloud_firestore/cloud_firestore.dart';
 export 'package:cloud_functions/cloud_functions.dart';
 export 'package:firebase_app_check/firebase_app_check.dart';
 //export 'package:firebase_messaging/firebase_messaging.dart';
-export 'package:firebase_storage/firebase_storage.dart';
+//export 'package:firebase_storage/firebase_storage.dart';
 export 'package:firebase_crashlytics/firebase_crashlytics.dart';
 
 ///Basic
 export 'package:provider/provider.dart';
 export 'package:uuid/uuid.dart';
 export 'package:google_maps_flutter/google_maps_flutter.dart';
+export 'package:syncfusion_flutter_maps/maps.dart';
 export 'package:file_picker/file_picker.dart';
 export 'package:http/http.dart';
 

@@ -665,8 +665,8 @@ class DeviceLocationState extends State<DeviceLocation> {
           zoomControlsEnabled: false,
           zoomGesturesEnabled: false,
           mapType: MapType.satellite,
-          initialCameraPosition:
-              CameraPosition(target: start.gps.latLng, zoom: 14),
+          initialCameraPosition: CameraPosition(target: LatLng(0, 0)),
+          //initialCameraPosition: CameraPosition(target: start.gps.latLng, zoom: 14),
         ),
       ),
     );
@@ -677,7 +677,7 @@ class DeviceLocationState extends State<DeviceLocation> {
       controller = controllerParam;
 
       //ADD MARKERS
-      _markers.add(Marker(
+      /*_markers.add(Marker(
         markerId: const MarkerId('start'),
         icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure),
         position: start.gps.latLng,
@@ -686,7 +686,7 @@ class DeviceLocationState extends State<DeviceLocation> {
           snippet:
               'Started ${start.timestamp.day}/${start.timestamp.month}/${start.timestamp.year} at ${start.timestamp.hour}:${start.timestamp.minute}',
         ),
-      ));
+      ));*/
     });
   }
 }

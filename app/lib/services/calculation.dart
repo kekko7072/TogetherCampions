@@ -3,7 +3,20 @@ import 'package:intl/intl.dart';
 import 'imports.dart';
 
 class CalculationService {
-  static double findDistanceFromList(List<LatLng> list) {
+  static int findFastestLogFromList(List<Log> list) {
+    int i = 0;
+    double speed = 0;
+    int index = 0;
+    for (i = 0; i < list.length - 1; i++) {
+      if (list[i].gps.speed > speed) {
+        speed = list[i].gps.speed;
+        index = i;
+      }
+    }
+    return index;
+  }
+
+  static double findDistanceFromList(List<MapLatLng> list) {
     int i = 0;
     double distance = 0;
     for (i = 0; i < list.length - 1; i++) {
@@ -12,7 +25,7 @@ class CalculationService {
     return distance;
   }
 
-  static double findDistance(LatLng from, LatLng to) {
+  static double findDistance(MapLatLng from, MapLatLng to) {
     double lat1 = toRadian(from.latitude);
     double lng1 = toRadian(from.longitude);
     double lat2 = toRadian(to.latitude);
@@ -30,7 +43,7 @@ class CalculationService {
     return res;
   }
 
-  static LatLng findCenter(LatLng from, LatLng to) {
+  static LatLng findCenter(MapLatLng from, MapLatLng to) {
     //Find the center of the two points
     double lat1 = toRadian(from.latitude);
     double lng1 = toRadian(from.longitude);
@@ -63,13 +76,13 @@ class CalculationService {
   }
 
   static initialCameraPosition(
-      {required List<LatLng> list, required bool isPreview}) {
-    LatLng start = list.first;
-    LatLng end = list.first;
+      {required List<MapLatLng> list, required bool isPreview}) {
+    MapLatLng start = list.first;
+    MapLatLng end = list.first;
     double distance = 0;
 
     //Find two more distant points
-    for (LatLng latLng in list) {
+    for (MapLatLng latLng in list) {
       double newDistance = findDistance(start, latLng);
       if (distance < newDistance) {
         end = latLng;
@@ -96,7 +109,7 @@ class CalculationService {
 
   static Telemetry telemetry({
     required List<Log> logs,
-    required List<LatLng> segment,
+    required List<MapLatLng> segment,
   }) {
     double speedMedium = 0;
     double speedMax = 0;

@@ -13,17 +13,28 @@ class SessionMap extends StatefulWidget {
   State<SessionMap> createState() => SessionMapState();
 }
 
-class SessionMapState extends State<SessionMap> {
+class SessionMapState extends State<SessionMap>
+    with SingleTickerProviderStateMixin {
   late GoogleMapController controller;
-  final Set<Marker> _markers = {};
-  final Set<Polyline> _polyline = {};
 
   late Log start;
   late Log end;
 
-  List<LatLng> segment = [];
-
   Telemetry? telemetry;
+
+  ///
+
+  List<MapLatLng> polylinePoints = [];
+  late MapTileLayerController _mapController;
+
+  late MapZoomPanBehavior _zoomPanBehavior;
+
+  AnimationController? _animationController;
+  late Animation<double> _animation;
+
+  int durationDivision = 2;
+  bool runningAnimation = false;
+  int indexFastestLog = 0;
 
   @override
   void initState() {
@@ -32,11 +43,45 @@ class SessionMapState extends State<SessionMap> {
     end = widget.logs.last;
 
     for (Log log in widget.logs) {
-      segment.add(log.gps.latLng);
+      polylinePoints.add(log.gps.latLng);
     }
 
-    telemetry =
-        CalculationService.telemetry(logs: widget.logs, segment: segment);
+    telemetry = CalculationService.telemetry(
+        logs: widget.logs, segment: polylinePoints);
+
+    indexFastestLog = CalculationService.findFastestLogFromList(widget.logs);
+
+    ///
+    _mapController = MapTileLayerController();
+
+    _zoomPanBehavior = MapZoomPanBehavior(
+        zoomLevel: 15,
+        minZoomLevel: 5,
+        maxZoomLevel: 20,
+        focalLatLng: start.gps.latLng,
+        toolbarSettings: const MapToolbarSettings(
+            direction: Axis.vertical, position: MapToolbarPosition.bottomRight)
+        //enableDoubleTapZooming: true,
+        );
+
+    _animationController = AnimationController(
+      duration: Duration(seconds: widget.logs.length ~/ durationDivision),
+      vsync: this,
+    );
+
+    _animation = CurvedAnimation(
+      parent: _animationController!,
+      curve: Curves.easeInCirc,
+    );
+
+    _animationController?.forward(from: widget.logs.length - 1);
+  }
+
+  @override
+  void dispose() {
+    _animationController!.dispose();
+    _mapController.dispose();
+    super.dispose();
   }
 
   @override
@@ -45,14 +90,116 @@ class SessionMapState extends State<SessionMap> {
       onWillPop: () => Future.value(false),
       child: Stack(
         children: [
-          GoogleMap(
-            polylines: _polyline,
-            markers: _markers,
-            onMapCreated: _onMapCreated,
-            zoomControlsEnabled: false,
-            mapType: MapType.satellite,
-            initialCameraPosition: CalculationService.initialCameraPosition(
-                list: segment, isPreview: false),
+          SfMaps(
+            layers: <MapLayer>[
+              MapTileLayer(
+                /// URL to request the tiles from the providers.
+                ///
+                /// The [urlTemplate] accepts the URL in WMTS format i.e. {z} —
+                /// zoom level, {x} and {y} — tile coordinates.
+                ///
+                /// We will replace the {z}, {x}, {y} internally based on the
+                /// current center point and the zoom level.
+                urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                zoomPanBehavior: _zoomPanBehavior,
+                controller: _mapController,
+                initialMarkersCount: widget.logs.length,
+                tooltipSettings: const MapTooltipSettings(
+                  color: Colors.white,
+                ),
+                markerTooltipBuilder: (BuildContext context, int index) {
+                  return ClipRRect(
+                    borderRadius: const BorderRadius.all(Radius.circular(8)),
+                    child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          Container(
+                            padding: const EdgeInsets.only(
+                                left: 10.0, top: 5.0, bottom: 5.0),
+                            width: 150,
+                            color: index == indexFastestLog
+                                ? Colors.green
+                                : Colors.white,
+                            child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: <Widget>[
+                                  Text(
+                                    index == 0
+                                        ? 'Start'
+                                        : index == widget.logs.length - 1
+                                            ? 'End'
+                                            : 'Speed: ${widget.logs[index].gps.speed.roundToDouble()} km/h',
+                                    style: const TextStyle(
+                                        fontSize: 14,
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 5.0),
+                                    child: Column(
+                                      children: [
+                                        Text(
+                                          'Altitude: ${widget.logs[index].gps.altitude.roundToDouble()}',
+                                          style: const TextStyle(
+                                              fontSize: 10,
+                                              color: Colors.black),
+                                        ),
+                                        Text(
+                                          'Course: ${widget.logs[index].gps.course}°',
+                                          style: const TextStyle(
+                                              fontSize: 10,
+                                              color: Colors.black),
+                                        ),
+                                      ],
+                                    ),
+                                  )
+                                ]),
+                          ),
+                        ]),
+                  );
+                },
+                markerBuilder: (BuildContext context, int index) {
+                  return MapMarker(
+                    latitude: widget.logs[index].gps.latLng.latitude,
+                    longitude: widget.logs[index].gps.latLng.longitude,
+                    alignment: Alignment.bottomCenter,
+                    child: FittedBox(
+                      child: Icon(Icons.location_on,
+                          color: index == 0 || index == widget.logs.length - 1
+                              ? Colors.blue
+                              : index == indexFastestLog
+                                  ? Colors.green
+                                  : AppStyle.primaryColor,
+                          size: index == 0 || index == widget.logs.length - 1
+                              ? 50
+                              : 20),
+                    ),
+                  );
+                },
+
+                sublayers: <MapSublayer>[
+                  MapPolylineLayer(
+                      polylines: <MapPolyline>{
+                        MapPolyline(
+                          points: polylinePoints,
+                          width: 6.0,
+                          color: AppStyle.primaryColor,
+                        )
+                      },
+                      animation: _animation,
+                      tooltipBuilder: (BuildContext context, int index) {
+                        return Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text("Tracciato",
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .caption!
+                                  .copyWith(color: Colors.black)),
+                        );
+                      }),
+                ],
+              ),
+            ],
           ),
           if (telemetry != null) ...[
             SafeArea(
@@ -63,9 +210,82 @@ class SessionMapState extends State<SessionMap> {
               ),
             ),
             SafeArea(
-              child: CardInfo(
-                session: widget.session,
-                battery: telemetry!.battery.consumption,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  CardInfo(
+                    session: widget.session,
+                    battery: telemetry!.battery.consumption,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 20.0, vertical: 10),
+                    child: Row(
+                      children: [
+                        Text(
+                          'Riproduci',
+                          style: Theme.of(context)
+                              .textTheme
+                              .titleMedium!
+                              .copyWith(fontWeight: FontWeight.bold),
+                        ),
+                        const SizedBox(width: 20),
+                        GestureDetector(
+                          child: Container(
+                            height: 35,
+                            width: 35,
+                            decoration: const BoxDecoration(
+                                shape: BoxShape.circle, color: Colors.white),
+                            child: Center(
+                              child: Icon(
+                                runningAnimation
+                                    ? CupertinoIcons.stop_circle
+                                    : CupertinoIcons.play_circle,
+                                size: 22,
+                                color: Colors.black87,
+                              ),
+                            ),
+                          ),
+                          onTap: () {
+                            if (_animationController!.isCompleted) {
+                              _animationController?.reset();
+                            }
+                            runningAnimation
+                                ? _animationController?.stop()
+                                : _animationController?.forward();
+                            setState(
+                                () => runningAnimation = !runningAnimation);
+                          },
+                        ),
+                        const SizedBox(width: 10),
+                        GestureDetector(
+                          child: Container(
+                            height: 35,
+                            width: 35,
+                            decoration: const BoxDecoration(
+                                shape: BoxShape.circle, color: Colors.white),
+                            child: const Center(
+                              child: Icon(
+                                CupertinoIcons.forward_end_alt,
+                                size: 22,
+                                color: Colors.black87,
+                              ),
+                            ),
+                          ),
+                          onTap: () => setState(() {
+                            _animationController?.stop();
+                            durationDivision = durationDivision * 2;
+                            _animationController!.duration = Duration(
+                                seconds:
+                                    widget.logs.length ~/ durationDivision);
+
+                            _animationController?.forward();
+                          }),
+                        ),
+                      ],
+                    ),
+                  )
+                ],
               ),
             ),
           ],
@@ -88,53 +308,5 @@ class SessionMapState extends State<SessionMap> {
         ],
       ),
     );
-  }
-
-  void _onMapCreated(GoogleMapController controllerParam) {
-    setState(() {
-      controller = controllerParam;
-
-      //ADD MARKERS
-      _markers.add(Marker(
-        markerId: const MarkerId('start'),
-        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure),
-        position: start.gps.latLng,
-        infoWindow: InfoWindow(
-          title: 'Start',
-          snippet: CalculationService.formatDate(
-              date: start.timestamp, year: true, seconds: true),
-        ),
-      ));
-      _markers.add(Marker(
-        markerId: const MarkerId('end'),
-        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure),
-        position: end.gps.latLng,
-        infoWindow: InfoWindow(
-          title: 'End',
-          snippet: CalculationService.formatDate(
-              date: end.timestamp, year: true, seconds: true),
-        ),
-      ));
-
-      //ADD LINES
-      _polyline.add(Polyline(
-        polylineId: const PolylineId('line1'),
-        visible: true,
-        points: segment,
-        width: 6,
-        color: AppStyle.primaryColor,
-        geodesic: true,
-        jointType: JointType.round,
-      ));
-
-      /*
-      _polyline.add(Polyline(
-        polylineId: PolylineId('line2'),
-        visible: true,
-        points: segment1,
-        width: 2,
-        color: Colors.red,
-      ));*/
-    });
   }
 }

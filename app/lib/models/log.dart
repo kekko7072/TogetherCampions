@@ -23,7 +23,7 @@ class GPS {
     required this.satellites,
   });
 
-  final LatLng latLng;
+  final MapLatLng latLng;
   final double altitude;
   final double speed;
   final double course;

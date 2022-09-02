@@ -133,7 +133,7 @@ class TrackPreviewState extends State<TrackPreview> {
   late Log start;
   late Log end;
 
-  List<LatLng> segment = [];
+  List<MapLatLng> segment = [];
 
   @override
   void initState() {
@@ -161,7 +161,7 @@ class TrackPreviewState extends State<TrackPreview> {
                 child: GoogleMap(
                   polylines: _polyline,
                   markers: _markers,
-                  onMapCreated: _onMapCreated,
+                  // onMapCreated: _onMapCreated,
                   scrollGesturesEnabled: false,
                   zoomControlsEnabled: false,
                   zoomGesturesEnabled: false,
@@ -175,7 +175,7 @@ class TrackPreviewState extends State<TrackPreview> {
           );
   }
 
-  void _onMapCreated(GoogleMapController controllerParam) {
+  /*void _onMapCreated(GoogleMapController controllerParam) {
     setState(() {
       controller = controllerParam;
 
@@ -202,7 +202,7 @@ class TrackPreviewState extends State<TrackPreview> {
       ));
 
       //ADD LINES
-      _polyline.add(Polyline(
+      /*_polyline.add(Polyline(
         polylineId: const PolylineId('line'),
         visible: true,
         points: segment,
@@ -210,7 +210,7 @@ class TrackPreviewState extends State<TrackPreview> {
         color: AppStyle.primaryColor,
         geodesic: true,
         jointType: JointType.round,
-      ));
+      ));*/
     });
-  }
+  }*/
 }

@@ -28,7 +28,7 @@ class DatabaseLog {
             : DateTime.now(),
         battery: snapshot.data()?['battery'].toDouble() ?? 0.0,
         gps: GPS(
-          latLng: LatLng(
+          latLng: MapLatLng(
               '${snapshot.data()?['gps']?['latitude']}' != 'NaN'
                   ? snapshot.data()?['gps']?['latitude']?.toDouble() ?? 0.0
                   : 0.0,
