@@ -638,15 +638,25 @@ class DeviceLocation extends StatefulWidget {
 }
 
 class DeviceLocationState extends State<DeviceLocation> {
-  late GoogleMapController controller;
-  final Set<Marker> _markers = {};
-
   late Log start;
+
+  late MapTileLayerController _mapController;
+
+  late MapZoomPanBehavior _zoomPanBehavior;
 
   @override
   void initState() {
     super.initState();
     start = widget.logs.first;
+    _mapController = MapTileLayerController();
+
+    _zoomPanBehavior = MapZoomPanBehavior(
+      zoomLevel: 15,
+      minZoomLevel: 3,
+      maxZoomLevel: 30,
+      focalLatLng: start.gps.latLng,
+      showToolbar: false,
+    );
   }
 
   @override
@@ -658,35 +668,82 @@ class DeviceLocationState extends State<DeviceLocation> {
         clipBehavior: Clip.hardEdge,
         decoration: const BoxDecoration(
             borderRadius: BorderRadius.all(Radius.circular(10))),
-        child: GoogleMap(
-          markers: _markers,
-          onMapCreated: _onMapCreated,
-          scrollGesturesEnabled: false,
-          zoomControlsEnabled: false,
-          zoomGesturesEnabled: false,
-          mapType: MapType.satellite,
-          initialCameraPosition: CameraPosition(target: LatLng(0, 0)),
-          //initialCameraPosition: CameraPosition(target: start.gps.latLng, zoom: 14),
+        child: SfMaps(
+          layers: <MapLayer>[
+            MapTileLayer(
+              urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+              zoomPanBehavior: _zoomPanBehavior,
+              controller: _mapController,
+              initialMarkersCount: widget.logs.length,
+              tooltipSettings: const MapTooltipSettings(
+                color: Colors.white,
+              ),
+              markerTooltipBuilder: (BuildContext context, int index) {
+                return ClipRRect(
+                  borderRadius: const BorderRadius.all(Radius.circular(8)),
+                  child:
+                      Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
+                    Container(
+                      padding: const EdgeInsets.only(
+                          left: 10.0, top: 5.0, bottom: 5.0),
+                      width: 150,
+                      color: Colors.white,
+                      child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Text(
+                              index == 0
+                                  ? 'Start'
+                                  : index == widget.logs.length - 1
+                                      ? 'End'
+                                      : 'Speed: ${widget.logs[index].gps.speed.roundToDouble()} km/h',
+                              style: const TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(top: 5.0),
+                              child: Column(
+                                children: [
+                                  Text(
+                                    'Altitude: ${widget.logs[index].gps.altitude.roundToDouble()}',
+                                    style: const TextStyle(
+                                        fontSize: 10, color: Colors.black),
+                                  ),
+                                  Text(
+                                    'Course: ${widget.logs[index].gps.course.roundToDouble()}°',
+                                    style: const TextStyle(
+                                        fontSize: 10, color: Colors.black),
+                                  ),
+                                ],
+                              ),
+                            )
+                          ]),
+                    ),
+                  ]),
+                );
+              },
+              markerBuilder: (BuildContext context, int index) {
+                return MapMarker(
+                  latitude: widget.logs[index].gps.latLng.latitude,
+                  longitude: widget.logs[index].gps.latLng.longitude,
+                  alignment: Alignment.bottomCenter,
+                  child: FittedBox(
+                    child: Icon(Icons.location_on,
+                        color: index == 0 || index == widget.logs.length - 1
+                            ? Colors.blue
+                            : AppStyle.primaryColor,
+                        size: index == 0 || index == widget.logs.length - 1
+                            ? 50
+                            : 20),
+                  ),
+                );
+              },
+            ),
+          ],
         ),
       ),
     );
-  }
-
-  void _onMapCreated(GoogleMapController controllerParam) {
-    setState(() {
-      controller = controllerParam;
-
-      //ADD MARKERS
-      /*_markers.add(Marker(
-        markerId: const MarkerId('start'),
-        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure),
-        position: start.gps.latLng,
-        infoWindow: InfoWindow(
-          title: 'Start',
-          snippet:
-              'Started ${start.timestamp.day}/${start.timestamp.month}/${start.timestamp.year} at ${start.timestamp.hour}:${start.timestamp.minute}',
-        ),
-      ));*/
-    });
   }
 }

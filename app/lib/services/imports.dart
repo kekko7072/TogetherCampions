@@ -27,7 +27,7 @@ export 'package:firebase_crashlytics/firebase_crashlytics.dart';
 ///Basic
 export 'package:provider/provider.dart';
 export 'package:uuid/uuid.dart';
-export 'package:google_maps_flutter/google_maps_flutter.dart';
+//export 'package:google_maps_flutter/google_maps_flutter.dart';
 export 'package:syncfusion_flutter_maps/maps.dart';
 export 'package:file_picker/file_picker.dart';
 export 'package:http/http.dart';

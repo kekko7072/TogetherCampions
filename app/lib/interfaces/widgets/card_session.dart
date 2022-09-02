@@ -1,6 +1,5 @@
 import 'package:app/services/imports.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:intl/intl.dart';
 
 class CardSession extends StatelessWidget {
   const CardSession(
@@ -126,14 +125,14 @@ class TrackPreview extends StatefulWidget {
 }
 
 class TrackPreviewState extends State<TrackPreview> {
-  late GoogleMapController controller;
-  final Set<Marker> _markers = {};
-  final Set<Polyline> _polyline = {};
-
   late Log start;
   late Log end;
 
   List<MapLatLng> segment = [];
+
+  late MapTileLayerController _mapController;
+
+  late MapZoomPanBehavior _zoomPanBehavior;
 
   @override
   void initState() {
@@ -144,6 +143,11 @@ class TrackPreviewState extends State<TrackPreview> {
     for (Log log in widget.logs) {
       segment.add(log.gps.latLng);
     }
+
+    _mapController = MapTileLayerController();
+
+    _zoomPanBehavior = CalculationService.initialCameraPosition(
+        list: segment, isPreview: true);
   }
 
   @override
@@ -158,59 +162,120 @@ class TrackPreviewState extends State<TrackPreview> {
                 clipBehavior: Clip.hardEdge,
                 decoration: const BoxDecoration(
                     borderRadius: BorderRadius.all(Radius.circular(20))),
-                child: GoogleMap(
-                  polylines: _polyline,
-                  markers: _markers,
-                  // onMapCreated: _onMapCreated,
-                  scrollGesturesEnabled: false,
-                  zoomControlsEnabled: false,
-                  zoomGesturesEnabled: false,
-                  mapType: MapType.satellite,
-                  initialCameraPosition:
-                      CalculationService.initialCameraPosition(
-                          list: segment, isPreview: true),
+                child: SfMaps(
+                  layers: <MapLayer>[
+                    MapTileLayer(
+                      /// URL to request the tiles from the providers.
+                      ///
+                      /// The [urlTemplate] accepts the URL in WMTS format i.e. {z} —
+                      /// zoom level, {x} and {y} — tile coordinates.
+                      ///
+                      /// We will replace the {z}, {x}, {y} internally based on the
+                      /// current center point and the zoom level.
+                      urlTemplate:
+                          'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                      zoomPanBehavior: _zoomPanBehavior,
+                      controller: _mapController,
+                      initialMarkersCount: widget.logs.length,
+                      tooltipSettings: const MapTooltipSettings(
+                        color: Colors.white,
+                      ),
+                      markerTooltipBuilder: (BuildContext context, int index) {
+                        return ClipRRect(
+                          borderRadius:
+                              const BorderRadius.all(Radius.circular(8)),
+                          child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: <Widget>[
+                                Container(
+                                  padding: const EdgeInsets.only(
+                                      left: 10.0, top: 5.0, bottom: 5.0),
+                                  width: 150,
+                                  color: Colors.white,
+                                  child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: <Widget>[
+                                        Text(
+                                          index == 0
+                                              ? 'Start'
+                                              : index == widget.logs.length - 1
+                                                  ? 'End'
+                                                  : 'Speed: ${widget.logs[index].gps.speed.roundToDouble()} km/h',
+                                          style: const TextStyle(
+                                              fontSize: 14,
+                                              color: Colors.black,
+                                              fontWeight: FontWeight.bold),
+                                        ),
+                                        Padding(
+                                          padding:
+                                              const EdgeInsets.only(top: 5.0),
+                                          child: Column(
+                                            children: [
+                                              Text(
+                                                'Altitude: ${widget.logs[index].gps.altitude.roundToDouble()}',
+                                                style: const TextStyle(
+                                                    fontSize: 10,
+                                                    color: Colors.black),
+                                              ),
+                                              Text(
+                                                'Course: ${widget.logs[index].gps.course.roundToDouble()}°',
+                                                style: const TextStyle(
+                                                    fontSize: 10,
+                                                    color: Colors.black),
+                                              ),
+                                            ],
+                                          ),
+                                        )
+                                      ]),
+                                ),
+                              ]),
+                        );
+                      },
+                      markerBuilder: (BuildContext context, int index) {
+                        return MapMarker(
+                          latitude: widget.logs[index].gps.latLng.latitude,
+                          longitude: widget.logs[index].gps.latLng.longitude,
+                          alignment: Alignment.bottomCenter,
+                          child: FittedBox(
+                            child: Icon(Icons.location_on,
+                                color: index == 0 ||
+                                        index == widget.logs.length - 1
+                                    ? Colors.blue
+                                    : AppStyle.primaryColor,
+                                size: index == 0 ||
+                                        index == widget.logs.length - 1
+                                    ? 50
+                                    : 20),
+                          ),
+                        );
+                      },
+
+                      sublayers: <MapSublayer>[
+                        MapPolylineLayer(
+                            polylines: <MapPolyline>{
+                              MapPolyline(
+                                points: segment,
+                                width: 6.0,
+                                color: AppStyle.primaryColor,
+                              )
+                            },
+                            tooltipBuilder: (BuildContext context, int index) {
+                              return Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text("Tracciato",
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .caption!
+                                        .copyWith(color: Colors.black)),
+                              );
+                            }),
+                      ],
+                    ),
+                  ],
                 ),
               ),
             ),
           );
   }
-
-  /*void _onMapCreated(GoogleMapController controllerParam) {
-    setState(() {
-      controller = controllerParam;
-
-      //ADD MARKERS
-      _markers.add(Marker(
-        markerId: const MarkerId('start'),
-        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure),
-        position: start.gps.latLng,
-        infoWindow: InfoWindow(
-          title: 'Start',
-          snippet:
-              'Started ${DateFormat('dd/MM/yyyy').format(start.timestamp)} at ${DateFormat('kk:mm').format(start.timestamp)}',
-        ),
-      ));
-      _markers.add(Marker(
-        markerId: const MarkerId('end'),
-        icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure),
-        position: end.gps.latLng,
-        infoWindow: InfoWindow(
-          title: 'End',
-          snippet:
-              'Ended ${DateFormat('dd/MM/yyyy').format(end.timestamp)} at ${DateFormat('kk:mm').format(end.timestamp)}',
-        ),
-      ));
-
-      //ADD LINES
-      /*_polyline.add(Polyline(
-        polylineId: const PolylineId('line'),
-        visible: true,
-        points: segment,
-        width: 6,
-        color: AppStyle.primaryColor,
-        geodesic: true,
-        jointType: JointType.round,
-      ));*/
-    });
-  }*/
 }

@@ -15,16 +15,13 @@ class SessionMap extends StatefulWidget {
 
 class SessionMapState extends State<SessionMap>
     with SingleTickerProviderStateMixin {
-  late GoogleMapController controller;
-
   late Log start;
   late Log end;
 
-  Telemetry? telemetry;
-
-  ///
+  late Telemetry telemetry;
 
   List<MapLatLng> polylinePoints = [];
+
   late MapTileLayerController _mapController;
 
   late MapZoomPanBehavior _zoomPanBehavior;
@@ -51,18 +48,10 @@ class SessionMapState extends State<SessionMap>
 
     indexFastestLog = CalculationService.findFastestLogFromList(widget.logs);
 
-    ///
     _mapController = MapTileLayerController();
 
-    _zoomPanBehavior = MapZoomPanBehavior(
-        zoomLevel: 15,
-        minZoomLevel: 5,
-        maxZoomLevel: 20,
-        focalLatLng: start.gps.latLng,
-        toolbarSettings: const MapToolbarSettings(
-            direction: Axis.vertical, position: MapToolbarPosition.bottomRight)
-        //enableDoubleTapZooming: true,
-        );
+    _zoomPanBehavior = CalculationService.initialCameraPosition(
+        list: polylinePoints, isPreview: false);
 
     _animationController = AnimationController(
       duration: Duration(seconds: widget.logs.length ~/ durationDivision),
@@ -139,13 +128,13 @@ class SessionMapState extends State<SessionMap>
                                     child: Column(
                                       children: [
                                         Text(
-                                          'Altitude: ${widget.logs[index].gps.altitude.roundToDouble()}',
+                                          'Altitude: ${widget.logs[index].gps.altitude.roundToDouble()} m',
                                           style: const TextStyle(
                                               fontSize: 10,
                                               color: Colors.black),
                                         ),
                                         Text(
-                                          'Course: ${widget.logs[index].gps.course}°',
+                                          'Course: ${widget.logs[index].gps.course.roundToDouble()}°',
                                           style: const TextStyle(
                                               fontSize: 10,
                                               color: Colors.black),
@@ -201,94 +190,90 @@ class SessionMapState extends State<SessionMap>
               ),
             ],
           ),
-          if (telemetry != null) ...[
-            SafeArea(
-              child: CardTelemetry(
-                id: widget.id,
-                telemetry: telemetry!,
-                session: widget.session,
-              ),
+          SafeArea(
+            child: CardTelemetry(
+              id: widget.id,
+              telemetry: telemetry,
+              session: widget.session,
             ),
-            SafeArea(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  CardInfo(
-                    session: widget.session,
-                    battery: telemetry!.battery.consumption,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 20.0, vertical: 10),
-                    child: Row(
-                      children: [
-                        Text(
-                          'Riproduci',
-                          style: Theme.of(context)
-                              .textTheme
-                              .titleMedium!
-                              .copyWith(fontWeight: FontWeight.bold),
-                        ),
-                        const SizedBox(width: 20),
-                        GestureDetector(
-                          child: Container(
-                            height: 35,
-                            width: 35,
-                            decoration: const BoxDecoration(
-                                shape: BoxShape.circle, color: Colors.white),
-                            child: Center(
-                              child: Icon(
-                                runningAnimation
-                                    ? CupertinoIcons.stop_circle
-                                    : CupertinoIcons.play_circle,
-                                size: 22,
-                                color: Colors.black87,
-                              ),
+          ),
+          SafeArea(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                CardInfo(
+                  session: widget.session,
+                  battery: telemetry.battery.consumption,
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 20.0, vertical: 10),
+                  child: Row(
+                    children: [
+                      Text(
+                        'Riproduci',
+                        style: Theme.of(context)
+                            .textTheme
+                            .titleMedium!
+                            .copyWith(fontWeight: FontWeight.bold),
+                      ),
+                      const SizedBox(width: 20),
+                      GestureDetector(
+                        child: Container(
+                          height: 35,
+                          width: 35,
+                          decoration: const BoxDecoration(
+                              shape: BoxShape.circle, color: Colors.white),
+                          child: Center(
+                            child: Icon(
+                              runningAnimation
+                                  ? CupertinoIcons.stop_circle
+                                  : CupertinoIcons.play_circle,
+                              size: 22,
+                              color: Colors.black87,
                             ),
                           ),
-                          onTap: () {
-                            if (_animationController!.isCompleted) {
-                              _animationController?.reset();
-                            }
-                            runningAnimation
-                                ? _animationController?.stop()
-                                : _animationController?.forward();
-                            setState(
-                                () => runningAnimation = !runningAnimation);
-                          },
                         ),
-                        const SizedBox(width: 10),
-                        GestureDetector(
-                          child: Container(
-                            height: 35,
-                            width: 35,
-                            decoration: const BoxDecoration(
-                                shape: BoxShape.circle, color: Colors.white),
-                            child: const Center(
-                              child: Icon(
-                                CupertinoIcons.forward_end_alt,
-                                size: 22,
-                                color: Colors.black87,
-                              ),
+                        onTap: () {
+                          if (_animationController!.isCompleted) {
+                            _animationController?.reset();
+                          }
+                          runningAnimation
+                              ? _animationController?.stop()
+                              : _animationController?.forward();
+                          setState(() => runningAnimation = !runningAnimation);
+                        },
+                      ),
+                      const SizedBox(width: 10),
+                      GestureDetector(
+                        child: Container(
+                          height: 35,
+                          width: 35,
+                          decoration: const BoxDecoration(
+                              shape: BoxShape.circle, color: Colors.white),
+                          child: const Center(
+                            child: Icon(
+                              CupertinoIcons.forward_end_alt,
+                              size: 22,
+                              color: Colors.black87,
                             ),
                           ),
-                          onTap: () => setState(() {
-                            _animationController?.stop();
-                            durationDivision = durationDivision * 2;
-                            _animationController!.duration = Duration(
-                                seconds:
-                                    widget.logs.length ~/ durationDivision);
+                        ),
+                        onTap: () => setState(() {
+                          _animationController?.stop();
+                          durationDivision = durationDivision * 2;
+                          _animationController!.duration = Duration(
+                              seconds: widget.logs.length ~/ durationDivision);
 
-                            _animationController?.forward();
-                          }),
-                        ),
-                      ],
-                    ),
-                  )
-                ],
-              ),
+                          _animationController?.forward();
+                        }),
+                      ),
+                    ],
+                  ),
+                )
+              ],
             ),
-          ],
+          ),
           SafeArea(
             child: Align(
               alignment: Alignment.topRight,

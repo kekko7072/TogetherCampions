@@ -43,7 +43,7 @@ class CalculationService {
     return res;
   }
 
-  static LatLng findCenter(MapLatLng from, MapLatLng to) {
+  static MapLatLng findCenter(MapLatLng from, MapLatLng to) {
     //Find the center of the two points
     double lat1 = toRadian(from.latitude);
     double lng1 = toRadian(from.longitude);
@@ -59,7 +59,7 @@ class CalculationService {
         sqrt((cos(lat1) + bx) * (cos(lat1) + bx) + by * by)));
     double lngMidway = toDegrees(lng1 + atan2(by, cos(lat1) + bx));
 
-    return LatLng(latMidway, lngMidway);
+    return MapLatLng(latMidway, lngMidway);
   }
 
   static double roundDouble({required double number, required int decimal}) {
@@ -104,7 +104,14 @@ class CalculationService {
       zoom = 10.5;
     }
 
-    return CameraPosition(target: findCenter(start, end), zoom: zoom);
+    return MapZoomPanBehavior(
+        zoomLevel: zoom,
+        minZoomLevel: 3,
+        maxZoomLevel: 30,
+        focalLatLng: findCenter(start, end),
+        toolbarSettings: const MapToolbarSettings(
+            direction: Axis.vertical,
+            position: MapToolbarPosition.bottomRight));
   }
 
   static Telemetry telemetry({
