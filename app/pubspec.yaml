@@ -33,11 +33,12 @@ dependencies:
   #Design
   flutter_slidable: ^2.0.0
   cupertino_icons: ^1.0.5
-  flutter_svg: ^1.1.4
+  #flutter_svg: ^1.1.4
   battery_indicator: ^0.1.1
   flutter_easyloading: ^3.0.5
   graphic: ^0.10.6
   compass_icon: ^1.0.4
+  rename_app: ^1.1.0
 
 
 dev_dependencies:
