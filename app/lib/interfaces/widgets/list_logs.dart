@@ -1,6 +1,7 @@
 import 'package:app/services/imports.dart';
+import 'package:flutter/cupertino.dart';
 
-class ListLogs extends StatelessWidget {
+class ListLogs extends StatefulWidget {
   const ListLogs(
       {Key? key, required this.id, required this.isSession, this.session})
       : super(key: key);
@@ -8,6 +9,12 @@ class ListLogs extends StatelessWidget {
   final bool isSession;
   final Session? session;
 
+  @override
+  State<ListLogs> createState() => _ListLogsState();
+}
+
+class _ListLogsState extends State<ListLogs> {
+  int loadLimit = 50;
   @override
   Widget build(BuildContext context) {
     return DraggableScrollableSheet(
@@ -25,9 +32,10 @@ class ListLogs extends StatelessWidget {
                       style: Theme.of(context).textTheme.titleLarge,
                     ),
                     StreamBuilder<List<Log>>(
-                        stream: isSession
-                            ? DatabaseLog(id: id).sessionLogs(session: session!)
-                            : DatabaseLog(id: id).allLogs,
+                        stream: widget.isSession
+                            ? DatabaseLog(id: widget.id).sessionLogs(
+                                session: widget.session!)
+                            : DatabaseLog(id: widget.id).allLogs,
                         builder: (context, snapshot) {
                           if (snapshot.hasError) {
                             return Center(
@@ -47,7 +55,11 @@ class ListLogs extends StatelessWidget {
                               itemCount: snapshot.data!.length,
                               itemBuilder: (context, index) =>
                                   CardLog(log: logs[index]));
-                        })
+                        }),
+                  /*  CupertinoButton(
+                        child: Text('Load more'),
+                        onPressed: () =>
+                            setState(() => loadLimit = loadLimit + 50))*/
                   ],
                 ),
               ),

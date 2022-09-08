@@ -92,7 +92,7 @@ class CalculationService {
     double zoom = 0.0;
     if (distance < 10) {
       if (isPreview) {
-        zoom = 18.5 - 1.6 * distance;
+        zoom = 18.5 - 2 * distance;
       } else {
         zoom = 18.5 - 1.35 * distance;
       }
@@ -100,8 +100,10 @@ class CalculationService {
       zoom = 12.5;
     } else if (distance < 30) {
       zoom = 11.5;
-    } else {
+    } else if (distance < 50) {
       zoom = 10.5;
+    } else {
+      zoom = 8;
     }
 
     return MapZoomPanBehavior(
@@ -238,8 +240,6 @@ class CalculationService {
 
   static String formatOutputWithNewTimestamp(
       {required String input, required DateTime start}) {
-    debugPrint(input);
-
     ///SPLIT
     debugPrint("\nSPLIT");
     List<String> original = input.split("&");

@@ -42,6 +42,7 @@ class _AddEditSessionState extends State<AddEditSession> {
       name.text = widget.session!.name;
       start = widget.session!.start;
       end = widget.session!.end;
+      deviceId = widget.session!.deviceID;
     }
   }
 
@@ -87,7 +88,7 @@ class _AddEditSessionState extends State<AddEditSession> {
                       controller: name,
                       textAlign: TextAlign.center,
                       decoration: AppStyle().kTextFieldDecoration(
-                          icon: Icons.person, hintText: 'Enter title'),
+                          icon: Icons.label, hintText: 'Enter title'),
                     ),
                   ),
                   const SizedBox(height: 10),
@@ -100,11 +101,12 @@ class _AddEditSessionState extends State<AddEditSession> {
                                 ? AppStyle.primaryColor
                                 : Colors.black12,
                             label: Text(
-                              'ONLINE',
+                              'CLOUD',
                               style: TextStyle(
                                   fontWeight: isOnline
                                       ? FontWeight.bold
-                                      : FontWeight.normal),
+                                      : FontWeight.normal,
+                                  color: Colors.white),
                             ),
                             onSelected: (value) =>
                                 setState(() => isOnline = true)),
@@ -118,10 +120,34 @@ class _AddEditSessionState extends State<AddEditSession> {
                               style: TextStyle(
                                   fontWeight: !isOnline
                                       ? FontWeight.bold
-                                      : FontWeight.normal),
+                                      : FontWeight.normal,
+                                  color: Colors.white),
                             ),
                             onSelected: (value) =>
                                 setState(() => isOnline = false)),
+                      ],
+                    ),
+                  ],
+                  for (String deviceID in widget.userData.devices) ...[
+                    Wrap(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(5.0),
+                          child: FilterChip(
+                              backgroundColor: deviceId == deviceID
+                                  ? AppStyle.primaryColor
+                                  : Colors.black12,
+                              label: Text(
+                                deviceID,
+                                style: TextStyle(
+                                    fontWeight: deviceId == deviceID
+                                        ? FontWeight.bold
+                                        : FontWeight.normal,
+                                    color: Colors.white),
+                              ),
+                              onSelected: (value) =>
+                                  setState(() => deviceId = deviceID)),
+                        ),
                       ],
                     ),
                   ],
@@ -178,7 +204,10 @@ class _AddEditSessionState extends State<AddEditSession> {
                                   uid: widget.userData.uid,
                                   oldSession: widget.session!,
                                   newSession: Session(
-                                      name: name.text, start: start, end: end))
+                                      name: name.text,
+                                      start: start,
+                                      end: end,
+                                      deviceID: deviceId))
                               .then((value) {
                             setState(() => showLoading = false);
                             Navigator.of(context).pop();
@@ -188,7 +217,10 @@ class _AddEditSessionState extends State<AddEditSession> {
                                   isCreate: true,
                                   uid: widget.userData.uid,
                                   session: Session(
-                                      name: name.text, start: start, end: end))
+                                      name: name.text,
+                                      start: start,
+                                      end: end,
+                                      deviceID: deviceId))
                               .then((value) {
                             setState(() => showLoading = false);
                             Navigator.of(context).pop();
@@ -198,28 +230,6 @@ class _AddEditSessionState extends State<AddEditSession> {
                       child: Text(widget.isEdit ? 'Modifica' : 'Avvia'),
                     ),
                   ] else ...[
-                    for (String deviceID in widget.userData.devices) ...[
-                      Wrap(
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.all(5.0),
-                            child: FilterChip(
-                                backgroundColor: deviceId == deviceID
-                                    ? AppStyle.primaryColor
-                                    : Colors.black12,
-                                label: Text(
-                                  deviceID,
-                                  style: TextStyle(
-                                      fontWeight: deviceId == deviceID
-                                          ? FontWeight.bold
-                                          : FontWeight.normal),
-                                ),
-                                onSelected: (value) =>
-                                    setState(() => deviceId = deviceID)),
-                          ),
-                        ],
-                      ),
-                    ],
                     const SizedBox(height: 10),
                     CupertinoButton.filled(
                       onPressed: () async {
@@ -294,13 +304,17 @@ class _AddEditSessionState extends State<AddEditSession> {
                                             .where((element) =>
                                                 element.contains("timestamp="))
                                             .last,
-                                        start: start)))
+                                        start: start),
+                                    deviceID: deviceId))
                             .then((value) {
                           setState(() => showLoading = false);
                           Navigator.of(context).pop();
                         });
                       },
-                      child: Text(widget.isEdit ? 'Modifica' : 'Avvia'),
+                      child: Text(
+                        widget.isEdit ? 'Modifica' : 'Avvia',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
                     ),
                   ]
                 ],

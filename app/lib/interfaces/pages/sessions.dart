@@ -1,7 +1,26 @@
 import 'package:app/services/imports.dart';
+import 'package:flutter/cupertino.dart';
 
-class Sessions extends StatelessWidget {
-  const Sessions({Key? key}) : super(key: key);
+class Sessions extends StatefulWidget {
+  const Sessions({Key? key, required this.userData}) : super(key: key);
+  final UserData userData;
+
+  @override
+  State<Sessions> createState() => _SessionsState();
+}
+
+class _SessionsState extends State<Sessions> {
+  late String deviceID;
+  List<Session> sessions = [];
+
+  @override
+  void initState() {
+    super.initState();
+    deviceID = widget.userData.devices.first;
+    sessions = widget.userData.sessions
+        .where((element) => deviceID == element.deviceID)
+        .toList();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -9,38 +28,76 @@ class Sessions extends StatelessWidget {
 
     return userData != null
         ? Scaffold(
+            backgroundColor: Colors.white,
             body: SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.all(10.0),
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      for (String id in userData.devices) ...[
-                        ListView.builder(
-                            shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
-                            itemCount: userData.sessions.length,
-                            reverse: true,
-                            itemBuilder: (context, index) =>
-                                StreamBuilder<List<Log>>(
-                                    stream: DatabaseLog(id: id).sessionLogs(
-                                        session: userData.sessions[index]),
-                                    builder: (context, snapshot) {
-                                      if (!snapshot.hasData) {
-                                        return Text(
-                                            'Caricamento: ${snapshot.error}');
-                                      }
-
-                                      return CardSession(
-                                        userData: userData,
-                                        id: id,
-                                        session: userData.sessions[index],
-                                        logs: snapshot.data!,
-                                      );
-                                    }))
-                      ]
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    for (String id in userData.devices) ...[
+                      Wrap(
+                        alignment: WrapAlignment.start,
+                        direction: Axis.horizontal,
+                        children: [
+                          FilterChip(
+                              backgroundColor: deviceID == id
+                                  ? AppStyle.primaryColor
+                                  : Colors.black12,
+                              label: Text(
+                                id,
+                                style: TextStyle(
+                                    fontWeight: deviceID == id
+                                        ? FontWeight.bold
+                                        : FontWeight.normal,
+                                    color: Colors.white),
+                              ),
+                              onSelected: (value) =>
+                                  setState(() => deviceID = id)),
+                        ],
+                      ),
                     ],
-                  ),
+                    ListView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: sessions.length,
+                        reverse: true,
+                        itemBuilder: (context, index) =>
+                            StreamBuilder<List<Log>>(
+                                stream: DatabaseLog(id: deviceID)
+                                    .sessionLogs(session: sessions[index]),
+                                builder: (context, snapshot) {
+                                  if (!snapshot.hasData) {
+                                    return const Center(
+                                        child: Padding(
+                                      padding: EdgeInsets.all(20.0),
+                                      child: CircularProgressIndicator(),
+                                    ));
+                                  }
+
+                                  return CardSession(
+                                    userData: userData,
+                                    id: deviceID,
+                                    session: userData.sessions[index],
+                                    logs: snapshot.data!,
+                                  );
+                                })),
+                    CupertinoButton(
+                      child: const Text(
+                        'Load more',
+                      ),
+                      onPressed: () => setState(() =>
+                          sessions.addAll(userData.sessions.sublist(
+                            widget.userData.sessions.length - sessions.length >
+                                    5
+                                ? widget.userData.sessions.length -
+                                    sessions.length -
+                                    5
+                                : widget.userData.sessions.length -
+                                    sessions.length,
+                            widget.userData.sessions.length - sessions.length,
+                          ))),
+                    ),
+                    const SizedBox(height: 60),
+                  ],
                 ),
               ),
             ),
@@ -57,23 +114,12 @@ class Sessions extends StatelessWidget {
               ),
               child: Card(
                   color: Theme.of(context).primaryColor,
-                  child: Padding(
-                    padding: const EdgeInsets.all(10.0),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: const [
-                        SizedBox(width: 7),
-                        Text(
-                          'Nuova sessione',
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold, color: Colors.black),
-                        ),
-                        SizedBox(width: 5),
-                        Icon(
-                          Icons.add,
-                          color: Colors.black,
-                        ),
-                      ],
+                  child: const Padding(
+                    padding: EdgeInsets.all(10.0),
+                    child: Icon(
+                      Icons.add,
+                      color: Colors.white,
+                      size: 30,
                     ),
                   )),
             ),

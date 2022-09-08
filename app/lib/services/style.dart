@@ -1,7 +1,7 @@
 import 'imports.dart';
 
 class AppStyle {
-  static int primaryColorValue = 0xFF00FFE5;
+  static int primaryColorValue = 0xFF00366B;
 
   static Color primaryColor = Color(primaryColorValue);
 
@@ -20,6 +20,10 @@ class AppStyle {
       900: primaryColor,
     },
   );
+
+  static int backgroundColorValue = 0xFFC40001;
+
+  static Color backgroundColor = Color(backgroundColorValue);
 
   ///TextStyle
   static TextStyle kHomeTitle =
@@ -55,7 +59,6 @@ class AppStyle {
               topLeft: Radius.circular(30), topRight: Radius.circular(30)));
 
   ///APP BAR
-  AppBar appBar = AppBar(
-    title: const Text('Sirius Platform'),
-  );
+
+  ///MENU
 }

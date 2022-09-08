@@ -10,36 +10,66 @@ class Menu extends StatefulWidget {
 
 class MenuState extends State<Menu> {
   int currentPage = 0;
-  List<Widget> pages = const [
-    Sessions(),
-    Track(),
-    Devices(),
-  ];
+  List<Widget> pages({required UserData userData}) => [
+        Sessions(userData: userData),
+        const Track(),
+        const Devices(),
+      ];
+  String pageName(int index) {
+    if (index == 0) {
+      return 'Sessions';
+    } else if (index == 1) {
+      return 'Track';
+    } else if (index == 2) {
+      return 'Devices';
+    } else {
+      return '';
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final userData = Provider.of<UserData?>(context);
     return userData != null
         ? Scaffold(
+            backgroundColor: Colors.white,
             appBar: AppBar(
               title: Text(
-                'Together Champions',
-                style: Theme.of(context).textTheme.titleLarge,
+                pageName(currentPage),
+                style: Theme.of(context).textTheme.titleLarge!.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: AppStyle.primaryColor,
+                    fontSize: 30),
               ),
+              backgroundColor: Colors.white,
+              surfaceTintColor: Colors.white,
               actions: [
-                IconButton(
-                    onPressed: () => showModalBottomSheet(
-                          context: context,
-                          shape: AppStyle.kModalBottomStyle,
-                          isScrollControlled: true,
-                          isDismissible: true,
-                          builder: (context) => Dismissible(
-                              key: UniqueKey(),
-                              child: AddEditProfile(
-                                userData: userData,
-                              )),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                  child: GestureDetector(
+                    onTap: () => showModalBottomSheet(
+                      context: context,
+                      shape: AppStyle.kModalBottomStyle,
+                      isScrollControlled: true,
+                      isDismissible: true,
+                      builder: (context) => Dismissible(
+                          key: UniqueKey(),
+                          child: AddEditProfile(
+                            userData: userData,
+                          )),
+                    ),
+                    child: CircleAvatar(
+                      radius: 30,
+                      backgroundColor: AppStyle.backgroundColor,
+                      child: const CircleAvatar(
+                        radius: 25,
+                        backgroundImage: AssetImage(
+                          'assets/tracker_image.png',
                         ),
-                    icon: const Icon(CupertinoIcons.person_alt_circle))
+                      ),
+                    ),
+                  ),
+                )
               ],
             ),
             body: MediaQuery.of(context).size.width >= 500
@@ -47,21 +77,46 @@ class MenuState extends State<Menu> {
                     NavigationRail(
                       minWidth: 170,
                       selectedIndex: currentPage,
+                      backgroundColor: AppStyle.backgroundColor,
                       onDestinationSelected: (index) =>
                           setState(() => currentPage = index),
                       labelType: NavigationRailLabelType.all,
                       destinations: const [
                         NavigationRailDestination(
-                          icon: Icon(CupertinoIcons.square_grid_2x2),
-                          label: Text('Session'),
+                          icon: Icon(
+                            CupertinoIcons.square_grid_2x2,
+                            color: Colors.white,
+                          ),
+                          label: Text(
+                            'Session',
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w600),
+                          ),
                         ),
                         NavigationRailDestination(
-                          icon: Icon(CupertinoIcons.app_badge),
-                          label: Text('Track'),
+                          icon: Icon(
+                            CupertinoIcons.app_badge,
+                            color: Colors.white,
+                          ),
+                          label: Text(
+                            'Track',
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w600),
+                          ),
                         ),
                         NavigationRailDestination(
-                          icon: Icon(CupertinoIcons.settings),
-                          label: Text('Devices'),
+                          icon: Icon(
+                            CupertinoIcons.settings,
+                            color: Colors.white,
+                          ),
+                          label: Text(
+                            'Devices',
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w600),
+                          ),
                         ),
                       ],
                     ),
@@ -69,28 +124,42 @@ class MenuState extends State<Menu> {
                     Expanded(
                       child: IndexedStack(
                         index: currentPage,
-                        children: pages,
+                        children: pages(userData: userData),
                       ),
                     ),
                   ])
-                : pages[currentPage],
+                : pages(userData: userData)[currentPage],
             bottomNavigationBar: MediaQuery.of(context).size.width >= 500
                 ? const SizedBox()
                 : NavigationBarTheme(
-                    data: const NavigationBarThemeData(),
+                    data: NavigationBarThemeData(
+                        labelTextStyle: const MaterialStatePropertyAll(
+                            TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w600)),
+                        backgroundColor: AppStyle.backgroundColor),
                     child: NavigationBar(
                         selectedIndex: currentPage,
                         onDestinationSelected: (index) =>
                             setState(() => currentPage = index),
                         destinations: const [
                           NavigationDestination(
-                              icon: Icon(CupertinoIcons.square_grid_2x2),
+                              icon: Icon(
+                                CupertinoIcons.square_grid_2x2,
+                                color: Colors.white,
+                              ),
                               label: 'Sessions'),
                           NavigationDestination(
-                              icon: Icon(CupertinoIcons.app_badge),
+                              icon: Icon(
+                                CupertinoIcons.app_badge,
+                                color: Colors.white,
+                              ),
                               label: 'Track'),
                           NavigationDestination(
-                              icon: Icon(CupertinoIcons.settings),
+                              icon: Icon(
+                                CupertinoIcons.settings,
+                                color: Colors.white,
+                              ),
                               label: 'Devices'),
                         ]),
                   ),

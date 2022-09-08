@@ -9,19 +9,13 @@ class Devices extends StatelessWidget {
 
     return userData != null
         ? Scaffold(
+            backgroundColor: Colors.white,
             body: SafeArea(
               child: Padding(
                 padding: const EdgeInsets.all(10.0),
                 child: SingleChildScrollView(
                   child: Column(
                     children: [
-                      Text(
-                        'Dispositivi',
-                        style: Theme.of(context)
-                            .textTheme
-                            .titleLarge!
-                            .copyWith(fontWeight: FontWeight.bold),
-                      ),
                       StreamBuilder<List<Device>>(
                           stream:
                               DatabaseDevice().allDevices(uid: userData.uid),
@@ -63,7 +57,7 @@ class Devices extends StatelessWidget {
                     padding: EdgeInsets.all(10.0),
                     child: Icon(
                       Icons.add,
-                      color: Colors.black,
+                      color: Colors.white,
                       size: 30,
                     ),
                   )),

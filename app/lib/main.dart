@@ -22,21 +22,14 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
         primarySwatch: AppStyle.primaryMaterialColor,
         primaryColor: AppStyle.primaryColor,
+        backgroundColor: AppStyle.backgroundColor,
       ),
       home: StreamProvider<CurrentUser?>.value(
           value: AuthService().user,
           initialData: CurrentUser(),
           catchError: (_, __) => null,
-          child: MaterialApp(
-            debugShowCheckedModeBanner: false,
-            theme: ThemeData(
-              useMaterial3: true,
-              primarySwatch: AppStyle.primaryMaterialColor,
-              primaryColor: AppStyle.primaryColor,
-            ),
-            home: const AppDirector(),
-            builder: EasyLoading.init(),
-          )),
+          child: const AppDirector()),
+      builder: EasyLoading.init(),
     );
   }
 }

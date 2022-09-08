@@ -41,8 +41,10 @@ class Session {
     required this.name,
     required this.start,
     required this.end,
+    required this.deviceID,
   });
   final String name;
   final DateTime start;
   final DateTime end;
+  final String deviceID;
 }

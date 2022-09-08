@@ -1,7 +1,9 @@
 import 'package:app/services/imports.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:intl/intl.dart';
 
-class CardSession extends StatelessWidget {
+class CardSession extends StatefulWidget {
   const CardSession(
       {Key? key,
       required this.userData,
@@ -15,6 +17,22 @@ class CardSession extends StatelessWidget {
   final List<Log> logs;
 
   @override
+  State<CardSession> createState() => _CardSessionState();
+}
+
+class _CardSessionState extends State<CardSession> {
+  List<MapLatLng> polylinePoints = [];
+
+  @override
+  void initState() {
+    super.initState();
+
+    for (Log log in widget.logs) {
+      polylinePoints.add(log.gps.latLng);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(5.0),
@@ -25,8 +43,10 @@ class CardSession extends StatelessWidget {
           children: [
             SlidableAction(
               onPressed: (con) async => await DatabaseUser.sessionCreateRemove(
-                  isCreate: false, uid: userData.uid, session: session),
-              backgroundColor: const Color(0xFFFE4A49),
+                  isCreate: false,
+                  uid: widget.userData.uid,
+                  session: widget.session),
+              backgroundColor: CupertinoColors.destructiveRed,
               foregroundColor: Colors.black,
               icon: Icons.delete,
               label: 'Delete',
@@ -38,9 +58,9 @@ class CardSession extends StatelessWidget {
                 isScrollControlled: true,
                 isDismissible: true,
                 builder: (context) => AddEditSession(
-                  userData: userData,
+                  userData: widget.userData,
                   isEdit: true,
-                  session: session,
+                  session: widget.session,
                 ),
               ),
               backgroundColor: AppStyle.primaryColor,
@@ -52,46 +72,95 @@ class CardSession extends StatelessWidget {
         ),
         child: GestureDetector(
             behavior: HitTestBehavior.opaque,
-            child: Card(
+            child: Container(
               margin: EdgeInsets.zero,
+              decoration: BoxDecoration(
+                  borderRadius: const BorderRadius.all(Radius.circular(20)),
+                  color: AppStyle.backgroundColor),
               child: Padding(
                 padding: const EdgeInsets.all(10.0),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                child: Row(
                   children: [
-                    Center(
-                      child: Text(
-                        session.name,
-                        style: Theme.of(context)
-                            .textTheme
-                            .titleLarge!
-                            .copyWith(fontWeight: FontWeight.bold),
+                    Expanded(
+                      flex: 4,
+                      child: Padding(
+                        padding: const EdgeInsets.only(left: 10.0),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              widget.session.name,
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .titleLarge!
+                                  .copyWith(
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white),
+                            ),
+                            const SizedBox(height: 10),
+                            Row(
+                              children: [
+                                const Icon(
+                                  CupertinoIcons.clock,
+                                  color: Colors.white70,
+                                  size: 20,
+                                ),
+                                const SizedBox(width: 10),
+                                Text(
+                                  DateFormat('EEE dd')
+                                      .format(widget.session.start),
+                                  style: const TextStyle(
+                                    color: Colors.white70,
+                                  ),
+                                ),
+                                const SizedBox(width: 5),
+                                const Text(
+                                  '|',
+                                  style: TextStyle(
+                                    color: Colors.white70,
+                                  ),
+                                ),
+                                const SizedBox(width: 5),
+                                Text(
+                                  DateFormat('kk:mm')
+                                      .format(widget.session.start),
+                                  style: const TextStyle(
+                                    color: Colors.white70,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 5),
+                            Row(
+                              children: [
+                                const Icon(
+                                  CupertinoIcons.map,
+                                  color: Colors.white70,
+                                  size: 20,
+                                ),
+                                const SizedBox(width: 10),
+                                Text(
+                                  '${CalculationService.telemetry(logs: widget.logs, segment: polylinePoints).distance} km',
+                                  style: const TextStyle(
+                                    color: Colors.white70,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
                       ),
                     ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text('Inizio:'),
-                        Text(CalculationService.formatDate(
-                            date: session.start, year: true, seconds: false)),
-                      ],
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text('Fine:'),
-                        Text(CalculationService.formatDate(
-                            date: session.end, year: true, seconds: false)),
-                      ],
-                    ),
-                    const SizedBox(height: 5),
-                    if (logs.isEmpty) ...[
+                    if (widget.logs.isEmpty) ...[
                       const Text('No data from GPS found...')
                     ] else ...[
-                      TrackPreview(
-                        logs: logs,
+                      Expanded(
+                        flex: 2,
+                        child: TrackPreview(
+                          logs: widget.logs,
+                        ),
                       )
                     ]
                   ],
@@ -99,14 +168,14 @@ class CardSession extends StatelessWidget {
               ),
             ),
             onTap: () {
-              if (logs.isNotEmpty) {
+              if (widget.logs.isNotEmpty) {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
                       builder: (context) => SessionMap(
-                            id: id,
-                            session: session,
-                            logs: logs,
+                            id: widget.id,
+                            session: widget.session,
+                            logs: widget.logs,
                           )),
                 );
               }
@@ -160,8 +229,9 @@ class TrackPreviewState extends State<TrackPreview> {
                 height: 100,
                 width: MediaQuery.of(context).size.width,
                 clipBehavior: Clip.hardEdge,
-                decoration: const BoxDecoration(
-                    borderRadius: BorderRadius.all(Radius.circular(20))),
+                decoration: BoxDecoration(
+                    borderRadius: const BorderRadius.all(Radius.circular(20)),
+                    color: AppStyle.backgroundColor),
                 child: SfMaps(
                   layers: <MapLayer>[
                     MapTileLayer(
@@ -169,80 +239,10 @@ class TrackPreviewState extends State<TrackPreview> {
                           'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
                       zoomPanBehavior: _zoomPanBehavior,
                       controller: _mapController,
-                      initialMarkersCount: widget.logs.length,
+                      initialMarkersCount: 0,
                       tooltipSettings: const MapTooltipSettings(
                         color: Colors.white,
                       ),
-                      markerTooltipBuilder: (BuildContext context, int index) {
-                        return ClipRRect(
-                          borderRadius:
-                              const BorderRadius.all(Radius.circular(8)),
-                          child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: <Widget>[
-                                Container(
-                                  padding: const EdgeInsets.only(
-                                      left: 10.0, top: 5.0, bottom: 5.0),
-                                  width: 150,
-                                  color: Colors.white,
-                                  child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: <Widget>[
-                                        Text(
-                                          index == 0
-                                              ? 'Start'
-                                              : index == widget.logs.length - 1
-                                                  ? 'End'
-                                                  : 'Speed: ${widget.logs[index].gps.speed.roundToDouble()} km/h',
-                                          style: const TextStyle(
-                                              fontSize: 14,
-                                              color: Colors.black,
-                                              fontWeight: FontWeight.bold),
-                                        ),
-                                        Padding(
-                                          padding:
-                                              const EdgeInsets.only(top: 5.0),
-                                          child: Column(
-                                            children: [
-                                              Text(
-                                                'Altitude: ${widget.logs[index].gps.altitude.roundToDouble()} m',
-                                                style: const TextStyle(
-                                                    fontSize: 10,
-                                                    color: Colors.black),
-                                              ),
-                                              Text(
-                                                'Course: ${widget.logs[index].gps.course.roundToDouble()}°',
-                                                style: const TextStyle(
-                                                    fontSize: 10,
-                                                    color: Colors.black),
-                                              ),
-                                            ],
-                                          ),
-                                        )
-                                      ]),
-                                ),
-                              ]),
-                        );
-                      },
-                      markerBuilder: (BuildContext context, int index) {
-                        return MapMarker(
-                          latitude: widget.logs[index].gps.latLng.latitude,
-                          longitude: widget.logs[index].gps.latLng.longitude,
-                          alignment: Alignment.bottomCenter,
-                          child: FittedBox(
-                            child: Icon(Icons.location_on,
-                                color: index == 0 ||
-                                        index == widget.logs.length - 1
-                                    ? Colors.blue
-                                    : AppStyle.primaryColor,
-                                size: index == 0 ||
-                                        index == widget.logs.length - 1
-                                    ? 50
-                                    : 20),
-                          ),
-                        );
-                      },
                       sublayers: <MapSublayer>[
                         MapPolylineLayer(
                             polylines: <MapPolyline>{

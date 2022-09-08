@@ -15,6 +15,7 @@ class _TrackState extends State<Track> {
     final userData = Provider.of<UserData?>(context);
     return userData != null
         ? Scaffold(
+            backgroundColor: Colors.white,
             body: userData.devices.isEmpty
                 ? Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 10.0),

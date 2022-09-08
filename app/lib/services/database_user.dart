@@ -85,9 +85,11 @@ class DatabaseUser {
     int i = 0;
     for (i = 0; i < snapshot.data()?['sessions'].length; i++) {
       sessions.add(Session(
-          name: snapshot.data()?['sessions'][i]['name'],
-          start: snapshot.data()?['sessions'][i]['start'].toDate(),
-          end: snapshot.data()?['sessions'][i]['end'].toDate()));
+        name: snapshot.data()?['sessions'][i]['name'],
+        start: snapshot.data()?['sessions'][i]['start'].toDate(),
+        end: snapshot.data()?['sessions'][i]['end'].toDate(),
+        deviceID: snapshot.data()?['sessions'][i]['deviceID'],
+      ));
     }
 
     sessions.sort((a, b) => a.start.compareTo(b.start));
