@@ -29,6 +29,7 @@ class AuthenticateState extends State<Authenticate> {
     return showLoading
         ? const LoadingScreen()
         : Scaffold(
+            backgroundColor: AppStyle.backgroundColor,
             body: SafeArea(
               child: Form(
                 key: _formKey,
@@ -38,13 +39,22 @@ class AuthenticateState extends State<Authenticate> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      const Padding(
-                        padding: EdgeInsets.only(top: 20.0),
+                      const SizedBox(
+                        height: 300,
+                        width: 300,
+                        child: Image(
+                            image: AssetImage(
+                          'assets/logo.png',
+                        )),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 20.0),
                         child: Text(
-                          'Together Champions',
+                          'Stone App',
                           style: TextStyle(
                             fontSize: 25,
                             fontWeight: FontWeight.bold,
+                            color: AppStyle.primaryColor,
                           ),
                           textAlign: TextAlign.center,
                         ),
@@ -61,6 +71,7 @@ class AuthenticateState extends State<Authenticate> {
                                   controller: emailController,
                                   keyboardType: TextInputType.emailAddress,
                                   textAlign: TextAlign.center,
+                                  style: const TextStyle(color: Colors.white),
                                   validator: (value) {
                                     String pattern = r'\w+@\w+\.\w+';
                                     RegExp regex = RegExp(pattern);
@@ -78,13 +89,15 @@ class AuthenticateState extends State<Authenticate> {
                                     setState(() => email = val);
                                   },
                                   decoration: AppStyle().kTextFieldDecoration(
-                                      icon: Icons.email,
-                                      hintText: 'Enter Your email')),
+                                    icon: Icons.email,
+                                    hintText: 'Enter Your email',
+                                  )),
                               const SizedBox(height: 10),
                               TextFormField(
                                 controller: password,
                                 obscureText: showPassword,
                                 textAlign: TextAlign.center,
+                                style: const TextStyle(color: Colors.white),
                                 decoration: AppStyle()
                                     .kTextFieldDecoration(
                                         icon: Icons.lock,
@@ -96,9 +109,12 @@ class AuthenticateState extends State<Authenticate> {
                                             showPassword = !showPassword;
                                           });
                                         },
-                                        icon: Icon(!showPassword
-                                            ? Icons.visibility
-                                            : Icons.visibility_off),
+                                        icon: Icon(
+                                          !showPassword
+                                              ? Icons.visibility
+                                              : Icons.visibility_off,
+                                          color: AppStyle.primaryColor,
+                                        ),
                                       ),
                                     ),
                                 validator: (value) {
@@ -148,6 +164,7 @@ class AuthenticateState extends State<Authenticate> {
                                   'Non hai un account? Crealo qui.',
                                   style: TextStyle(
                                     fontWeight: FontWeight.bold,
+                                    color: Colors.white,
                                     decoration: TextDecoration.underline,
                                     //color: Colors.black,
                                   ),

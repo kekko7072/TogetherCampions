@@ -107,14 +107,18 @@ class CalculationService {
     }
 
     return MapZoomPanBehavior(
-        zoomLevel: zoom,
-        minZoomLevel: 3,
-        maxZoomLevel: 30,
-        focalLatLng: findCenter(start, end),
-        showToolbar: !isPreview,
-        toolbarSettings: const MapToolbarSettings(
-            direction: Axis.vertical,
-            position: MapToolbarPosition.bottomRight));
+      zoomLevel: zoom,
+      minZoomLevel: 3,
+      maxZoomLevel: 30,
+      enableMouseWheelZooming: true,
+      enableDoubleTapZooming: true,
+      focalLatLng: findCenter(start, end),
+      showToolbar: !isPreview,
+      toolbarSettings: const MapToolbarSettings(
+          direction: Axis.horizontal,
+          position: MapToolbarPosition.topRight,
+          iconColor: Colors.black),
+    );
   }
 
   static Telemetry telemetry({

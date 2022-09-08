@@ -38,29 +38,35 @@ class MenuState extends State<Menu> {
                 pageName(currentPage),
                 style: Theme.of(context).textTheme.titleLarge!.copyWith(
                     fontWeight: FontWeight.bold,
-                    color: AppStyle.primaryColor,
+                    color: MediaQuery.of(context).size.width >= 500
+                        ? Colors.white
+                        : AppStyle.primaryColor,
                     fontSize: 30),
               ),
-              backgroundColor: Colors.white,
+              backgroundColor: MediaQuery.of(context).size.width >= 500
+                  ? AppStyle.backgroundColor
+                  : Colors.white,
               surfaceTintColor: Colors.white,
               actions: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 5.0),
-                  child: GestureDetector(
-                    onTap: () => showModalBottomSheet(
-                      context: context,
-                      shape: AppStyle.kModalBottomStyle,
-                      isScrollControlled: true,
-                      isDismissible: true,
-                      builder: (context) => Dismissible(
-                          key: UniqueKey(),
-                          child: AddEditProfile(
-                            userData: userData,
-                          )),
-                    ),
+                GestureDetector(
+                  onTap: () => showModalBottomSheet(
+                    context: context,
+                    shape: AppStyle.kModalBottomStyle,
+                    isScrollControlled: true,
+                    isDismissible: true,
+                    builder: (context) => Dismissible(
+                        key: UniqueKey(),
+                        child: AddEditProfile(
+                          userData: userData,
+                        )),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(5.0),
                     child: CircleAvatar(
                       radius: 30,
-                      backgroundColor: AppStyle.backgroundColor,
+                      backgroundColor: MediaQuery.of(context).size.width >= 500
+                          ? AppStyle.primaryColor
+                          : AppStyle.backgroundColor,
                       child: const CircleAvatar(
                         radius: 25,
                         backgroundImage: AssetImage(

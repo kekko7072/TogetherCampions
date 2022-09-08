@@ -35,8 +35,14 @@ class AppStyle {
   InputDecoration kTextFieldDecoration(
           {required IconData icon, required String hintText}) =>
       InputDecoration(
-        prefixIcon: Icon(icon),
+        prefixIcon: Icon(
+          icon,
+          color: AppStyle.primaryColor,
+        ),
         hintText: hintText,
+        hintStyle: const TextStyle(
+          color: Colors.white60,
+        ),
         contentPadding:
             const EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
         border: const OutlineInputBorder(
