@@ -1,7 +1,3 @@
-/*
-  This file is for the helpers of the code
-*/
-
 //GPS value
 /*
   Here are defined all the arrays used to store the datas.
@@ -19,7 +15,7 @@ struct Input {
 /*
   Manual switch used to set if using SIM or OFFLINE
 */
-//Status 
+//Status
 enum Status {
   online,
   offline
@@ -60,18 +56,57 @@ struct Settings {
   int frequency;
 };
 
+/*
+  This file is for the helpers of the code
+*/
+//LED helper
+void turn_off_all_LED() {
+  digitalWrite(LED_GREEN, LOW);
+  digitalWrite(LED_YELLOW, LOW);
+  digitalWrite(LED_RED, LOW);
+}
+
+void turn_status_LED(Status settings, PinStatus pinStatus) {
+  if (settings == online) {
+    digitalWrite(LED_GREEN, pinStatus);
+  } else if (settings == offline) {
+    digitalWrite(LED_YELLOW, pinStatus);
+  }
+}
+
+void turn_error_LED(PinStatus pinStatus) {
+  digitalWrite(LED_RED, pinStatus);
+}
 
 //Await some seconds
-void await_seconds(int seconds) {
+void await_with_blinking(int seconds, Status settings) {
   PinStatus ledStatus = HIGH;
   for (int i = 0; i < seconds; i++) {
     Serial.print(".");
-    digitalWrite(LED_BUILTIN, ledStatus);
+    turn_status_LED(settings, ledStatus);
     delay(1000);
     ledStatus = ledStatus == HIGH ? LOW : HIGH;
   }
 }
 
+void await_with_blinking_error(int seconds) {
+  PinStatus ledStatus = HIGH;
+  for (int i = 0; i < seconds; i++) {
+    Serial.print(".");
+    turn_error_LED(ledStatus);
+    delay(1000);
+    ledStatus = ledStatus == HIGH ? LOW : HIGH;
+  }
+}
+//GPS blink
+void gps_connecting(Status settings) {
+  turn_status_LED(settings, HIGH);
+  digitalWrite(LED_RED, HIGH);
+}
+void gps_connected(Status settings) {
+  turn_status_LED(settings, LOW);
+  digitalWrite(LED_RED, LOW);
+}
 
 //Available ram memory https://docs.arduino.cc/learn/programming/memory-guide#flash-memory-measurement
 extern "C" char* sbrk(int incr);

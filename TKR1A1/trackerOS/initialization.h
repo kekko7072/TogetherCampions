@@ -1,4 +1,15 @@
 /* 
+  LEDs initialization
+*/
+void initializationLED() {
+  Serial.print("Intializing  LEDs:  ");
+
+  pinMode(LED_GREEN, OUTPUT);
+  pinMode(LED_YELLOW, OUTPUT);
+  pinMode(LED_RED, OUTPUT);
+}
+
+/* 
   GPRS initialization from SIM settings
 */
 void initializationGPRS(GSM gsm, GPRS gprs) {
@@ -97,6 +108,7 @@ void initializationGPS() {
   }
   Serial.print("OK");
   Serial.println();
+  digitalWrite(LED_RED, HIGH);
 }
 
 /* 

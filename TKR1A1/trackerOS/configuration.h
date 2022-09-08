@@ -38,10 +38,10 @@
 /* 
   Sim parameters for connction of GPRS service
 */
-#define SIM_PIN ""   //[WIND-TRE] "" || [TIM] "" || [THINGS MOBILE] 1503 not working
-#define SIM_APN "internet.it"     // [WIND-TRE] internet.it || [TIM] "ibox.tim.it" || [THINGS MOBILE] TM not working
-#define SIM_LOGIN ""     // replace with your GPRS login
-#define SIM_PASSWORD ""  // replace with your GPRS password
+#define SIM_PIN ""             //[WIND-TRE] "" || [TIM] "" || [THINGS MOBILE] 1503 not working
+#define SIM_APN "internet.it"  // [WIND-TRE] internet.it || [TIM] "ibox.tim.it" || [THINGS MOBILE] TM not working
+#define SIM_LOGIN ""           // replace with your GPRS login
+#define SIM_PASSWORD ""        // replace with your GPRS password
 
 
 
@@ -55,3 +55,13 @@
 #define SERVER_SETTINGS "/settings?serialNumber="
 #define SERVER_INITIALIZE "/initialize?serialNumber="
 #define SERVER_POST "/post?serialNumber="
+
+/*
+  LED meaning and pinouts
+    GREEN: System ok all working
+    YELLOW: System saving on SDCARD
+    RED: Error on system
+*/
+#define LED_GREEN 0
+#define LED_YELLOW 1
+#define LED_RED 2

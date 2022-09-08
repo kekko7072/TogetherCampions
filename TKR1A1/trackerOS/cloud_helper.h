@@ -41,7 +41,7 @@ bool cloud_save(HttpClient http, Settings settings, String input_data) {
 
   } else {
     Serial.println("Connect failed: " + String(err));
-    await_seconds(10);
+    await_with_blinking(10, online);
 
     return false;
   }

@@ -158,7 +158,7 @@ class SessionMapState extends State<SessionMap>
                               ? Colors.blue
                               : index == indexFastestLog
                                   ? Colors.green
-                                  : AppStyle.primaryColor,
+                                  : Colors.transparent,
                           size: index == 0 || index == widget.logs.length - 1
                               ? 50
                               : 20),

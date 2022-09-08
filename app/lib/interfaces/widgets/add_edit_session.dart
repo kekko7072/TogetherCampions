@@ -223,28 +223,28 @@ class _AddEditSessionState extends State<AddEditSession> {
                     const SizedBox(height: 10),
                     CupertinoButton.filled(
                       onPressed: () async {
+                        //TODO macos not working permission requied
                         result = await FilePicker.platform.pickFiles(
                           dialogTitle:
                               'Seleziona il file datalog.txt dalla sd card',
                           type: FileType.custom,
-                          allowedExtensions: ['txt'],
+                          allowedExtensions: ["txt"], //tkrlg
                         );
 
                         if (result != null) {
+                          EasyLoading.show();
                           file = result!.files.first;
-
-                          print(file!.name);
-                          //print(file.bytes);
-                          print(file!.size);
-                          print(file!.extension);
+                          debugPrint(
+                              "NAME: ${file!.name}\nEXTENSION: ${file!.extension}\nSIZE: ${file!.size}\nBYTES AVAILABLE: ${file!.bytes != null}");
                           if (file!.bytes != null) {
                             String convertedValue =
                                 String.fromCharCodes(file!.bytes!);
                             setState(() => value = convertedValue.split(","));
-                            print(value.length);
+                            debugPrint("LOGS: ${value.length}");
                           }
+                          EasyLoading.dismiss();
                         } else {
-                          // User canceled the picker
+                          debugPrint("User cancelled");
                         }
                       },
                       child: const Text('Carica file'),
@@ -272,8 +272,8 @@ class _AddEditSessionState extends State<AddEditSession> {
                             }, //CLOCK AND FREQUENCY ARE NOW SAVED DIRECTLY ON SD CARD, before clock=6&frequency=10
                             body: body,
                           );
-                          print('Response status: ${response.statusCode}');
-                          print('Response body: ${response.body}');
+                          debugPrint(
+                              'RESPONSE\nStatus: ${response.statusCode}\nBody: ${response.body}');
                           if (response.statusCode == 200) {
                             //OK GO ON
                             setState(() => ++progress);

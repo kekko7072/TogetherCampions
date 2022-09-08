@@ -46,7 +46,7 @@ String sdcard_read() {
       Serial.print(".");
       Serial.write(dataFile.read());
       input_data = input_data + String(dataFile.read());
-      digitalWrite(LED_BUILTIN, ledStatus);
+      //turn_status_LED(settings.status, ledStatus);
       ledStatus = ledStatus == HIGH ? LOW : HIGH;
     }
     // close the file:

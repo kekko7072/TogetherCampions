@@ -76,12 +76,17 @@ void setup() {
   */
   ///
 
+  //LED
+  initializationLED();
+
   //TODO manage the read button state: OFFLINE or ONLINE
   //  OFFLINE: work only using sdcard and millis() as timestamp,
   //  ONLINE: work with both sdcard and online realtime.
   settings.status = offline;  //Al momento è manuale
 
 
+
+  turn_status_LED(settings.status, HIGH);
   if (settings.status == online) {
     ///GPRS
     initializationGPRS(gsm, gprs);
@@ -92,12 +97,13 @@ void setup() {
     ///SETTINGS
     settings = initializationSETTINGS(http, sdCard_available);
   } else {
+
     settings.status == offline;
     settings.mode = record;
     settings.frequency = 10;
     //SD CARD
     bool sdCard_available = initializationSDCARD(chipSelect);
-    Serial.print(sdCard_available);
+    Serial.print(sdCard_available == 0 ? "FALSE" : "TRUE");
   }
 
   ///GPS
@@ -120,22 +126,22 @@ void loop() {
 
   } else {
     /* 
-
-  NO CODE HERE BECAUSE IF YOU PUT LOGIC HERE, OUTSIIDE THE while(GPS.available()) LOOP,
-  THE GPS WILL LOSE THE CONNECTION FROM THE SATELLITES 
-  AND THEN TO RECONNECT IT WILL NEED 3/4 MINUTES EACH TIMES.
-
-  */
+    NO CODE HERE BECAUSE IF YOU PUT LOGIC HERE, OUTSIIDE THE while(GPS.available()) LOOP,
+    THE GPS WILL LOSE THE CONNECTION FROM THE SATELLITES 
+    AND THEN TO RECONNECT IT WILL NEED 3/4 MINUTES EACH TIMES.
+    */
     while (GPS.available()) {
 
+      //TURN OFF GPS AND STATUS LED
+      gps_connected(settings.status);
+
       if (i < DEVICE_CLOCK) {
-        digitalWrite(LED_BUILTIN, LOW);
 
         //AWAIT SYNC FROM FREQUENCY
-        await_seconds(settings.frequency);
+        await_with_blinking(settings.frequency, settings.status);
 
         //SAVE DATA INTO ARRAYS
-        digitalWrite(LED_BUILTIN, HIGH);
+        turn_status_LED(settings.status, HIGH);
         Serial.println();
         Serial.println("Saving data at cicle  " + String(i));
 
@@ -171,22 +177,25 @@ void loop() {
           case realtime:
             {
               if (cloud_save(http, settings, input_data)) {
-                digitalWrite(LED_BUILTIN, LOW);
+                turn_status_LED(settings.status, LOW);
+
                 i = 0;
                 input_data = "";
               } else {
                 Serial.print("Cloud save returned false");
+                await_with_blinking_error(5);
               }
               break;
             }
           case record:
             {
               if (sdcard_save(input_data)) {
-                digitalWrite(LED_BUILTIN, LOW);
+                turn_status_LED(settings.status, LOW);
                 i = 0;
                 input_data = "";
               } else {
                 Serial.print("SD card helper returned false");
+                await_with_blinking_error(5);
               }
               break;
             }
