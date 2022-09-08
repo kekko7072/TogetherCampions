@@ -33,7 +33,7 @@ export 'package:file_picker/file_picker.dart';
 export 'package:http/http.dart';
 
 ///Design
-//export 'package:flutter_svg/flutter_svg.dart';
+export 'package:font_awesome_flutter/font_awesome_flutter.dart';
 export 'package:battery_indicator/battery_indicator.dart';
 export 'package:flutter_easyloading/flutter_easyloading.dart';
 export 'package:graphic/graphic.dart';

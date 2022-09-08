@@ -1,5 +1,4 @@
 import 'package:app/services/imports.dart';
-import 'package:flutter/cupertino.dart';
 
 class ListLogs extends StatefulWidget {
   const ListLogs(
@@ -33,8 +32,8 @@ class _ListLogsState extends State<ListLogs> {
                     ),
                     StreamBuilder<List<Log>>(
                         stream: widget.isSession
-                            ? DatabaseLog(id: widget.id).sessionLogs(
-                                session: widget.session!)
+                            ? DatabaseLog(id: widget.id)
+                                .sessionLogs(session: widget.session!)
                             : DatabaseLog(id: widget.id).allLogs,
                         builder: (context, snapshot) {
                           if (snapshot.hasError) {
@@ -56,7 +55,7 @@ class _ListLogsState extends State<ListLogs> {
                               itemBuilder: (context, index) =>
                                   CardLog(log: logs[index]));
                         }),
-                  /*  CupertinoButton(
+                    /*  CupertinoButton(
                         child: Text('Load more'),
                         onPressed: () =>
                             setState(() => loadLimit = loadLimit + 50))*/

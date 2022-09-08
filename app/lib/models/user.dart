@@ -1,5 +1,3 @@
-import 'package:app/services/imports.dart';
-
 class CurrentUser {
   final String? uid;
 

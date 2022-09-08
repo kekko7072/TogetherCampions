@@ -63,19 +63,21 @@ class MenuState extends State<Menu> {
                   child: Padding(
                     padding: const EdgeInsets.all(5.0),
                     child: CircleAvatar(
-                      radius: 30,
+                      radius: 25,
                       backgroundColor: MediaQuery.of(context).size.width >= 500
                           ? AppStyle.primaryColor
                           : AppStyle.backgroundColor,
-                      child: const CircleAvatar(
-                        radius: 25,
-                        backgroundImage: AssetImage(
-                          'assets/tracker_image.png',
-                        ),
+                      child: CircleAvatar(
+                        radius: 20,
+                        backgroundImage: Image.network(
+                          'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQcKtNs7ZY5ryppExfbYwxOe-iB1BURlKwkbLWmmec&s',
+                          fit: BoxFit.cover,
+                        ).image,
                       ),
                     ),
                   ),
-                )
+                ),
+                const SizedBox(width: 10),
               ],
             ),
             body: MediaQuery.of(context).size.width >= 500
@@ -94,7 +96,7 @@ class MenuState extends State<Menu> {
                             color: Colors.white,
                           ),
                           label: Text(
-                            'Session',
+                            'Sessions',
                             style: TextStyle(
                                 color: Colors.white,
                                 fontWeight: FontWeight.w600),
@@ -102,7 +104,7 @@ class MenuState extends State<Menu> {
                         ),
                         NavigationRailDestination(
                           icon: Icon(
-                            CupertinoIcons.app_badge,
+                            FontAwesomeIcons.chartSimple,
                             color: Colors.white,
                           ),
                           label: Text(
@@ -114,7 +116,7 @@ class MenuState extends State<Menu> {
                         ),
                         NavigationRailDestination(
                           icon: Icon(
-                            CupertinoIcons.settings,
+                            CupertinoIcons.app_badge,
                             color: Colors.white,
                           ),
                           label: Text(
@@ -157,13 +159,13 @@ class MenuState extends State<Menu> {
                               label: 'Sessions'),
                           NavigationDestination(
                               icon: Icon(
-                                CupertinoIcons.app_badge,
+                                FontAwesomeIcons.chartSimple,
                                 color: Colors.white,
                               ),
                               label: 'Track'),
                           NavigationDestination(
                               icon: Icon(
-                                CupertinoIcons.settings,
+                                CupertinoIcons.app_badge,
                                 color: Colors.white,
                               ),
                               label: 'Devices'),

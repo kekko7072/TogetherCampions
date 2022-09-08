@@ -42,16 +42,16 @@ class CardTelemetry extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     const Icon(
-                      CupertinoIcons.clock,
+                      FontAwesomeIcons.satellite,
                       color: Colors.grey,
+                      size: 20,
                     ),
                     const SizedBox(width: 5),
                     Text(
-                      'Time',
-                      style: Theme.of(context)
-                          .textTheme
-                          .titleMedium!
-                          .copyWith(color: Colors.grey),
+                      '${telemetry.satellites} satellites',
+                      style: const TextStyle(
+                        color: Colors.grey,
+                      ),
                     ),
                   ],
                 ),
@@ -257,7 +257,7 @@ class CardTelemetry extends StatelessWidget {
                       child: Column(
                         children: [
                           const Icon(
-                            CupertinoIcons.arrow_up,
+                            FontAwesomeIcons.mountain,
                             size: 50,
                           ),
                           const SizedBox(height: 5),

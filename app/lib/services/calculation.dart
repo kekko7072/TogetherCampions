@@ -89,22 +89,59 @@ class CalculationService {
         distance = newDistance;
       }
     }
+
     double zoom = 0.0;
-    if (distance < 10) {
+
+    if (distance < 2.5) {
       if (isPreview) {
-        zoom = 18.5 - 2 * distance;
+        zoom = 15 - 2 * distance;
+      } else {
+        zoom = 15 - 1.35 * distance;
+      }
+    } else if (distance < 5) {
+      if (isPreview) {
+        zoom = 16 - 1.5 * distance;
+      } else {
+        zoom = 16 - 1.35 * distance;
+      }
+    } else if (distance < 10) {
+      if (isPreview) {
+        zoom = 18.5 - 1.5 * distance;
       } else {
         zoom = 18.5 - 1.35 * distance;
       }
     } else if (distance < 20) {
-      zoom = 12.5;
+      if (isPreview) {
+        zoom = 12.5;
+      } else {
+        zoom = 15.5;
+      }
     } else if (distance < 30) {
-      zoom = 11.5;
+      if (isPreview) {
+        zoom = 9.5;
+      } else {
+        zoom = 11.5;
+      }
     } else if (distance < 50) {
-      zoom = 10.5;
+      if (isPreview) {
+        zoom = 8.5;
+      } else {
+        zoom = 10.5;
+      }
+    } else if (distance < 100) {
+      if (isPreview) {
+        zoom = 6;
+      } else {
+        zoom = 9;
+      }
     } else {
-      zoom = 8;
+      if (isPreview) {
+        zoom = 5;
+      } else {
+        zoom = 8;
+      }
     }
+    print(zoom);
 
     return MapZoomPanBehavior(
       zoomLevel: zoom,
@@ -136,6 +173,8 @@ class CalculationService {
     double courseMedium = 0;
     double courseMax = 0;
     double courseMin = 10000;
+
+    int satellites = 0;
 
     double batteryMax = 0;
     double batteryMin = 10000;
@@ -180,6 +219,9 @@ class CalculationService {
             CalculationService.roundDouble(number: log.gps.course, decimal: 3);
       }
 
+      ///Satellites
+      satellites = satellites + log.gps.satellites;
+
       ///Battery
       if (batteryMax < log.battery) {
         batteryMax = log.battery;
@@ -211,6 +253,7 @@ class CalculationService {
         ),
         distance:
             CalculationService.findDistanceFromList(segment).roundToDouble(),
+        satellites: satellites ~/ logs.length,
         battery: Battery(
           consumption: CalculationService.roundDouble(
               number: batteryMax - batteryMin, decimal: 3),

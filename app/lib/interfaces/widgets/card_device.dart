@@ -302,14 +302,14 @@ class _CardDeviceState extends State<CardDevice> {
                                 ),
                               )),
                         ),
-                        const Padding(
-                          padding: EdgeInsets.only(top: 5.0),
-                          child: Center(
-                              child: Image(
-                            image: AssetImage('assets/tracker_image.png'),
-                            height: 150,
-                          )),
-                        ),
+                        Center(
+                            child: Image(
+                          image: AssetImage(
+                            'assets/tracker_image.png',
+                          ),
+                          fit: BoxFit.cover,
+                          height: 150,
+                        )),
                         Wrap(
                           spacing: 4,
                           children: [
@@ -574,7 +574,7 @@ class DeviceLocationState extends State<DeviceLocation> {
                   child: FittedBox(
                     child: Icon(Icons.location_on,
                         color: index == 0 || index == widget.logs.length - 1
-                            ? Colors.blue
+                            ? AppStyle.primaryColor
                             : AppStyle.primaryColor,
                         size: index == 0 || index == widget.logs.length - 1
                             ? 50

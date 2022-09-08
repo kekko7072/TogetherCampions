@@ -10,6 +10,7 @@ class Telemetry {
     required this.altitude,
     required this.course,
     required this.distance,
+    required this.satellites,
     required this.battery,
   });
 
@@ -17,6 +18,7 @@ class Telemetry {
   final Range altitude;
   final Range course;
   final double distance;
+  final int satellites;
   final Battery battery;
 }
 

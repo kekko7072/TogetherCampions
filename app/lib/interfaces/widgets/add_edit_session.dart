@@ -313,7 +313,7 @@ class _AddEditSessionState extends State<AddEditSession> {
                       },
                       child: Text(
                         widget.isEdit ? 'Modifica' : 'Avvia',
-                        style: TextStyle(fontWeight: FontWeight.bold),
+                        style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
                     ),
                   ]
