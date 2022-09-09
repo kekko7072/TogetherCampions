@@ -41,7 +41,7 @@ dependencies:
   flutter_easyloading: ^3.0.5
   graphic: ^0.10.6
   compass_icon: ^1.0.4
-  rename_app: ^1.1.0 #Enable only when renaiming is needed
+  rename_app: ^1.1.0
 
 dev_dependencies:
   flutter_test:

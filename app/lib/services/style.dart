@@ -1,7 +1,7 @@
 import 'imports.dart';
 
 class AppStyle {
-  static int primaryColorValue = 0xFF00366B;
+  static int primaryColorValue = 0xFF003F7C;
 
   static Color primaryColor = Color(primaryColorValue);
 

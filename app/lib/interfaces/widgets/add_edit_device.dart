@@ -22,7 +22,7 @@ class _AddEditDeviceState extends State<AddEditDevice> {
 
   TextEditingController id = TextEditingController();
   TextEditingController model = TextEditingController(text: 'TKR1A1');
-  TextEditingController name = TextEditingController();
+  TextEditingController name = TextEditingController(text: 'BlackStone 1');
   int clock = 6;
   int frequency = 10;
 
@@ -69,7 +69,7 @@ class _AddEditDeviceState extends State<AddEditDevice> {
                         FilterChip(
                             backgroundColor: model.text == 'TKR1A1'
                                 ? AppStyle.primaryColor
-                                : Colors.black12,
+                                : Colors.white,
                             label: Text(
                               'TKR1A1',
                               style: TextStyle(
@@ -88,7 +88,7 @@ class _AddEditDeviceState extends State<AddEditDevice> {
                         controller: id,
                         textAlign: TextAlign.center,
                         decoration: AppStyle().kTextFieldDecoration(
-                            icon: Icons.settings,
+                            icon: CupertinoIcons.number,
                             hintText: 'Enter device serial number'),
                       ),
                     ),
@@ -101,7 +101,7 @@ class _AddEditDeviceState extends State<AddEditDevice> {
                       controller: name,
                       textAlign: TextAlign.center,
                       decoration: AppStyle().kTextFieldDecoration(
-                          icon: Icons.person, hintText: 'Enter device name'),
+                          icon: Icons.edit, hintText: 'Enter device name'),
                     ),
                   ),
                   Row(

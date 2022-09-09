@@ -29,7 +29,7 @@ class AuthenticateState extends State<Authenticate> {
     return showLoading
         ? const LoadingScreen()
         : Scaffold(
-            backgroundColor: AppStyle.backgroundColor,
+            backgroundColor: AppStyle.primaryColor,
             body: SafeArea(
               child: Form(
                 key: _formKey,
