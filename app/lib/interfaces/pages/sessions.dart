@@ -33,28 +33,33 @@ class _SessionsState extends State<Sessions> {
               child: SingleChildScrollView(
                 child: Column(
                   children: [
-                    for (String id in userData.devices) ...[
-                      Wrap(
+                    Padding(
+                      padding: const EdgeInsets.all(10.0),
+                      child: Wrap(
                         alignment: WrapAlignment.start,
                         direction: Axis.horizontal,
+                        spacing: 5,
                         children: [
-                          FilterChip(
-                              backgroundColor: deviceID == id
-                                  ? AppStyle.primaryColor
-                                  : Colors.black12,
-                              label: Text(
-                                id,
-                                style: TextStyle(
-                                    fontWeight: deviceID == id
-                                        ? FontWeight.bold
-                                        : FontWeight.normal,
-                                    color: Colors.white),
-                              ),
-                              onSelected: (value) =>
-                                  setState(() => deviceID = id)),
+                          for (String id in userData.devices) ...[
+                            FilterChip(
+                                backgroundColor: deviceID == id
+                                    ? AppStyle.primaryColor
+                                    : Colors.black12,
+                                label: Text(
+                                  id,
+                                  style: TextStyle(
+                                      fontWeight: deviceID == id
+                                          ? FontWeight.bold
+                                          : FontWeight.normal,
+                                      color: Colors.white),
+                                ),
+                                onSelected: (value) => setState(() {
+                                      deviceID = id;
+                                    })),
+                          ],
                         ],
                       ),
-                    ],
+                    ),
                     ListView.builder(
                         shrinkWrap: true,
                         physics: const NeverScrollableScrollPhysics(),
@@ -71,6 +76,9 @@ class _SessionsState extends State<Sessions> {
                                       padding: EdgeInsets.all(20.0),
                                       child: CircularProgressIndicator(),
                                     ));
+                                  } else if (snapshot.data!.isEmpty) {
+                                    return const Center(
+                                        child: Text('No data available'));
                                   }
 
                                   return CardSession(

@@ -1,5 +1,4 @@
 import 'package:app/services/imports.dart';
-import 'package:flutter/cupertino.dart';
 
 class Devices extends StatefulWidget {
   const Devices({Key? key}) : super(key: key);
@@ -40,6 +39,18 @@ class _DevicesState extends State<Devices> {
     setState(() => availablePorts = SerialPort.availablePorts);
   }
 
+  bool checkAvailablePorts({required String serialNumber}) => availablePorts
+      .where((element) => SerialPort(element).serialNumber == serialNumber)
+      .isNotEmpty;
+
+  SerialPort? setSerialPorts({required String serialNumber}) =>
+      checkAvailablePorts(serialNumber: serialNumber)
+          ? availablePorts
+              .where(
+                  (element) => SerialPort(element).serialNumber == serialNumber)
+              .first
+          : null;
+
   @override
   Widget build(BuildContext context) {
     final userData = Provider.of<UserData?>(context);
@@ -69,18 +80,12 @@ class _DevicesState extends State<Devices> {
                                 itemBuilder: (context, index) => CardDevice(
                                       device: devices[index],
                                       uid: userData.uid,
-                                      serialConnected: availablePorts
-                                          .where((element) =>
-                                              SerialPort(element)
-                                                  .serialNumber ==
-                                              devices[index].serialNumber)
-                                          .isNotEmpty,
-                                      serialPort: availablePorts
-                                          .where((element) =>
-                                              SerialPort(element)
-                                                  .serialNumber ==
-                                              devices[index].serialNumber)
-                                          .first,
+                                      serialConnected: checkAvailablePorts(
+                                          serialNumber:
+                                              devices[index].serialNumber),
+                                      serialPort: setSerialPorts(
+                                          serialNumber:
+                                              devices[index].serialNumber),
                                     ));
                           })
                     ],
