@@ -11,6 +11,7 @@
 #include "initialization.h"
 
 
+
 /*
   Settings is the enum of parameters used as settings.
 */
@@ -76,56 +77,11 @@ void setup() {
   */
   ///
 
-  //LED
-  initializationLED();
-
-  //TODO manage the read button state: OFFLINE or ONLINE
-  //  OFFLINE: work only using sdcard and millis() as timestamp,
-  //  ONLINE: work with both sdcard and online realtime.
-  settings.status = offline;  //Al momento è manuale
-
-
-
-  turn_status_LED(settings.status, HIGH);
-  if (settings.status == online) {
-    ///GPRS
-    initializationGPRS(gsm, gprs);
-
-    //SD CARD
-    bool sdCard_available = initializationSDCARD(chipSelect);
-
-    ///SETTINGS
-    settings = initializationSETTINGS(http, sdCard_available);
-  } else {
-
-    settings.status == offline;
-    settings.mode = record;
-    settings.frequency = 10;
-    //SD CARD
-    bool sdCard_available = initializationSDCARD(chipSelect);
-    Serial.print(sdCard_available == 0 ? "FALSE" : "TRUE");
-  }
-
-  ///GPS
-  initializationGPS();
+  initialize();
 }
 
 void loop() {
-  if (settings.mode == sync) {
-    String input_data = sdcard_read();
-
-    Serial.println(input_data);
-    display_freeram();
-
-    if (cloud_save(http, settings, input_data)) {
-      ///LEAVE LED ON forever to report the uploading was successfull
-      digitalWrite(LED_BUILTIN, HIGH);
-    } else {
-      Serial.print("Cloud save returned false");
-    }
-
-  } else {
-    /* 
+  /* 
     NO CODE HERE BECAUSE IF YOU PUT LOGIC HERE, OUTSIIDE THE while(GPS.available()) LOOP,
     THE GPS WILL LOSE THE CONNECTION FROM THE SATELLITES 
     AND THEN TO RECONNECT IT WILL NEED 3/4 MINUTES EACH TIMES.
@@ -145,7 +101,7 @@ void loop() {
         Serial.println();
         Serial.println("Saving data at cicle  " + String(i));
 
-        input.timestamp[i] = settings.status == online ? gsm.getTime() : millis();
+        input.timestamp[i] = settings.status == cloud ? gsm.getTime() : millis();
         input.battery[i] = analogRead(ADC_BATTERY) * (4.3 / 1023.0);
         input.latitude[i] = isnan(GPS.latitude()) ? 0.0 : GPS.latitude();
         input.longitude[i] = isnan(GPS.longitude()) ? 0.0 : GPS.longitude();
@@ -173,8 +129,8 @@ void loop() {
         Serial.println(input_data);
         display_freeram();
 
-        switch (settings.mode) {
-          case realtime:
+        switch (settings.status) {
+          case cloud:
             {
               if (cloud_save(http, settings, input_data)) {
                 turn_status_LED(settings.status, LOW);
@@ -187,7 +143,7 @@ void loop() {
               }
               break;
             }
-          case record:
+          case sdCard:
             {
               if (sdcard_save(input_data)) {
                 turn_status_LED(settings.status, LOW);
@@ -202,5 +158,43 @@ void loop() {
         }
       }
     }
+  
+}
+
+void initialize() {
+  //if (!calledInitialization) {
+
+  //SWITCH
+  initializationSWITCH();
+
+  //LED
+  initializationLED();
+
+  settings.status = status_reader(digitalRead(CLOUD_SDCARD));
+  turn_status_LED(settings.status, HIGH);
+
+  if (settings.status == cloud) {
+    ///GPRS
+    initializationGPRS(gsm, gprs);
+
+    //SD CARD
+    bool sdCard_available = initializationSDCARD(chipSelect);
+
+    ///SETTINGS
+    settings = initializationSETTINGS(http, sdCard_available);
+  } else {
+
+    settings.status == sdCard;
+    // settings.mode = record;
+    settings.frequency = 10;
+    //SD CARD
+    bool sdCard_available = initializationSDCARD(chipSelect);
+    Serial.print(sdCard_available == 0 ? "FALSE" : "TRUE");
   }
+
+  ///GPS
+  initializationGPS();
+
+  //calledInitialization = true;
+  //}
 }

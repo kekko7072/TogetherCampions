@@ -1,4 +1,5 @@
 import 'package:app/services/imports.dart';
+import 'package:flutter/cupertino.dart';
 
 class Devices extends StatelessWidget {
   const Devices({Key? key}) : super(key: key);
@@ -16,6 +17,9 @@ class Devices extends StatelessWidget {
                 child: SingleChildScrollView(
                   child: Column(
                     children: [
+                      CupertinoButton(
+                          child: const Text('Test ports'),
+                          onPressed: () => testPorts()),
                       StreamBuilder<List<Device>>(
                           stream:
                               DatabaseDevice().allDevices(uid: userData.uid),
@@ -67,4 +71,21 @@ class Devices extends StatelessWidget {
             child: CircularProgressIndicator(),
           );
   }
+}
+
+void testPorts() {
+  print(SerialPort.availablePorts);
+  final name = SerialPort.availablePorts.first;
+  final port = SerialPort(name);
+  if (!port.openReadWrite()) {
+    print(SerialPort.lastError);
+    exit(-1);
+  }
+
+  // port.write();
+
+  final reader = SerialPortReader(port);
+  reader.stream.listen((data) {
+    print('received: $data');
+  });
 }

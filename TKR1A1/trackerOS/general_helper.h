@@ -17,10 +17,19 @@ struct Input {
 */
 //Status
 enum Status {
-  online,
-  offline
+  cloud,
+  sdCard
 };
 
+Status status_reader(int buttonState) {
+  if (buttonState) {
+    return cloud;
+  } else {
+    return sdCard;
+  }
+}
+
+/*
 //Mode
 enum Mode {
   realtime,
@@ -47,12 +56,11 @@ String mode_deserializer(Mode mode) {
     case sync:
       return "Mode.sync";
   }
-}
+}*/
 
 //Settings
 struct Settings {
   Status status;
-  Mode mode;
   int frequency;
 };
 
@@ -67,9 +75,9 @@ void turn_off_all_LED() {
 }
 
 void turn_status_LED(Status settings, PinStatus pinStatus) {
-  if (settings == online) {
+  if (settings == cloud) {
     digitalWrite(LED_GREEN, pinStatus);
-  } else if (settings == offline) {
+  } else if (settings == sdCard) {
     digitalWrite(LED_YELLOW, pinStatus);
   }
 }
@@ -98,6 +106,41 @@ void await_with_blinking_error(int seconds) {
     ledStatus = ledStatus == HIGH ? LOW : HIGH;
   }
 }
+
+void led_battery_charging() {
+  PinStatus ledStatus = HIGH;
+  for (int i = 0; i < 5; i++) {
+    delay(500);
+    digitalWrite(LED_GREEN, HIGH);
+    delay(500);
+    digitalWrite(LED_YELLOW, HIGH);
+    delay(500);
+    digitalWrite(LED_RED, HIGH);
+    delay(500);
+    digitalWrite(LED_RED, LOW);
+    delay(500);
+    digitalWrite(LED_YELLOW, LOW);
+    delay(500);
+    digitalWrite(LED_GREEN, LOW);
+  }
+  digitalWrite(LED_YELLOW, LOW);
+  digitalWrite(LED_GREEN, LOW);
+  digitalWrite(LED_GREEN, LOW);
+}
+
+void led_battery_low() {
+  PinStatus ledStatus = HIGH;
+  for (int i = 0; i < 10; i++) {
+    digitalWrite(LED_YELLOW, ledStatus);
+    digitalWrite(LED_RED, ledStatus);
+    ledStatus = ledStatus == HIGH ? LOW : HIGH;
+    delay(500);
+  }
+  digitalWrite(LED_YELLOW, LOW);
+  digitalWrite(LED_GREEN, LOW);
+  digitalWrite(LED_GREEN, LOW);
+}
+
 //GPS blink
 void gps_connecting(Status settings) {
   turn_status_LED(settings, HIGH);
@@ -107,6 +150,8 @@ void gps_connected(Status settings) {
   turn_status_LED(settings, LOW);
   digitalWrite(LED_RED, LOW);
 }
+
+//SWITCH READER AND CONVERTER
 
 //Available ram memory https://docs.arduino.cc/learn/programming/memory-guide#flash-memory-measurement
 extern "C" char* sbrk(int incr);

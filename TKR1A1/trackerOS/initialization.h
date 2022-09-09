@@ -1,6 +1,16 @@
 /* 
   LEDs initialization
 */
+void initializationSWITCH() {
+  Serial.print("Intializing  SWITCH:  ");
+  pinMode(CLOUD_SDCARD, INPUT);
+  Serial.print("OK");
+  Serial.println();
+}
+
+/* 
+  LEDs initialization
+*/
 void initializationLED() {
   Serial.print("Intializing  LEDs:  ");
 
@@ -40,8 +50,7 @@ struct Settings initializationSETTINGS(HttpClient http, bool sdCard_available) {
   struct Settings set;
 
   //Set default value
-  set.status = online;
-  set.mode = realtime;
+  set.status = cloud;
   set.frequency = 10;
 
   Serial.println("Initializing settings...");
@@ -66,7 +75,7 @@ struct Settings initializationSETTINGS(HttpClient http, bool sdCard_available) {
           Serial.print("deserializeJson() failed: ");
           Serial.println(error.c_str());
         } else {
-          set.mode = mode_serializer(doc_settings["mode"]);
+          //set.mode = mode_serializer(doc_settings["mode"]);
           set.frequency = doc_settings["frequency"];
         }
 

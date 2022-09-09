@@ -41,7 +41,7 @@ bool cloud_save(HttpClient http, Settings settings, String input_data) {
 
   } else {
     Serial.println("Connect failed: " + String(err));
-    await_with_blinking(10, online);
+    await_with_blinking(10, cloud);
 
     return false;
   }
@@ -59,7 +59,7 @@ bool cloud_register_device(HttpClient http, Settings settings, bool sdCard_avail
   char content_type[] = "application/x-www-form-urlencoded";
   String sdCardAvailable = sdCard_available ? "true" : "false";
   String post_data = "modelNumber=" + String(DEVICE_MODEL_NUMBER) + "&clock=" + String(DEVICE_CLOCK) + "&frequency=" + String(settings.frequency)
-                     + "&sdCardAvailable=" + sdCardAvailable + "&mode=" + mode_deserializer(settings.mode) + "&softwareName=" + String(SOFTWARE_NAME)
+                     + "&sdCardAvailable=" + sdCardAvailable +"&softwareName=" + String(SOFTWARE_NAME)
                      + "&softwareVersion=" + String(SOFTWARE_VERSION);
 
   Serial.println();

@@ -57,11 +57,17 @@
 #define SERVER_POST "/post?serialNumber="
 
 /*
+  SWITCH meaning and pinouts
+    CLOUD_SDCARD: Switch beteen CLOUD or SDCARD
+*/
+#define CLOUD_SDCARD 1
+
+/*
   LED meaning and pinouts
     GREEN: System ok all working
     YELLOW: System saving on SDCARD
     RED: Error on system
 */
-#define LED_GREEN 0
-#define LED_YELLOW 1
-#define LED_RED 2
+#define LED_GREEN 2
+#define LED_YELLOW 3
+#define LED_RED 4
