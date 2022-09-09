@@ -29,7 +29,8 @@ dependencies:
   syncfusion_flutter_maps: ^20.2.48
   file_picker: ^5.0.1
   http: ^0.13.4
-  libserialport: ^0.3.0+1
+  flutter_libserialport: ^0.3.0
+  geolocator: ^9.0.1
 
   #Design
   flutter_slidable: ^2.0.0
@@ -40,8 +41,7 @@ dependencies:
   flutter_easyloading: ^3.0.5
   graphic: ^0.10.6
   compass_icon: ^1.0.4
-  rename_app: ^1.1.0
-
+  rename_app: ^1.1.0 #Enable only when renaiming is needed
 
 dev_dependencies:
   flutter_test:
@@ -49,8 +49,6 @@ dev_dependencies:
 
   flutter_lints: ^2.0.1
   flutter_launcher_icons: ^0.10.0
-
-
 
 
 flutter:

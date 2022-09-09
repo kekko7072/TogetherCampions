@@ -1,12 +1,20 @@
+import 'package:app/interfaces/widgets/serial_monitor.dart';
 import 'package:app/services/imports.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 
 class CardDevice extends StatefulWidget {
-  const CardDevice({Key? key, required this.device, required this.uid})
+  const CardDevice(
+      {Key? key,
+      required this.device,
+      required this.uid,
+      required this.serialConnected,
+      this.serialPort})
       : super(key: key);
   final Device device;
   final String uid;
+  final bool serialConnected;
+  final SerialPort? serialPort;
 
   @override
   State<CardDevice> createState() => _CardDeviceState();
@@ -15,15 +23,25 @@ class CardDevice extends StatefulWidget {
 class _CardDeviceState extends State<CardDevice> {
   int frequency = 0;
   Mode mode = Mode.realtime;
+
+  GPS? gps;
+
+  bool showHelper = false;
+  Timer? timer;
+
   @override
   void initState() {
     super.initState();
     frequency = widget.device.frequency;
     mode = widget.device.mode;
-  }
 
-  bool showHelper = false;
-  Timer? timer;
+    GeolocationHelper().determinePosition().then((value) => gps = GPS(
+        latLng: MapLatLng(value.latitude, value.longitude),
+        altitude: value.altitude,
+        speed: value.speed,
+        course: 0,
+        satellites: 10));
+  }
 
   Timer toastHelper(bool connected, bool isFrequency) =>
       Timer(const Duration(seconds: 3), () async {
@@ -111,24 +129,7 @@ class _CardDeviceState extends State<CardDevice> {
                                   .titleLarge!
                                   .copyWith(fontWeight: FontWeight.bold),
                             ),
-                            if (!connected) ...[
-                              Card(
-                                margin: EdgeInsets.zero,
-                                color: Colors.red,
-                                child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Text(
-                                    'OFFLINE',
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .titleMedium!
-                                        .copyWith(
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.white),
-                                  ),
-                                ),
-                              )
-                            ] else ...[
+                            if (connected) ...[
                               Row(
                                 children: [
                                   BatteryIndicator(
@@ -152,6 +153,58 @@ class _CardDeviceState extends State<CardDevice> {
                                         .copyWith(fontWeight: FontWeight.bold),
                                   ),
                                 ],
+                              )
+                            ] else if (widget.serialConnected &&
+                                widget.serialPort != null) ...[
+                              GestureDetector(
+                                onTap: () => showModalBottomSheet(
+                                  context: context,
+                                  shape: AppStyle.kModalBottomStyle,
+                                  isScrollControlled: true,
+                                  isDismissible: true,
+                                  builder: (context) => Dismissible(
+                                      key: UniqueKey(),
+                                      child: SerialMonitor(
+                                        id: widget.device.serialNumber,
+                                        isSession: false,
+                                        serialPort: widget.serialPort!,
+                                        serialPortReader: SerialPortReader(
+                                            widget.serialPort!),
+                                      )),
+                                ),
+                                child: Card(
+                                  margin: EdgeInsets.zero,
+                                  color: CupertinoColors.activeGreen,
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Text(
+                                      'CONNECTED',
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .titleMedium!
+                                          .copyWith(
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.white),
+                                    ),
+                                  ),
+                                ),
+                              )
+                            ] else ...[
+                              Card(
+                                margin: EdgeInsets.zero,
+                                color: Colors.red,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Text(
+                                    'OFFLINE',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .titleMedium!
+                                        .copyWith(
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.white),
+                                  ),
+                                ),
                               )
                             ]
                           ],
@@ -296,13 +349,13 @@ class _CardDeviceState extends State<CardDevice> {
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: 10.0, vertical: 4),
                                 child: Text(
-                                  widget.device.serialNumber,
+                                  widget.device.modelNumber,
                                   style: TextStyle(
                                       color: Colors.black.withOpacity(0.5)),
                                 ),
                               )),
                         ),
-                        Center(
+                        const Center(
                             child: Image(
                           image: AssetImage(
                             'assets/tracker_image.png',
@@ -399,51 +452,72 @@ class _CardDeviceState extends State<CardDevice> {
                               child: Padding(
                                 padding: const EdgeInsets.all(10.0),
                                 child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      'Posizione',
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .titleMedium,
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          vertical: 4.0),
-                                      child: StreamBuilder<List<Log>>(
-                                          stream: DatabaseLog(
-                                                  id: widget
-                                                      .device.serialNumber)
-                                              .lastLog,
-                                          builder: (context, snapshot) {
-                                            if (snapshot.hasData) {
-                                              return snapshot.data!.isNotEmpty
-                                                  ? DeviceLocation(
-                                                      logs: snapshot.data!,
-                                                    )
-                                                  : const SizedBox(
-                                                      width: 100,
-                                                      height: 130,
-                                                      child: Text(
-                                                        'Mappa non dipsonibile',
-                                                        textAlign:
-                                                            TextAlign.center,
-                                                      ),
-                                                    );
-                                            } else {
-                                              return const SizedBox(
-                                                width: 100,
-                                                height: 130,
-                                                child: Text(
-                                                  'Caricamento mappa',
-                                                  textAlign: TextAlign.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'Posizione',
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .titleMedium,
+                                      ),
+                                      if (widget.serialConnected) ...[
+                                        Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              vertical: 4.0),
+                                          child: gps == null
+                                              ? const Text('Loading position')
+                                              : DeviceLocation(
+                                                  logs: [
+                                                    Log(
+                                                        id: 'connectedSerial',
+                                                        timestamp:
+                                                            DateTime.now(),
+                                                        battery: 4.2,
+                                                        gps: gps!)
+                                                  ],
                                                 ),
-                                              );
-                                            }
-                                          }),
-                                    ),
-                                  ],
-                                ),
+                                        ),
+                                      ] else ...[
+                                        Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              vertical: 4.0),
+                                          child: StreamBuilder<List<Log>>(
+                                              stream: DatabaseLog(
+                                                      id: widget
+                                                          .device.serialNumber)
+                                                  .lastLog,
+                                              builder: (context, snapshot) {
+                                                if (snapshot.hasData) {
+                                                  return snapshot
+                                                          .data!.isNotEmpty
+                                                      ? DeviceLocation(
+                                                          logs: snapshot.data!,
+                                                        )
+                                                      : const SizedBox(
+                                                          width: 100,
+                                                          height: 130,
+                                                          child: Text(
+                                                            'Mappa non dipsonibile',
+                                                            textAlign: TextAlign
+                                                                .center,
+                                                          ),
+                                                        );
+                                                } else {
+                                                  return const SizedBox(
+                                                    width: 100,
+                                                    height: 130,
+                                                    child: Text(
+                                                      'Caricamento mappa',
+                                                      textAlign:
+                                                          TextAlign.center,
+                                                    ),
+                                                  );
+                                                }
+                                              }),
+                                        ),
+                                      ],
+                                    ]),
                               ),
                             ),
                           ],
@@ -521,50 +595,7 @@ class DeviceLocationState extends State<DeviceLocation> {
                 color: Colors.white,
               ),
               markerTooltipBuilder: (BuildContext context, int index) {
-                return ClipRRect(
-                  borderRadius: const BorderRadius.all(Radius.circular(8)),
-                  child:
-                      Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
-                    Container(
-                      padding: const EdgeInsets.only(
-                          left: 10.0, top: 5.0, bottom: 5.0),
-                      width: 150,
-                      color: Colors.white,
-                      child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            Text(
-                              index == 0
-                                  ? 'Start'
-                                  : index == widget.logs.length - 1
-                                      ? 'End'
-                                      : 'Speed: ${widget.logs[index].gps.speed.roundToDouble()} km/h',
-                              style: const TextStyle(
-                                  fontSize: 14,
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.bold),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(top: 5.0),
-                              child: Column(
-                                children: [
-                                  Text(
-                                    'Altitude: ${widget.logs[index].gps.altitude.roundToDouble()}',
-                                    style: const TextStyle(
-                                        fontSize: 10, color: Colors.black),
-                                  ),
-                                  Text(
-                                    'Course: ${widget.logs[index].gps.course.roundToDouble()}°',
-                                    style: const TextStyle(
-                                        fontSize: 10, color: Colors.black),
-                                  ),
-                                ],
-                              ),
-                            )
-                          ]),
-                    ),
-                  ]),
-                );
+                return Container();
               },
               markerBuilder: (BuildContext context, int index) {
                 return MapMarker(

@@ -141,7 +141,6 @@ class CalculationService {
         zoom = 8;
       }
     }
-    print(zoom);
 
     return MapZoomPanBehavior(
       zoomLevel: zoom,

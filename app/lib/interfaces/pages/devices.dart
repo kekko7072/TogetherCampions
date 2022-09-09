@@ -1,8 +1,44 @@
 import 'package:app/services/imports.dart';
 import 'package:flutter/cupertino.dart';
 
-class Devices extends StatelessWidget {
+class Devices extends StatefulWidget {
   const Devices({Key? key}) : super(key: key);
+
+  @override
+  State<Devices> createState() => _DevicesState();
+}
+
+extension IntToString on int {
+  String toHex() => '0x${toRadixString(16)}';
+  String toPadded([int width = 3]) => toString().padLeft(width, '0');
+  String toTransport() {
+    switch (this) {
+      case SerialPortTransport.usb:
+        return 'USB';
+      case SerialPortTransport.bluetooth:
+        return 'Bluetooth';
+      case SerialPortTransport.native:
+        return 'Native';
+      default:
+        return 'Unknown';
+    }
+  }
+}
+
+class _DevicesState extends State<Devices> {
+  var availablePorts = [];
+
+  @override
+  void initState() {
+    super.initState();
+    if (!Platform.isIOS || !kIsWeb) {
+      initPorts();
+    }
+  }
+
+  void initPorts() {
+    setState(() => availablePorts = SerialPort.availablePorts);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -17,9 +53,6 @@ class Devices extends StatelessWidget {
                 child: SingleChildScrollView(
                   child: Column(
                     children: [
-                      CupertinoButton(
-                          child: const Text('Test ports'),
-                          onPressed: () => testPorts()),
                       StreamBuilder<List<Device>>(
                           stream:
                               DatabaseDevice().allDevices(uid: userData.uid),
@@ -36,6 +69,18 @@ class Devices extends StatelessWidget {
                                 itemBuilder: (context, index) => CardDevice(
                                       device: devices[index],
                                       uid: userData.uid,
+                                      serialConnected: availablePorts
+                                          .where((element) =>
+                                              SerialPort(element)
+                                                  .serialNumber ==
+                                              devices[index].serialNumber)
+                                          .isNotEmpty,
+                                      serialPort: availablePorts
+                                          .where((element) =>
+                                              SerialPort(element)
+                                                  .serialNumber ==
+                                              devices[index].serialNumber)
+                                          .first,
                                     ));
                           })
                     ],
@@ -71,21 +116,4 @@ class Devices extends StatelessWidget {
             child: CircularProgressIndicator(),
           );
   }
-}
-
-void testPorts() {
-  print(SerialPort.availablePorts);
-  final name = SerialPort.availablePorts.first;
-  final port = SerialPort(name);
-  if (!port.openReadWrite()) {
-    print(SerialPort.lastError);
-    exit(-1);
-  }
-
-  // port.write();
-
-  final reader = SerialPortReader(port);
-  reader.stream.listen((data) {
-    print('received: $data');
-  });
 }

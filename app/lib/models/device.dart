@@ -20,6 +20,7 @@ class Device {
   final int clock;
   final int frequency;
   final bool sdCardAvailable;
+  //@Deprecated
   final Mode mode;
   final Software software;
 }
