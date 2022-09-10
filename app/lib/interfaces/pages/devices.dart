@@ -25,7 +25,7 @@ extension IntToString on int {
 }
 
 class _DevicesState extends State<Devices> {
-  var availablePorts = [];
+  List<String> availablePorts = [];
 
   @override
   void initState() {
@@ -45,11 +45,15 @@ class _DevicesState extends State<Devices> {
 
   SerialPort? setSerialPorts({required String serialNumber}) =>
       checkAvailablePorts(serialNumber: serialNumber)
-          ? availablePorts
+          ? SerialPort(availablePorts
               .where(
                   (element) => SerialPort(element).serialNumber == serialNumber)
-              .first
+              .first)
           : null;
+
+  ///TODO
+  ///PROBLEM: To discover device plugged is needed to reload code
+  ///SOLUTION: Implement a way to auto call every some time initPorts()
 
   @override
   Widget build(BuildContext context) {
