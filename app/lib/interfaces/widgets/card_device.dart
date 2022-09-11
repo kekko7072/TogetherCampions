@@ -24,8 +24,6 @@ class _CardDeviceState extends State<CardDevice> {
   int frequency = 0;
   Mode mode = Mode.realtime;
 
-  GPS? gps;
-
   bool showHelper = false;
   Timer? timer;
 
@@ -34,13 +32,6 @@ class _CardDeviceState extends State<CardDevice> {
     super.initState();
     frequency = widget.device.frequency;
     mode = widget.device.mode;
-
-    GeolocationHelper().determinePosition().then((value) => gps = GPS(
-        latLng: MapLatLng(value.latitude, value.longitude),
-        altitude: value.altitude,
-        speed: value.speed,
-        course: 0,
-        satellites: 10));
   }
 
   Timer toastHelper(bool connected, bool isFrequency) =>
@@ -455,17 +446,34 @@ class _CardDeviceState extends State<CardDevice> {
                                       Padding(
                                         padding: const EdgeInsets.symmetric(
                                             vertical: 4.0),
-                                        child: gps == null
-                                            ? const Text('Loading position')
-                                            : DeviceLocation(
+                                        child: StreamBuilder<Position>(
+                                            stream:
+                                                Geolocator.getPositionStream(),
+                                            builder: (context, snapshot) {
+                                              if (!snapshot.hasData) {
+                                                return Container();
+                                              }
+                                              return DeviceLocation(
                                                 logs: [
                                                   Log(
                                                       id: 'connectedSerial',
                                                       timestamp: DateTime.now(),
                                                       battery: 4.2,
-                                                      gps: gps!)
+                                                      gps: GPS(
+                                                          latLng: MapLatLng(
+                                                              snapshot.data!
+                                                                  .latitude,
+                                                              snapshot.data!
+                                                                  .longitude),
+                                                          altitude: snapshot
+                                                              .data!.altitude,
+                                                          speed: snapshot
+                                                              .data!.speed,
+                                                          course: 0,
+                                                          satellites: 10))
                                                 ],
-                                              ),
+                                              );
+                                            }),
                                       ),
                                     ] else ...[
                                       Padding(

@@ -73,4 +73,3 @@ export 'package:app/services/database_device.dart';
 export 'package:app/services/auth.dart';
 export 'package:app/services/calculation.dart';
 export 'package:app/services/style.dart';
-export 'package:app/services/geolocation.dart';
