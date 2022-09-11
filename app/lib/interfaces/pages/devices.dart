@@ -27,11 +27,11 @@ extension IntToString on int {
 
 class _DevicesState extends State<Devices> {
   Stream<List<String>> streamPorts() async* {
-    await Future.delayed(const Duration(seconds: 10));
+    await Future.delayed(const Duration(seconds: 1));
+    yield SerialConnectionService.enableConnection()
+        ? SerialPort.availablePorts
+        : [];
     setState(() {});
-    yield SerialConnectionService.disableConnection()
-        ? []
-        : SerialPort.availablePorts;
   }
 
   @override

@@ -164,11 +164,7 @@ class _CardDeviceState extends State<CardDevice> {
                                 builder: (context) => Dismissible(
                                     key: UniqueKey(),
                                     child: SerialMonitor(
-                                      id: widget.device.serialNumber,
-                                      isSession: false,
-                                      serialPort: widget.serialPort!,
-                                      serialPortReader:
-                                          SerialPortReader(widget.serialPort!),
+                                      device: widget.device,
                                     )),
                               ),
                               child: Card(
