@@ -30,14 +30,16 @@ class _DevicesState extends State<Devices> {
   @override
   void initState() {
     super.initState();
-    if (!Platform.isIOS || !kIsWeb) {
+
+    if (disableConnection()) {
       initPorts();
     }
   }
 
-  void initPorts() {
-    setState(() => availablePorts = SerialPort.availablePorts);
-  }
+  bool disableConnection() => !Platform.isIOS && !kIsWeb;
+
+  void initPorts() =>
+      setState(() => availablePorts = SerialPort.availablePorts);
 
   bool checkAvailablePorts({required String serialNumber}) => availablePorts
       .where((element) => SerialPort(element).serialNumber == serialNumber)

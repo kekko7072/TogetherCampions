@@ -128,29 +128,29 @@ class _AddEditSessionState extends State<AddEditSession> {
                       ],
                     ),
                   ],
-                  for (String deviceID in widget.userData.devices) ...[
-                    Wrap(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.all(5.0),
-                          child: FilterChip(
-                              backgroundColor: deviceId == deviceID
-                                  ? AppStyle.primaryColor
-                                  : Colors.black12,
-                              label: Text(
-                                deviceID,
-                                style: TextStyle(
-                                    fontWeight: deviceId == deviceID
-                                        ? FontWeight.bold
-                                        : FontWeight.normal,
-                                    color: Colors.white),
-                              ),
-                              onSelected: (value) =>
-                                  setState(() => deviceId = deviceID)),
-                        ),
+                  Wrap(
+                    alignment: WrapAlignment.start,
+                    direction: Axis.horizontal,
+                    spacing: 5,
+                    children: [
+                      for (String deviceID in widget.userData.devices) ...[
+                        FilterChip(
+                            backgroundColor: deviceId == deviceID
+                                ? AppStyle.primaryColor
+                                : Colors.black12,
+                            label: Text(
+                              deviceID,
+                              style: TextStyle(
+                                  fontWeight: deviceId == deviceID
+                                      ? FontWeight.bold
+                                      : FontWeight.normal,
+                                  color: Colors.white),
+                            ),
+                            onSelected: (value) =>
+                                setState(() => deviceId = deviceID)),
                       ],
-                    ),
-                  ],
+                    ],
+                  ),
                   Padding(
                     padding: const EdgeInsets.only(left: 20.0),
                     child: Row(
@@ -227,7 +227,10 @@ class _AddEditSessionState extends State<AddEditSession> {
                           });
                         }
                       },
-                      child: Text(widget.isEdit ? 'Modifica' : 'Avvia'),
+                      child: Text(
+                        widget.isEdit ? 'Modifica' : 'Avvia',
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
                     ),
                   ] else ...[
                     const SizedBox(height: 10),
@@ -257,7 +260,7 @@ class _AddEditSessionState extends State<AddEditSession> {
                           debugPrint("User cancelled");
                         }
                       },
-                      child: const Text('Carica file'),
+                      child: const Text('Select file'),
                     ),
                     const SizedBox(height: 10),
                     Text('N° Log: ${value.length}'),
@@ -312,7 +315,7 @@ class _AddEditSessionState extends State<AddEditSession> {
                         });
                       },
                       child: Text(
-                        widget.isEdit ? 'Modifica' : 'Avvia',
+                        widget.isEdit ? 'Modifica' : 'Carica',
                         style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
                     ),

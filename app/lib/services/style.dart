@@ -37,7 +37,7 @@ class AppStyle {
       InputDecoration(
         prefixIcon: Icon(
           icon,
-          color: AppStyle.primaryColor,
+          color: AppStyle.backgroundColor,
         ),
         hintText: hintText,
         hintStyle: const TextStyle(
@@ -49,11 +49,11 @@ class AppStyle {
           borderRadius: BorderRadius.all(Radius.circular(32.0)),
         ),
         enabledBorder: OutlineInputBorder(
-          borderSide: BorderSide(color: AppStyle.primaryColor, width: 2.0),
+          borderSide: BorderSide(color: AppStyle.backgroundColor, width: 2.0),
           borderRadius: const BorderRadius.all(Radius.circular(32.0)),
         ),
         focusedBorder: OutlineInputBorder(
-          borderSide: BorderSide(color: AppStyle.primaryColor, width: 2.0),
+          borderSide: BorderSide(color: AppStyle.backgroundColor, width: 2.0),
           borderRadius: const BorderRadius.all(Radius.circular(32.0)),
         ),
       );
