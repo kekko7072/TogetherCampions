@@ -1,4 +1,5 @@
 import 'package:app/services/imports.dart';
+import 'package:app/services/serial_connection.dart';
 
 class Devices extends StatefulWidget {
   const Devices({Key? key}) : super(key: key);
@@ -25,37 +26,13 @@ extension IntToString on int {
 }
 
 class _DevicesState extends State<Devices> {
-  List<String> availablePorts = [];
-
-  @override
-  void initState() {
-    super.initState();
-
-    if (disableConnection()) {
-      initPorts();
-    }
+  Stream<List<String>> streamPorts() async* {
+    await Future.delayed(const Duration(seconds: 10));
+    setState(() {});
+    yield SerialConnectionService.disableConnection()
+        ? []
+        : SerialPort.availablePorts;
   }
-
-  bool disableConnection() => !Platform.isIOS && !kIsWeb;
-
-  void initPorts() =>
-      setState(() => availablePorts = SerialPort.availablePorts);
-
-  bool checkAvailablePorts({required String serialNumber}) => availablePorts
-      .where((element) => SerialPort(element).serialNumber == serialNumber)
-      .isNotEmpty;
-
-  SerialPort? setSerialPorts({required String serialNumber}) =>
-      checkAvailablePorts(serialNumber: serialNumber)
-          ? SerialPort(availablePorts
-              .where(
-                  (element) => SerialPort(element).serialNumber == serialNumber)
-              .first)
-          : null;
-
-  ///TODO
-  ///PROBLEM: To discover device plugged is needed to reload code
-  ///SOLUTION: Implement a way to auto call every some time initPorts()
 
   @override
   Widget build(BuildContext context) {
@@ -83,16 +60,26 @@ class _DevicesState extends State<Devices> {
                                 reverse: true,
                                 physics: const NeverScrollableScrollPhysics(),
                                 itemCount: devices.length,
-                                itemBuilder: (context, index) => CardDevice(
-                                      device: devices[index],
-                                      uid: userData.uid,
-                                      serialConnected: checkAvailablePorts(
-                                          serialNumber:
-                                              devices[index].serialNumber),
-                                      serialPort: setSerialPorts(
-                                          serialNumber:
-                                              devices[index].serialNumber),
-                                    ));
+                                itemBuilder: (context, index) => StreamBuilder<
+                                        List<String>>(
+                                    stream: streamPorts(),
+                                    initialData: const [],
+                                    builder: (context, snapshot) {
+                                      return CardDevice(
+                                        device: devices[index],
+                                        uid: userData.uid,
+                                        serialConnected: SerialConnectionService
+                                            .checkAvailablePorts(
+                                                availablePorts: snapshot.data!,
+                                                serialNumber: devices[index]
+                                                    .serialNumber),
+                                        serialPort: SerialConnectionService
+                                            .setSerialPorts(
+                                                availablePorts: snapshot.data!,
+                                                serialNumber: devices[index]
+                                                    .serialNumber),
+                                      );
+                                    }));
                           })
                     ],
                   ),
