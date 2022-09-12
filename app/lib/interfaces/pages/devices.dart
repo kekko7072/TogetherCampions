@@ -28,7 +28,7 @@ extension IntToString on int {
 class _DevicesState extends State<Devices> {
   Stream<List<String>> streamPorts() async* {
     await Future.delayed(const Duration(seconds: 1));
-    yield SerialConnectionService.enableConnection()
+    yield SerialConnectionService.connectionEnabled()
         ? SerialPort.availablePorts
         : [];
     setState(() {});
@@ -52,7 +52,7 @@ class _DevicesState extends State<Devices> {
                           if (!snapshot.hasData) {
                             return const Text('No data');
                           }
-                          List<Device> devices = snapshot.data!;
+                          List<Device> devices = snapshot.data ?? [];
 
                           return StreamBuilder<List<String>>(
                               stream: streamPorts(),

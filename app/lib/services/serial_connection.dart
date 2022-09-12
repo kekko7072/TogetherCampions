@@ -1,7 +1,7 @@
 import 'package:app/services/imports.dart';
 
 class SerialConnectionService {
-  static bool enableConnection() => !Platform.isIOS && !kIsWeb;
+  static bool connectionEnabled() => kIsWeb ? false : !Platform.isIOS;
 
   static bool checkAvailablePorts(
           {required List<String> availablePorts,

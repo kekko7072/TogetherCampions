@@ -30,7 +30,9 @@ export 'package:uuid/uuid.dart';
 export 'package:syncfusion_flutter_maps/maps.dart';
 export 'package:file_picker/file_picker.dart';
 export 'package:http/http.dart';
-export 'package:flutter_libserialport/flutter_libserialport.dart';
+export 'package:libserialport/libserialport.dart'
+    if (dart.library.html) 'package:app/services/web_serialport.dart'
+    if (dart.library.io) 'package:libserialport/libserialport.dart';
 export 'package:geolocator/geolocator.dart';
 
 ///Design
