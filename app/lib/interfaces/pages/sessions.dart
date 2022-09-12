@@ -30,15 +30,17 @@ class _SessionsState extends State<Sessions> {
         ? Scaffold(
             backgroundColor: Colors.white,
             body: SafeArea(
-              child: SingleChildScrollView(
-                child: Column(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.all(10.0),
-                      child: Wrap(
+              child: Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Wrap(
                         alignment: WrapAlignment.start,
                         direction: Axis.horizontal,
                         spacing: 5,
+                        runSpacing: 5,
                         children: [
                           for (String id in userData.devices) ...[
                             FilterChip(
@@ -55,57 +57,68 @@ class _SessionsState extends State<Sessions> {
                                 ),
                                 onSelected: (value) => setState(() {
                                       deviceID = id;
+                                      sessions = userData.sessions
+                                          .where((element) =>
+                                              deviceID == element.deviceID)
+                                          .toList();
                                     })),
                           ],
                         ],
                       ),
-                    ),
-                    ListView.builder(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        itemCount: sessions.length,
-                        reverse: true,
-                        itemBuilder: (context, index) =>
-                            StreamBuilder<List<Log>>(
-                                stream: DatabaseLog(id: deviceID)
-                                    .sessionLogs(session: sessions[index]),
-                                builder: (context, snapshot) {
-                                  if (!snapshot.hasData) {
-                                    return const Center(
-                                        child: Padding(
-                                      padding: EdgeInsets.all(20.0),
-                                      child: CircularProgressIndicator(),
-                                    ));
-                                  } else if (snapshot.data!.isEmpty) {
-                                    return const Center(
-                                        child: Text('No data available'));
-                                  }
+                      const SizedBox(height: 10),
+                      Center(
+                        child: Wrap(
+                          direction: Axis.horizontal,
+                          spacing: 5,
+                          runSpacing: 5,
+                          children: [
+                            for (Session session in sessions) ...[
+                              StreamBuilder<List<Log>>(
+                                  stream: DatabaseLog(id: deviceID)
+                                      .sessionLogs(session: session),
+                                  builder: (context, snapshot) {
+                                    if (!snapshot.hasData) {
+                                      return const Center(
+                                          child: Padding(
+                                        padding: EdgeInsets.all(20.0),
+                                        child: CircularProgressIndicator(),
+                                      ));
+                                    } else if (snapshot.data!.isEmpty) {
+                                      return const Center(
+                                          child: Text('No data available'));
+                                    }
 
-                                  return CardSession(
-                                    userData: userData,
-                                    id: deviceID,
-                                    session: userData.sessions[index],
-                                    logs: snapshot.data!,
-                                  );
-                                })),
-                    CupertinoButton(
-                      child: const Text(
-                        'Load more',
+                                    return CardSession(
+                                      userData: userData,
+                                      id: deviceID,
+                                      session: session,
+                                      logs: snapshot.data!,
+                                    );
+                                  }),
+                            ]
+                          ],
+                        ),
                       ),
-                      onPressed: () => setState(() =>
-                          sessions.addAll(userData.sessions.sublist(
-                            widget.userData.sessions.length - sessions.length >
-                                    5
-                                ? widget.userData.sessions.length -
-                                    sessions.length -
-                                    5
-                                : widget.userData.sessions.length -
-                                    sessions.length,
-                            widget.userData.sessions.length - sessions.length,
-                          ))),
-                    ),
-                    const SizedBox(height: 60),
-                  ],
+                      CupertinoButton(
+                        child: const Text(
+                          'Load more',
+                        ),
+                        onPressed: () => setState(() =>
+                            sessions.addAll(userData.sessions.sublist(
+                              widget.userData.sessions.length -
+                                          sessions.length >
+                                      5
+                                  ? widget.userData.sessions.length -
+                                      sessions.length -
+                                      5
+                                  : widget.userData.sessions.length -
+                                      sessions.length,
+                              widget.userData.sessions.length - sessions.length,
+                            ))),
+                      ),
+                      const SizedBox(height: 60),
+                    ],
+                  ),
                 ),
               ),
             ),

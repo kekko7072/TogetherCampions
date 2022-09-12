@@ -64,7 +64,11 @@ class AppStyle {
           borderRadius: BorderRadius.only(
               topLeft: Radius.circular(30), topRight: Radius.circular(30)));
 
-  ///APP BAR
+  ///WIDTH
+  static double resizeAutomaticallyWidth(BuildContext context) =>
+      MediaQuery.of(context).size.width >= 400
+          ? 400
+          : MediaQuery.of(context).size.width;
 
   ///MENU
 }

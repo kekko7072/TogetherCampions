@@ -45,43 +45,44 @@ class _DevicesState extends State<Devices> {
               child: Padding(
                 padding: const EdgeInsets.all(10.0),
                 child: SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      StreamBuilder<List<Device>>(
-                          stream:
-                              DatabaseDevice().allDevices(uid: userData.uid),
-                          builder: (context, snapshot) {
-                            if (!snapshot.hasData) {
-                              return const Text('No data');
-                            }
-                            List<Device> devices = snapshot.data!;
-                            return ListView.builder(
-                                shrinkWrap: true,
-                                reverse: true,
-                                physics: const NeverScrollableScrollPhysics(),
-                                itemCount: devices.length,
-                                itemBuilder: (context, index) => StreamBuilder<
-                                        List<String>>(
-                                    stream: streamPorts(),
-                                    initialData: const [],
-                                    builder: (context, snapshot) {
-                                      return CardDevice(
-                                        device: devices[index],
+                  child: Center(
+                    child: StreamBuilder<List<Device>>(
+                        stream: DatabaseDevice().allDevices(uid: userData.uid),
+                        builder: (context, snapshot) {
+                          if (!snapshot.hasData) {
+                            return const Text('No data');
+                          }
+                          List<Device> devices = snapshot.data!;
+
+                          return StreamBuilder<List<String>>(
+                              stream: streamPorts(),
+                              initialData: const [],
+                              builder: (context, snapshot) {
+                                return Wrap(
+                                  direction: Axis.horizontal,
+                                  spacing: 5,
+                                  runSpacing: 5,
+                                  children: [
+                                    for (Device device in devices) ...[
+                                      CardDevice(
+                                        device: device,
                                         uid: userData.uid,
                                         serialConnected: SerialConnectionService
                                             .checkAvailablePorts(
                                                 availablePorts: snapshot.data!,
-                                                serialNumber: devices[index]
-                                                    .serialNumber),
+                                                serialNumber:
+                                                    device.serialNumber),
                                         serialPort: SerialConnectionService
                                             .setSerialPorts(
                                                 availablePorts: snapshot.data!,
-                                                serialNumber: devices[index]
-                                                    .serialNumber),
-                                      );
-                                    }));
-                          })
-                    ],
+                                                serialNumber:
+                                                    device.serialNumber),
+                                      )
+                                    ]
+                                  ],
+                                );
+                              });
+                        }),
                   ),
                 ),
               ),

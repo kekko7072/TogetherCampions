@@ -36,47 +36,49 @@ class _CardSessionState extends State<CardSession> {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(5.0),
-      child: Slidable(
-        key: const ValueKey(0),
-        startActionPane: ActionPane(
-          motion: const ScrollMotion(),
-          children: [
-            SlidableAction(
-              onPressed: (con) async => await DatabaseUser.sessionCreateRemove(
-                  isCreate: false,
-                  uid: widget.userData.uid,
-                  session: widget.session),
-              backgroundColor: CupertinoColors.destructiveRed,
-              foregroundColor: Colors.black,
-              icon: Icons.delete,
-              label: 'Delete',
-            ),
-            SlidableAction(
-              onPressed: (cons) async => showModalBottomSheet(
-                context: context,
-                shape: AppStyle.kModalBottomStyle,
-                isScrollControlled: true,
-                isDismissible: true,
-                builder: (context) => AddEditSession(
-                  userData: widget.userData,
-                  isEdit: true,
-                  session: widget.session,
-                ),
+      child: Container(
+        margin: EdgeInsets.zero,
+        width: AppStyle.resizeAutomaticallyWidth(context),
+        decoration: BoxDecoration(
+            borderRadius: const BorderRadius.all(Radius.circular(20)),
+            color: AppStyle.backgroundColor),
+        child: Slidable(
+          key: const ValueKey(0),
+          startActionPane: ActionPane(
+            motion: const ScrollMotion(),
+            children: [
+              SlidableAction(
+                onPressed: (con) async =>
+                    await DatabaseUser.sessionCreateRemove(
+                        isCreate: false,
+                        uid: widget.userData.uid,
+                        session: widget.session),
+                backgroundColor: CupertinoColors.destructiveRed,
+                foregroundColor: Colors.black,
+                icon: Icons.delete,
+                label: 'Delete',
               ),
-              backgroundColor: AppStyle.primaryColor,
-              foregroundColor: Colors.black,
-              icon: Icons.edit,
-              label: 'Edit',
-            ),
-          ],
-        ),
-        child: GestureDetector(
-            behavior: HitTestBehavior.opaque,
-            child: Container(
-              margin: EdgeInsets.zero,
-              decoration: BoxDecoration(
-                  borderRadius: const BorderRadius.all(Radius.circular(20)),
-                  color: AppStyle.backgroundColor),
+              SlidableAction(
+                onPressed: (cons) async => showModalBottomSheet(
+                  context: context,
+                  shape: AppStyle.kModalBottomStyle,
+                  isScrollControlled: true,
+                  isDismissible: true,
+                  builder: (context) => AddEditSession(
+                    userData: widget.userData,
+                    isEdit: true,
+                    session: widget.session,
+                  ),
+                ),
+                backgroundColor: AppStyle.primaryColor,
+                foregroundColor: Colors.black,
+                icon: Icons.edit,
+                label: 'Edit',
+              ),
+            ],
+          ),
+          child: GestureDetector(
+              behavior: HitTestBehavior.translucent,
               child: Padding(
                 padding: const EdgeInsets.all(10.0),
                 child: Row(
@@ -166,20 +168,20 @@ class _CardSessionState extends State<CardSession> {
                   ],
                 ),
               ),
-            ),
-            onTap: () {
-              if (widget.logs.isNotEmpty) {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => SessionMap(
-                            id: widget.id,
-                            session: widget.session,
-                            logs: widget.logs,
-                          )),
-                );
-              }
-            }),
+              onTap: () {
+                if (widget.logs.isNotEmpty) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => SessionMap(
+                              id: widget.id,
+                              session: widget.session,
+                              logs: widget.logs,
+                            )),
+                  );
+                }
+              }),
+        ),
       ),
     );
   }

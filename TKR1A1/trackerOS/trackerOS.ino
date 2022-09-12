@@ -184,7 +184,6 @@ void loop() {
 }
 
 void initialize() {
-  //if (!calledInitialization) {
 
   //SWITCH
   initializationSWITCH();
@@ -217,6 +216,4 @@ void initialize() {
   ///GPS
   initializationGPS();
 
-  //calledInitialization = true;
-  //}
 }
