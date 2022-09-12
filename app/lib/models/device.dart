@@ -4,6 +4,7 @@ class Device {
   Device({
     required this.serialNumber,
     required this.modelNumber,
+    required this.modelName,
     required this.uid,
     required this.name,
     required this.clock,
@@ -15,6 +16,7 @@ class Device {
 
   final String serialNumber;
   final String modelNumber;
+  final String modelName;
   final String uid;
   final String name;
   final int clock;

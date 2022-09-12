@@ -22,6 +22,7 @@ class _AddEditDeviceState extends State<AddEditDevice> {
 
   TextEditingController id = TextEditingController();
   TextEditingController model = TextEditingController(text: 'TKR1A1');
+  TextEditingController modelName = TextEditingController(text: 'BlackStone 1');
   TextEditingController name = TextEditingController(text: 'BlackStone 1');
   int clock = 6;
   int frequency = 10;
@@ -75,7 +76,8 @@ class _AddEditDeviceState extends State<AddEditDevice> {
                               style: TextStyle(
                                   fontWeight: model.text == 'TKR1A1'
                                       ? FontWeight.bold
-                                      : FontWeight.normal),
+                                      : FontWeight.normal,
+                                  color: Colors.white),
                             ),
                             onSelected: (value) =>
                                 setState(() => model.text = 'TKR1A1')),
@@ -149,6 +151,8 @@ class _AddEditDeviceState extends State<AddEditDevice> {
                       await DatabaseDevice()
                           .register(
                         serialNumber: id.text,
+                        modelNumber: model.text,
+                        modelName: modelName.text,
                         uid: widget.uid,
                         name: name.text,
                         frequency: frequency,
@@ -158,7 +162,10 @@ class _AddEditDeviceState extends State<AddEditDevice> {
                         Navigator.of(context).pop();
                       });
                     },
-                    child: Text(widget.isEdit ? 'Modifica' : 'Crea'),
+                    child: Text(
+                      widget.isEdit ? 'Modifica' : 'Crea',
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
                   ),
                   const Padding(
                     padding: EdgeInsets.all(10),

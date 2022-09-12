@@ -47,14 +47,18 @@ class _SessionsState extends State<Sessions> {
                                 backgroundColor: deviceID == id
                                     ? AppStyle.primaryColor
                                     : Colors.black12,
-                                label: Text(
-                                  id,
-                                  style: TextStyle(
-                                      fontWeight: deviceID == id
-                                          ? FontWeight.bold
-                                          : FontWeight.normal,
-                                      color: Colors.white),
-                                ),
+                                label: StreamBuilder<Device>(
+                                    stream: DatabaseDevice().device(id: id),
+                                    builder: (context, snapshot) {
+                                      return Text(
+                                        snapshot.data?.name ?? id,
+                                        style: TextStyle(
+                                            fontWeight: deviceID == id
+                                                ? FontWeight.bold
+                                                : FontWeight.normal,
+                                            color: Colors.white),
+                                      );
+                                    }),
                                 onSelected: (value) => setState(() {
                                       deviceID = id;
                                       sessions = userData.sessions

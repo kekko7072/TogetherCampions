@@ -6,10 +6,14 @@ class DatabaseDevice {
 
   Future register(
       {required String serialNumber,
+      required String modelNumber,
+      required String modelName,
       required String name,
       required String uid,
       required int frequency}) async {
     Map<String, dynamic> value = {
+      'modelNumber': modelNumber,
+      "modelName": modelName,
       'name': name,
       'uid': uid,
       "frequency": frequency,
@@ -58,6 +62,7 @@ class DatabaseDevice {
     return Device(
         serialNumber: snapshot.id,
         modelNumber: snapshot.data()?['modelNumber'] ?? '',
+        modelName: snapshot.data()?['modelName'] ?? '',
         uid: snapshot.data()?['uid'] ?? '',
         name: snapshot.data()?['name'] ?? '',
         clock: snapshot.data()?['clock'] ?? 0,
