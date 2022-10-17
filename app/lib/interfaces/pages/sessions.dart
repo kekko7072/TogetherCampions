@@ -17,9 +17,7 @@ class _SessionsState extends State<Sessions> {
   void initState() {
     super.initState();
     deviceID = widget.userData.devices.first;
-    sessions = widget.userData.sessions
-        .where((element) => deviceID == element.deviceID)
-        .toList();
+    sessions = widget.userData.sessions.where((element) => deviceID == element.deviceID).toList();
   }
 
   @override
@@ -44,27 +42,18 @@ class _SessionsState extends State<Sessions> {
                         children: [
                           for (String id in userData.devices) ...[
                             FilterChip(
-                                backgroundColor: deviceID == id
-                                    ? AppStyle.primaryColor
-                                    : Colors.black12,
+                                backgroundColor: deviceID == id ? AppStyle.primaryColor : Colors.black12,
                                 label: StreamBuilder<Device>(
                                     stream: DatabaseDevice().device(id: id),
                                     builder: (context, snapshot) {
                                       return Text(
                                         snapshot.data?.name ?? id,
-                                        style: TextStyle(
-                                            fontWeight: deviceID == id
-                                                ? FontWeight.bold
-                                                : FontWeight.normal,
-                                            color: Colors.white),
+                                        style: TextStyle(fontWeight: deviceID == id ? FontWeight.bold : FontWeight.normal, color: Colors.white),
                                       );
                                     }),
                                 onSelected: (value) => setState(() {
                                       deviceID = id;
-                                      sessions = userData.sessions
-                                          .where((element) =>
-                                              deviceID == element.deviceID)
-                                          .toList();
+                                      sessions = userData.sessions.where((element) => deviceID == element.deviceID).toList();
                                     })),
                           ],
                         ],
@@ -78,8 +67,7 @@ class _SessionsState extends State<Sessions> {
                           children: [
                             for (Session session in sessions) ...[
                               StreamBuilder<List<Log>>(
-                                  stream: DatabaseLog(id: deviceID)
-                                      .sessionLogs(session: session),
+                                  stream: DatabaseLog(id: deviceID).sessionLogs(session: session),
                                   builder: (context, snapshot) {
                                     if (!snapshot.hasData) {
                                       return const Center(
@@ -88,8 +76,7 @@ class _SessionsState extends State<Sessions> {
                                         child: CircularProgressIndicator(),
                                       ));
                                     } else if (snapshot.data!.isEmpty) {
-                                      return const Center(
-                                          child: Text('No data available'));
+                                      return const Center(child: Text('No data available'));
                                     }
 
                                     return CardSession(
@@ -107,16 +94,8 @@ class _SessionsState extends State<Sessions> {
                         child: const Text(
                           'Load more',
                         ),
-                        onPressed: () => setState(() =>
-                            sessions.addAll(userData.sessions.sublist(
-                              widget.userData.sessions.length -
-                                          sessions.length >
-                                      5
-                                  ? widget.userData.sessions.length -
-                                      sessions.length -
-                                      5
-                                  : widget.userData.sessions.length -
-                                      sessions.length,
+                        onPressed: () => setState(() => sessions.addAll(userData.sessions.sublist(
+                              widget.userData.sessions.length - sessions.length > 5 ? widget.userData.sessions.length - sessions.length - 5 : widget.userData.sessions.length - sessions.length,
                               widget.userData.sessions.length - sessions.length,
                             ))),
                       ),

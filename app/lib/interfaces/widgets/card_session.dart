@@ -4,13 +4,7 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:intl/intl.dart';
 
 class CardSession extends StatefulWidget {
-  const CardSession(
-      {Key? key,
-      required this.userData,
-      required this.id,
-      required this.session,
-      required this.logs})
-      : super(key: key);
+  const CardSession({Key? key, required this.userData, required this.id, required this.session, required this.logs}) : super(key: key);
   final UserData userData;
   final String id;
   final Session session;
@@ -39,20 +33,14 @@ class _CardSessionState extends State<CardSession> {
       child: Container(
         margin: EdgeInsets.zero,
         width: AppStyle.resizeAutomaticallyWidth(context),
-        decoration: BoxDecoration(
-            borderRadius: const BorderRadius.all(Radius.circular(20)),
-            color: AppStyle.backgroundColor),
+        decoration: BoxDecoration(borderRadius: const BorderRadius.all(Radius.circular(20)), color: AppStyle.backgroundColor),
         child: Slidable(
           key: const ValueKey(0),
           startActionPane: ActionPane(
             motion: const ScrollMotion(),
             children: [
               SlidableAction(
-                onPressed: (con) async =>
-                    await DatabaseUser.sessionCreateRemove(
-                        isCreate: false,
-                        uid: widget.userData.uid,
-                        session: widget.session),
+                onPressed: (con) async => await DatabaseUser.sessionCreateRemove(isCreate: false, uid: widget.userData.uid, session: widget.session),
                 backgroundColor: CupertinoColors.destructiveRed,
                 foregroundColor: Colors.black,
                 icon: Icons.delete,
@@ -94,12 +82,7 @@ class _CardSessionState extends State<CardSession> {
                           children: [
                             Text(
                               widget.session.name,
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .titleLarge!
-                                  .copyWith(
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white),
+                              style: Theme.of(context).textTheme.titleLarge!.copyWith(fontWeight: FontWeight.bold, color: Colors.white),
                             ),
                             const SizedBox(height: 10),
                             Row(
@@ -111,8 +94,7 @@ class _CardSessionState extends State<CardSession> {
                                 ),
                                 const SizedBox(width: 10),
                                 Text(
-                                  DateFormat('EEE dd')
-                                      .format(widget.session.start),
+                                  DateFormat('EEE dd').format(widget.session.start),
                                   style: const TextStyle(
                                     color: Colors.white70,
                                   ),
@@ -126,8 +108,7 @@ class _CardSessionState extends State<CardSession> {
                                 ),
                                 const SizedBox(width: 5),
                                 Text(
-                                  DateFormat('kk:mm')
-                                      .format(widget.session.start),
+                                  DateFormat('kk:mm').format(widget.session.start),
                                   style: const TextStyle(
                                     color: Colors.white70,
                                   ),
@@ -217,8 +198,7 @@ class TrackPreviewState extends State<TrackPreview> {
 
     _mapController = MapTileLayerController();
 
-    _zoomPanBehavior = CalculationService.initialCameraPosition(
-        list: segment, isPreview: true);
+    _zoomPanBehavior = CalculationService.initialCameraPosition(list: segment, isPreview: true);
   }
 
   @override
@@ -231,14 +211,11 @@ class TrackPreviewState extends State<TrackPreview> {
                 height: 100,
                 width: MediaQuery.of(context).size.width,
                 clipBehavior: Clip.hardEdge,
-                decoration: BoxDecoration(
-                    borderRadius: const BorderRadius.all(Radius.circular(20)),
-                    color: AppStyle.backgroundColor),
+                decoration: BoxDecoration(borderRadius: const BorderRadius.all(Radius.circular(20)), color: AppStyle.backgroundColor),
                 child: SfMaps(
                   layers: <MapLayer>[
                     MapTileLayer(
-                      urlTemplate:
-                          'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                      urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
                       zoomPanBehavior: _zoomPanBehavior,
                       controller: _mapController,
                       initialMarkersCount: 0,
@@ -257,11 +234,7 @@ class TrackPreviewState extends State<TrackPreview> {
                             tooltipBuilder: (BuildContext context, int index) {
                               return Padding(
                                 padding: const EdgeInsets.all(8.0),
-                                child: Text("Tracciato",
-                                    style: Theme.of(context)
-                                        .textTheme
-                                        .caption!
-                                        .copyWith(color: Colors.black)),
+                                child: Text("Tracciato", style: Theme.of(context).textTheme.caption!.copyWith(color: Colors.black)),
                               );
                             }),
                       ],

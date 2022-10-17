@@ -62,9 +62,7 @@ class AuthenticateState extends State<Authenticate> {
                         ),
                         Center(
                           child: SizedBox(
-                            width: MediaQuery.of(context).size.width < 500
-                                ? MediaQuery.of(context).size.width
-                                : 500,
+                            width: MediaQuery.of(context).size.width < 500 ? MediaQuery.of(context).size.width : 500,
                             child: Column(
                               children: [
                                 const SizedBox(height: 10),
@@ -79,8 +77,7 @@ class AuthenticateState extends State<Authenticate> {
                                       if (value == null || value.isEmpty) {
                                         return 'Enter your email';
                                       } else {
-                                        if (!regex
-                                            .hasMatch(emailController.text)) {
+                                        if (!regex.hasMatch(emailController.text)) {
                                           return 'Invalid Email Address format';
                                         }
                                         return null;
@@ -99,11 +96,7 @@ class AuthenticateState extends State<Authenticate> {
                                   obscureText: showPassword,
                                   textAlign: TextAlign.center,
                                   style: const TextStyle(color: Colors.white),
-                                  decoration: AppStyle()
-                                      .kTextFieldDecoration(
-                                          icon: Icons.lock,
-                                          hintText: 'Enter Your Password')
-                                      .copyWith(
+                                  decoration: AppStyle().kTextFieldDecoration(icon: Icons.lock, hintText: 'Enter Your Password').copyWith(
                                         suffixIcon: IconButton(
                                           onPressed: () {
                                             setState(() {
@@ -111,9 +104,7 @@ class AuthenticateState extends State<Authenticate> {
                                             });
                                           },
                                           icon: Icon(
-                                            !showPassword
-                                                ? Icons.visibility
-                                                : Icons.visibility_off,
+                                            !showPassword ? Icons.visibility : Icons.visibility_off,
                                             color: AppStyle.backgroundColor,
                                           ),
                                         ),
@@ -134,18 +125,12 @@ class AuthenticateState extends State<Authenticate> {
                                       return;
                                     }
                                     setState(() => showLoading = true);
-                                    await AuthService()
-                                        .loginWithEmailAndPassword(
-                                            email: email,
-                                            password: password.text)
-                                        .then((state) {
+                                    await AuthService().loginWithEmailAndPassword(email: email, password: password.text).then((state) {
                                       setState(() => showLoading = false);
                                       if (state == null) {
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(
+                                        ScaffoldMessenger.of(context).showSnackBar(
                                           const SnackBar(
-                                            content: Text(
-                                                'Not authenticated, please check email and password'),
+                                            content: Text('Not authenticated, please check email and password'),
                                           ),
                                         );
                                       }

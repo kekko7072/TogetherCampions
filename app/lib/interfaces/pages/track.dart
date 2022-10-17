@@ -1,5 +1,71 @@
 import 'package:app/services/imports.dart';
 import 'package:flutter/cupertino.dart';
+import '../../services/bluetooth.dart';
+
+DeviceData deviceDataFromJson(String str) =>
+    DeviceData.fromJson(json.decode(str));
+
+String deviceDataToJson(DeviceData data) => json.encode(data.toJson());
+
+class DeviceData {
+  DeviceData({
+    required this.status,
+    required this.gps,
+  });
+
+  Status status;
+  Gps gps;
+
+  factory DeviceData.fromJson(Map<String, dynamic> json) => DeviceData(
+        status: Status.fromJson(json["status"]),
+        gps: Gps.fromJson(json["gps"]),
+      );
+
+  Map<String, dynamic> toJson() => {
+        "status": status.toJson(),
+        "gps": gps.toJson(),
+      };
+}
+
+class Gps {
+  Gps({
+    required this.connected,
+    required this.latitude,
+    required this.longitude,
+  });
+
+  bool connected;
+  double latitude;
+  double longitude;
+
+  factory Gps.fromJson(Map<String, dynamic> json) => Gps(
+        connected: json["connected"],
+        latitude: json["latitude"],
+        longitude: json["longitude"],
+      );
+
+  Map<String, dynamic> toJson() => {
+        "connected": connected,
+        "latitude": latitude,
+        "longitude": longitude,
+      };
+}
+
+class Status {
+  Status({
+    required this.battery,
+  });
+
+  double battery;
+
+  factory Status.fromJson(Map<String, dynamic> json) => Status(
+        battery: json["battery"].toDouble(),
+      );
+
+  Map<String, dynamic> toJson() => {
+        "battery": battery,
+      };
+}
 
 class Track extends StatefulWidget {
   const Track({Key? key}) : super(key: key);
@@ -9,7 +75,16 @@ class Track extends StatefulWidget {
 }
 
 class _TrackState extends State<Track> {
-  int time = 10;
+  final info = NetworkInfo();
+  DeviceData? deviceData;
+
+  int time = 2;
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     final userData = Provider.of<UserData?>(context);
@@ -23,7 +98,7 @@ class _TrackState extends State<Track> {
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
                         const Icon(
-                          CupertinoIcons.wifi_exclamationmark,
+                          CupertinoIcons.exclamationmark_triangle,
                           size: 200,
                         ),
                         Text(
@@ -46,7 +121,51 @@ class _TrackState extends State<Track> {
                       ],
                     ),
                   )
-                : StreamBuilder<List<Log>>(
+                : Center(
+                    child: StreamBuilder<BluetoothState>(
+                        stream: FlutterBluePlus.instance.state,
+                        initialData: BluetoothState.off,
+                        builder: (context, snapshot) {
+                          BluetoothState? state = snapshot.data;
+
+                          return snapshot.hasData
+                              ? state == BluetoothState.on
+                                  ? const FindDevicesScreen()
+                                  : Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Icon(
+                                          Icons.bluetooth_disabled,
+                                          size: 200,
+                                          color: AppStyle.primaryColor,
+                                        ),
+                                        Padding(
+                                          padding: const EdgeInsets.symmetric(
+                                              vertical: 40.0, horizontal: 15),
+                                          child: Text(
+                                            'Bluetooth Adapter is ${state != null ? state.toString().substring(15) : 'not available'}.',
+                                            style: Theme.of(context)
+                                                .textTheme
+                                                .titleMedium!
+                                                .copyWith(
+                                                    fontWeight:
+                                                        FontWeight.w600),
+                                            textAlign: TextAlign.center,
+                                          ),
+                                        ),
+                                        CupertinoButton.filled(
+                                          onPressed: Platform.isAndroid
+                                              ? () => FlutterBluePlus.instance
+                                                  .turnOn()
+                                              : () => setState(() {}),
+                                          child: const Text('TURN ON'),
+                                        ),
+                                      ],
+                                    )
+                              : const CircularProgressIndicator();
+                        }),
+                  ) /*StreamBuilder<List<Log>>(
                     stream: DatabaseLog(id: userData.devices.first)
                         .liveLog(addTime: time),
                     builder: (context, snapshot) {
@@ -82,8 +201,8 @@ class _TrackState extends State<Track> {
                           ],
                         );
                       }
-                    }),
-          )
+                    }),*/
+            )
         : const Center(
             child: CircularProgressIndicator(),
           );

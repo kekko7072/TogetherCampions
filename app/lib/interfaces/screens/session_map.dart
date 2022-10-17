@@ -3,9 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:intl/intl.dart';
 
 class SessionMap extends StatefulWidget {
-  const SessionMap(
-      {Key? key, required this.id, required this.session, required this.logs})
-      : super(key: key);
+  const SessionMap({Key? key, required this.id, required this.session, required this.logs}) : super(key: key);
   final String id;
   final Session session;
   final List<Log> logs;
@@ -14,8 +12,7 @@ class SessionMap extends StatefulWidget {
   State<SessionMap> createState() => SessionMapState();
 }
 
-class SessionMapState extends State<SessionMap>
-    with SingleTickerProviderStateMixin {
+class SessionMapState extends State<SessionMap> with SingleTickerProviderStateMixin {
   late Log start;
   late Log end;
 
@@ -44,15 +41,13 @@ class SessionMapState extends State<SessionMap>
       polylinePoints.add(log.gps.latLng);
     }
 
-    telemetry = CalculationService.telemetry(
-        logs: widget.logs, segment: polylinePoints);
+    telemetry = CalculationService.telemetry(logs: widget.logs, segment: polylinePoints);
 
     indexFastestLog = CalculationService.findFastestLogFromList(widget.logs);
 
     _mapController = MapTileLayerController();
 
-    _zoomPanBehavior = CalculationService.initialCameraPosition(
-        list: polylinePoints, isPreview: false);
+    _zoomPanBehavior = CalculationService.initialCameraPosition(list: polylinePoints, isPreview: false);
 
     _animationController = AnimationController(
       duration: Duration(seconds: widget.logs.length ~/ durationDivision),
@@ -105,12 +100,7 @@ class SessionMapState extends State<SessionMap>
                           children: [
                             Text(
                               widget.session.name,
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .titleLarge!
-                                  .copyWith(
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white),
+                              style: Theme.of(context).textTheme.titleLarge!.copyWith(fontWeight: FontWeight.bold, color: Colors.white),
                             ),
                             const SizedBox(height: 10),
                             Row(
@@ -122,8 +112,7 @@ class SessionMapState extends State<SessionMap>
                                 ),
                                 const SizedBox(width: 10),
                                 Text(
-                                  DateFormat('EEE dd MMM yyyy')
-                                      .format(widget.session.start),
+                                  DateFormat('EEE dd MMM yyyy').format(widget.session.start),
                                   style: const TextStyle(
                                     color: Colors.white70,
                                   ),
@@ -140,8 +129,7 @@ class SessionMapState extends State<SessionMap>
                                 ),
                                 const SizedBox(width: 10),
                                 Text(
-                                  DateFormat('kk:mm')
-                                      .format(widget.session.start),
+                                  DateFormat('kk:mm').format(widget.session.start),
                                   style: const TextStyle(
                                     color: Colors.white70,
                                   ),
@@ -155,8 +143,7 @@ class SessionMapState extends State<SessionMap>
                                 ),
                                 const SizedBox(width: 5),
                                 Text(
-                                  DateFormat('kk:mm')
-                                      .format(widget.session.end),
+                                  DateFormat('kk:mm').format(widget.session.end),
                                   style: const TextStyle(
                                     color: Colors.white70,
                                   ),
@@ -187,10 +174,7 @@ class SessionMapState extends State<SessionMap>
                 Expanded(
                   child: Container(
                     clipBehavior: Clip.hardEdge,
-                    decoration: BoxDecoration(
-                        borderRadius:
-                            const BorderRadius.all(Radius.circular(20)),
-                        color: AppStyle.backgroundColor),
+                    decoration: BoxDecoration(borderRadius: const BorderRadius.all(Radius.circular(20)), color: AppStyle.backgroundColor),
                     child: Stack(
                       children: [
                         SfMaps(
@@ -203,97 +187,63 @@ class SessionMapState extends State<SessionMap>
                               ///
                               /// We will replace the {z}, {x}, {y} internally based on the
                               /// current center point and the zoom level.
-                              urlTemplate:
-                                  'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                              urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
                               zoomPanBehavior: _zoomPanBehavior,
                               controller: _mapController,
                               initialMarkersCount: widget.logs.length,
                               tooltipSettings: const MapTooltipSettings(
                                 color: Colors.white,
                               ),
-                              markerTooltipBuilder:
-                                  (BuildContext context, int index) {
+                              markerTooltipBuilder: (BuildContext context, int index) {
                                 return ClipRRect(
-                                  borderRadius: const BorderRadius.all(
-                                      Radius.circular(8)),
-                                  child: Column(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: <Widget>[
-                                        Container(
-                                          padding: const EdgeInsets.only(
-                                              left: 10.0,
-                                              top: 5.0,
-                                              bottom: 5.0),
-                                          width: 150,
-                                          color: index == indexFastestLog
-                                              ? Colors.green
-                                              : Colors.white,
-                                          child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: <Widget>[
-                                                Text(
-                                                  index == 0
-                                                      ? 'Start'
-                                                      : index ==
-                                                              widget.logs
-                                                                      .length -
-                                                                  1
-                                                          ? 'End'
-                                                          : 'Speed: ${widget.logs[index].gps.speed.roundToDouble()} km/h',
-                                                  style: const TextStyle(
-                                                      fontSize: 14,
-                                                      color: Colors.black,
-                                                      fontWeight:
-                                                          FontWeight.bold),
-                                                ),
-                                                Padding(
-                                                  padding:
-                                                      const EdgeInsets.only(
-                                                          top: 5.0),
-                                                  child: Column(
-                                                    children: [
-                                                      Text(
-                                                        'Altitude: ${widget.logs[index].gps.altitude.roundToDouble()} m',
-                                                        style: const TextStyle(
-                                                            fontSize: 10,
-                                                            color:
-                                                                Colors.black),
-                                                      ),
-                                                      Text(
-                                                        'Course: ${widget.logs[index].gps.course.roundToDouble()}°',
-                                                        style: const TextStyle(
-                                                            fontSize: 10,
-                                                            color:
-                                                                Colors.black),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                )
-                                              ]),
+                                  borderRadius: const BorderRadius.all(Radius.circular(8)),
+                                  child: Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
+                                    Container(
+                                      padding: const EdgeInsets.only(left: 10.0, top: 5.0, bottom: 5.0),
+                                      width: 150,
+                                      color: index == indexFastestLog ? Colors.green : Colors.white,
+                                      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
+                                        Text(
+                                          index == 0
+                                              ? 'Start'
+                                              : index == widget.logs.length - 1
+                                                  ? 'End'
+                                                  : 'Speed: ${widget.logs[index].gps.speed.roundToDouble()} km/h',
+                                          style: const TextStyle(fontSize: 14, color: Colors.black, fontWeight: FontWeight.bold),
                                         ),
+                                        Padding(
+                                          padding: const EdgeInsets.only(top: 5.0),
+                                          child: Column(
+                                            children: [
+                                              Text(
+                                                'Altitude: ${widget.logs[index].gps.altitude.roundToDouble()} m',
+                                                style: const TextStyle(fontSize: 10, color: Colors.black),
+                                              ),
+                                              Text(
+                                                'Course: ${widget.logs[index].gps.course.roundToDouble()}°',
+                                                style: const TextStyle(fontSize: 10, color: Colors.black),
+                                              ),
+                                            ],
+                                          ),
+                                        )
                                       ]),
+                                    ),
+                                  ]),
                                 );
                               },
                               markerBuilder: (BuildContext context, int index) {
                                 return MapMarker(
-                                  latitude:
-                                      widget.logs[index].gps.latLng.latitude,
-                                  longitude:
-                                      widget.logs[index].gps.latLng.longitude,
+                                  latitude: widget.logs[index].gps.latLng.latitude,
+                                  longitude: widget.logs[index].gps.latLng.longitude,
                                   alignment: Alignment.bottomCenter,
                                   child: FittedBox(
                                     child: Icon(Icons.location_on,
-                                        color: index == 0 ||
-                                                index == widget.logs.length - 1
+                                        color: index == 0 || index == widget.logs.length - 1
                                             ? AppStyle.primaryColor
                                             : index == indexFastestLog
                                                 ? Colors.green
                                                 : Colors.transparent,
-                                        size: index == 0 ||
-                                                index == widget.logs.length - 1
-                                            ? 50
-                                            : 20),
+                                        size: index == 0 || index == widget.logs.length - 1 ? 50 : 20),
                                   ),
                                 );
                               },
@@ -308,15 +258,10 @@ class SessionMapState extends State<SessionMap>
                                       )
                                     },
                                     animation: _animation,
-                                    tooltipBuilder:
-                                        (BuildContext context, int index) {
+                                    tooltipBuilder: (BuildContext context, int index) {
                                       return Padding(
                                         padding: const EdgeInsets.all(8.0),
-                                        child: Text("Tracciato",
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .caption!
-                                                .copyWith(color: Colors.black)),
+                                        child: Text("Tracciato", style: Theme.of(context).textTheme.caption!.copyWith(color: Colors.black)),
                                       );
                                     }),
                               ],
@@ -332,22 +277,17 @@ class SessionMapState extends State<SessionMap>
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Padding(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 10.0, vertical: 10),
+                              padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 10),
                               child: Row(
                                 children: [
                                   GestureDetector(
                                     child: Container(
                                       height: 35,
                                       width: 35,
-                                      decoration: const BoxDecoration(
-                                          shape: BoxShape.circle,
-                                          color: Colors.white),
+                                      decoration: const BoxDecoration(shape: BoxShape.circle, color: Colors.white),
                                       child: Center(
                                         child: Icon(
-                                          runningAnimation
-                                              ? CupertinoIcons.stop_circle
-                                              : CupertinoIcons.play_circle,
+                                          runningAnimation ? CupertinoIcons.stop_circle : CupertinoIcons.play_circle,
                                           size: 22,
                                           color: Colors.black87,
                                         ),
@@ -357,11 +297,8 @@ class SessionMapState extends State<SessionMap>
                                       if (_animationController!.isCompleted) {
                                         _animationController?.reset();
                                       }
-                                      runningAnimation
-                                          ? _animationController?.stop()
-                                          : _animationController?.forward();
-                                      setState(() =>
-                                          runningAnimation = !runningAnimation);
+                                      runningAnimation ? _animationController?.stop() : _animationController?.forward();
+                                      setState(() => runningAnimation = !runningAnimation);
                                     },
                                   ),
                                   const SizedBox(width: 10),
@@ -369,9 +306,7 @@ class SessionMapState extends State<SessionMap>
                                     child: Container(
                                       height: 35,
                                       width: 35,
-                                      decoration: const BoxDecoration(
-                                          shape: BoxShape.circle,
-                                          color: Colors.white),
+                                      decoration: const BoxDecoration(shape: BoxShape.circle, color: Colors.white),
                                       child: const Center(
                                         child: Icon(
                                           CupertinoIcons.forward_end_alt,
@@ -383,9 +318,7 @@ class SessionMapState extends State<SessionMap>
                                     onTap: () => setState(() {
                                       _animationController?.stop();
                                       durationDivision = durationDivision * 2;
-                                      _animationController!.duration = Duration(
-                                          seconds: widget.logs.length ~/
-                                              durationDivision);
+                                      _animationController!.duration = Duration(seconds: widget.logs.length ~/ durationDivision);
 
                                       _animationController?.forward();
                                     }),

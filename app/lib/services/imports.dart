@@ -34,12 +34,16 @@ export 'package:libserialport/libserialport.dart'
     if (dart.library.html) 'package:app/services/web_serialport.dart'
     if (dart.library.io) 'package:libserialport/libserialport.dart';
 export 'package:geolocator/geolocator.dart';
+export 'package:network_info_plus/network_info_plus.dart';
+export 'package:connectivity_plus/connectivity_plus.dart';
+export 'package:flutter_blue_plus/flutter_blue_plus.dart';
 
 ///Design
 export 'package:font_awesome_flutter/font_awesome_flutter.dart';
 export 'package:battery_indicator/battery_indicator.dart';
 export 'package:flutter_easyloading/flutter_easyloading.dart';
 export 'package:graphic/graphic.dart';
+export 'package:wifi_iot/wifi_iot.dart';
 
 ///INTERFACE
 ///##Pages

@@ -1,9 +1,7 @@
 import 'package:app/services/imports.dart';
 
 class ListLogs extends StatefulWidget {
-  const ListLogs(
-      {Key? key, required this.id, required this.isSession, this.session})
-      : super(key: key);
+  const ListLogs({Key? key, required this.id, required this.isSession, this.session}) : super(key: key);
   final String id;
   final bool isSession;
   final Session? session;
@@ -31,10 +29,7 @@ class _ListLogsState extends State<ListLogs> {
                       style: Theme.of(context).textTheme.titleLarge,
                     ),
                     StreamBuilder<List<Log>>(
-                        stream: widget.isSession
-                            ? DatabaseLog(id: widget.id)
-                                .sessionLogs(session: widget.session!)
-                            : DatabaseLog(id: widget.id).allLogs,
+                        stream: widget.isSession ? DatabaseLog(id: widget.id).sessionLogs(session: widget.session!) : DatabaseLog(id: widget.id).allLogs,
                         builder: (context, snapshot) {
                           if (snapshot.hasError) {
                             return Center(
@@ -47,13 +42,7 @@ class _ListLogsState extends State<ListLogs> {
                           }
                           List<Log> logs = snapshot.data ?? [];
 
-                          return ListView.builder(
-                              shrinkWrap: true,
-                              reverse: true,
-                              physics: const NeverScrollableScrollPhysics(),
-                              itemCount: snapshot.data!.length,
-                              itemBuilder: (context, index) =>
-                                  CardLog(log: logs[index]));
+                          return ListView.builder(shrinkWrap: true, reverse: true, physics: const NeverScrollableScrollPhysics(), itemCount: snapshot.data!.length, itemBuilder: (context, index) => CardLog(log: logs[index]));
                         }),
                     /*  CupertinoButton(
                         child: Text('Load more'),

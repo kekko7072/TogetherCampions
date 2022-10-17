@@ -22,10 +22,7 @@ class CardInfo extends StatelessWidget {
           children: [
             Text(
               session.name,
-              style: Theme.of(context)
-                  .textTheme
-                  .titleMedium!
-                  .copyWith(fontWeight: FontWeight.w600),
+              style: Theme.of(context).textTheme.titleMedium!.copyWith(fontWeight: FontWeight.w600),
             ),
             Row(
               mainAxisSize: MainAxisSize.min,
@@ -53,10 +50,8 @@ class CardInfo extends StatelessWidget {
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    Text(CalculationService.formatDate(
-                        date: session.start, year: true, seconds: true)),
-                    Text(CalculationService.formatDate(
-                        date: session.end, year: true, seconds: true)),
+                    Text(CalculationService.formatDate(date: session.start, year: true, seconds: true)),
+                    Text(CalculationService.formatDate(date: session.end, year: true, seconds: true)),
                     Text('$battery Volts'),
                   ],
                 ),

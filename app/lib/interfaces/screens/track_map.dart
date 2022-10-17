@@ -1,8 +1,7 @@
 import 'package:app/services/imports.dart';
 
 class TrackMap extends StatefulWidget {
-  const TrackMap({Key? key, required this.id, required this.logs})
-      : super(key: key);
+  const TrackMap({Key? key, required this.id, required this.logs}) : super(key: key);
   final String id;
   final List<Log> logs;
 
@@ -31,14 +30,12 @@ class TrackMapState extends State<TrackMap> {
 
     _mapController = MapTileLayerController();
 
-    _zoomPanBehavior = CalculationService.initialCameraPosition(
-        list: polylinePoints, isPreview: false);
+    _zoomPanBehavior = CalculationService.initialCameraPosition(list: polylinePoints, isPreview: false);
   }
 
   @override
   Widget build(BuildContext context) {
-    Telemetry telemetry = CalculationService.telemetry(
-        logs: widget.logs, segment: polylinePoints);
+    Telemetry telemetry = CalculationService.telemetry(logs: widget.logs, segment: polylinePoints);
     return Stack(
       children: [
         SfMaps(
@@ -61,45 +58,36 @@ class TrackMapState extends State<TrackMap> {
               markerTooltipBuilder: (BuildContext context, int index) {
                 return ClipRRect(
                   borderRadius: const BorderRadius.all(Radius.circular(8)),
-                  child:
-                      Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
+                  child: Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
                     Container(
-                      padding: const EdgeInsets.only(
-                          left: 10.0, top: 5.0, bottom: 5.0),
+                      padding: const EdgeInsets.only(left: 10.0, top: 5.0, bottom: 5.0),
                       width: 150,
                       color: Colors.white,
-                      child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            Text(
-                              index == 0
-                                  ? 'Start'
-                                  : index == widget.logs.length - 1
-                                      ? 'End'
-                                      : 'Speed: ${widget.logs[index].gps.speed.roundToDouble()} km/h',
-                              style: const TextStyle(
-                                  fontSize: 14,
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.bold),
-                            ),
-                            Padding(
-                              padding: const EdgeInsets.only(top: 5.0),
-                              child: Column(
-                                children: [
-                                  Text(
-                                    'Altitude: ${widget.logs[index].gps.altitude.roundToDouble()}',
-                                    style: const TextStyle(
-                                        fontSize: 10, color: Colors.black),
-                                  ),
-                                  Text(
-                                    'Course: ${widget.logs[index].gps.course.roundToDouble()}°',
-                                    style: const TextStyle(
-                                        fontSize: 10, color: Colors.black),
-                                  ),
-                                ],
+                      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: <Widget>[
+                        Text(
+                          index == 0
+                              ? 'Start'
+                              : index == widget.logs.length - 1
+                                  ? 'End'
+                                  : 'Speed: ${widget.logs[index].gps.speed.roundToDouble()} km/h',
+                          style: const TextStyle(fontSize: 14, color: Colors.black, fontWeight: FontWeight.bold),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(top: 5.0),
+                          child: Column(
+                            children: [
+                              Text(
+                                'Altitude: ${widget.logs[index].gps.altitude.roundToDouble()}',
+                                style: const TextStyle(fontSize: 10, color: Colors.black),
                               ),
-                            )
-                          ]),
+                              Text(
+                                'Course: ${widget.logs[index].gps.course.roundToDouble()}°',
+                                style: const TextStyle(fontSize: 10, color: Colors.black),
+                              ),
+                            ],
+                          ),
+                        )
+                      ]),
                     ),
                   ]),
                 );
@@ -110,13 +98,7 @@ class TrackMapState extends State<TrackMap> {
                   longitude: widget.logs[index].gps.latLng.longitude,
                   alignment: Alignment.bottomCenter,
                   child: FittedBox(
-                    child: Icon(Icons.location_on,
-                        color: index == 0 || index == widget.logs.length - 1
-                            ? Colors.blue
-                            : AppStyle.primaryColor,
-                        size: index == 0 || index == widget.logs.length - 1
-                            ? 50
-                            : 20),
+                    child: Icon(Icons.location_on, color: index == 0 || index == widget.logs.length - 1 ? Colors.blue : AppStyle.primaryColor, size: index == 0 || index == widget.logs.length - 1 ? 50 : 20),
                   ),
                 );
               },
@@ -133,11 +115,7 @@ class TrackMapState extends State<TrackMap> {
                     tooltipBuilder: (BuildContext context, int index) {
                       return Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: Text("Tracciato",
-                            style: Theme.of(context)
-                                .textTheme
-                                .caption!
-                                .copyWith(color: Colors.black)),
+                        child: Text("Tracciato", style: Theme.of(context).textTheme.caption!.copyWith(color: Colors.black)),
                       );
                     }),
               ],
@@ -157,14 +135,9 @@ class TrackMapState extends State<TrackMap> {
           child: Align(
             alignment: Alignment.topLeft,
             child: Container(
-              decoration: const BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.only(
-                      bottomLeft: Radius.circular(30),
-                      bottomRight: Radius.circular(30))),
+              decoration: const BoxDecoration(color: Colors.white, borderRadius: BorderRadius.only(bottomLeft: Radius.circular(30), bottomRight: Radius.circular(30))),
               child: Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5),
+                padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -172,51 +145,26 @@ class TrackMapState extends State<TrackMap> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         FilterChip(
-                            backgroundColor:
-                                telemetryViewRange == TelemetryViewLive.speed
-                                    ? AppStyle.primaryColor
-                                    : Colors.black12,
+                            backgroundColor: telemetryViewRange == TelemetryViewLive.speed ? AppStyle.primaryColor : Colors.black12,
                             label: Text(
                               'Speed',
-                              style: TextStyle(
-                                  fontWeight: telemetryViewRange ==
-                                          TelemetryViewLive.speed
-                                      ? FontWeight.bold
-                                      : FontWeight.normal),
+                              style: TextStyle(fontWeight: telemetryViewRange == TelemetryViewLive.speed ? FontWeight.bold : FontWeight.normal),
                             ),
-                            onSelected: (value) => setState(() =>
-                                telemetryViewRange = TelemetryViewLive.speed)),
+                            onSelected: (value) => setState(() => telemetryViewRange = TelemetryViewLive.speed)),
                         FilterChip(
-                            backgroundColor:
-                                telemetryViewRange == TelemetryViewLive.altitude
-                                    ? AppStyle.primaryColor
-                                    : Colors.black12,
+                            backgroundColor: telemetryViewRange == TelemetryViewLive.altitude ? AppStyle.primaryColor : Colors.black12,
                             label: Text(
                               'Altitude',
-                              style: TextStyle(
-                                  fontWeight: telemetryViewRange ==
-                                          TelemetryViewLive.altitude
-                                      ? FontWeight.bold
-                                      : FontWeight.normal),
+                              style: TextStyle(fontWeight: telemetryViewRange == TelemetryViewLive.altitude ? FontWeight.bold : FontWeight.normal),
                             ),
-                            onSelected: (value) => setState(() =>
-                                telemetryViewRange =
-                                    TelemetryViewLive.altitude)),
+                            onSelected: (value) => setState(() => telemetryViewRange = TelemetryViewLive.altitude)),
                         FilterChip(
-                            backgroundColor:
-                                telemetryViewRange == TelemetryViewLive.course
-                                    ? AppStyle.primaryColor
-                                    : Colors.black12,
+                            backgroundColor: telemetryViewRange == TelemetryViewLive.course ? AppStyle.primaryColor : Colors.black12,
                             label: Text(
                               'Course',
-                              style: TextStyle(
-                                  fontWeight: telemetryViewRange ==
-                                          TelemetryViewLive.course
-                                      ? FontWeight.bold
-                                      : FontWeight.normal),
+                              style: TextStyle(fontWeight: telemetryViewRange == TelemetryViewLive.course ? FontWeight.bold : FontWeight.normal),
                             ),
-                            onSelected: (value) => setState(() =>
-                                telemetryViewRange = TelemetryViewLive.course)),
+                            onSelected: (value) => setState(() => telemetryViewRange = TelemetryViewLive.course)),
                       ],
                     ),
                     const SizedBox(width: 10),
@@ -231,8 +179,7 @@ class TrackMapState extends State<TrackMap> {
                           ],
                         ),
                       ),
-                    ] else if (telemetryViewRange ==
-                        TelemetryViewLive.altitude) ...[
+                    ] else if (telemetryViewRange == TelemetryViewLive.altitude) ...[
                       SizedBox(
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
@@ -243,8 +190,7 @@ class TrackMapState extends State<TrackMap> {
                           ],
                         ),
                       ),
-                    ] else if (telemetryViewRange ==
-                        TelemetryViewLive.course) ...[
+                    ] else if (telemetryViewRange == TelemetryViewLive.course) ...[
                       SizedBox(
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
@@ -266,14 +212,9 @@ class TrackMapState extends State<TrackMap> {
           child: Align(
             alignment: Alignment.bottomCenter,
             child: Container(
-              decoration: const BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(30),
-                      topRight: Radius.circular(30))),
+              decoration: const BoxDecoration(color: Colors.white, borderRadius: BorderRadius.only(topLeft: Radius.circular(30), topRight: Radius.circular(30))),
               child: Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 20.0, vertical: 5),
+                padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 5),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -281,52 +222,26 @@ class TrackMapState extends State<TrackMap> {
                       spacing: 10,
                       children: [
                         FilterChip(
-                            backgroundColor:
-                                telemetryViewCharts == TelemetryViewLive.speed
-                                    ? AppStyle.primaryColor
-                                    : Colors.black12,
+                            backgroundColor: telemetryViewCharts == TelemetryViewLive.speed ? AppStyle.primaryColor : Colors.black12,
                             label: Text(
                               'Speed',
-                              style: TextStyle(
-                                  fontWeight: telemetryViewCharts ==
-                                          TelemetryViewLive.speed
-                                      ? FontWeight.bold
-                                      : FontWeight.normal),
+                              style: TextStyle(fontWeight: telemetryViewCharts == TelemetryViewLive.speed ? FontWeight.bold : FontWeight.normal),
                             ),
-                            onSelected: (value) => setState(() =>
-                                telemetryViewCharts = TelemetryViewLive.speed)),
+                            onSelected: (value) => setState(() => telemetryViewCharts = TelemetryViewLive.speed)),
                         FilterChip(
-                            backgroundColor: telemetryViewCharts ==
-                                    TelemetryViewLive.altitude
-                                ? AppStyle.primaryColor
-                                : Colors.black12,
+                            backgroundColor: telemetryViewCharts == TelemetryViewLive.altitude ? AppStyle.primaryColor : Colors.black12,
                             label: Text(
                               'Altitude',
-                              style: TextStyle(
-                                  fontWeight: telemetryViewCharts ==
-                                          TelemetryViewLive.altitude
-                                      ? FontWeight.bold
-                                      : FontWeight.normal),
+                              style: TextStyle(fontWeight: telemetryViewCharts == TelemetryViewLive.altitude ? FontWeight.bold : FontWeight.normal),
                             ),
-                            onSelected: (value) => setState(() =>
-                                telemetryViewCharts =
-                                    TelemetryViewLive.altitude)),
+                            onSelected: (value) => setState(() => telemetryViewCharts = TelemetryViewLive.altitude)),
                         FilterChip(
-                            backgroundColor:
-                                telemetryViewCharts == TelemetryViewLive.course
-                                    ? AppStyle.primaryColor
-                                    : Colors.black12,
+                            backgroundColor: telemetryViewCharts == TelemetryViewLive.course ? AppStyle.primaryColor : Colors.black12,
                             label: Text(
                               'Course',
-                              style: TextStyle(
-                                  fontWeight: telemetryViewCharts ==
-                                          TelemetryViewLive.course
-                                      ? FontWeight.bold
-                                      : FontWeight.normal),
+                              style: TextStyle(fontWeight: telemetryViewCharts == TelemetryViewLive.course ? FontWeight.bold : FontWeight.normal),
                             ),
-                            onSelected: (value) => setState(() =>
-                                telemetryViewCharts =
-                                    TelemetryViewLive.course)),
+                            onSelected: (value) => setState(() => telemetryViewCharts = TelemetryViewLive.course)),
                       ],
                     ),
                     if (telemetryViewCharts == TelemetryViewLive.speed) ...[
@@ -340,15 +255,9 @@ class TrackMapState extends State<TrackMap> {
                           variables: {
                             'timestamp': Variable(
                               accessor: (Log log) => log.timestamp,
-                              scale: TimeScale(
-                                  formatter: (date) =>
-                                      '${date.hour}:${date.minute < 10 ? '0${date.minute}' : date.minute}:${date.second < 10 ? '0${date.second}' : date.second}'),
+                              scale: TimeScale(formatter: (date) => '${date.hour}:${date.minute < 10 ? '0${date.minute}' : date.minute}:${date.second < 10 ? '0${date.second}' : date.second}'),
                             ),
-                            'speed': Variable(
-                                accessor: (Log log) => log.gps.speed,
-                                scale: LinearScale(
-                                    title: 'Speed',
-                                    formatter: (number) => '$number km/h')),
+                            'speed': Variable(accessor: (Log log) => log.gps.speed, scale: LinearScale(title: 'Speed', formatter: (number) => '$number km/h')),
                           },
                           coord: RectCoord(),
                           elements: [LineElement()],
@@ -359,8 +268,7 @@ class TrackMapState extends State<TrackMap> {
                           ],
                         ),
                       ),
-                    ] else if (telemetryViewCharts ==
-                        TelemetryViewLive.altitude) ...[
+                    ] else if (telemetryViewCharts == TelemetryViewLive.altitude) ...[
                       SizedBox(
                         height: MediaQuery.of(context).size.height / 4,
                         width: MediaQuery.of(context).size.width,
@@ -371,15 +279,9 @@ class TrackMapState extends State<TrackMap> {
                           variables: {
                             'timestamp': Variable(
                               accessor: (Log log) => log.timestamp,
-                              scale: TimeScale(
-                                  formatter: (date) =>
-                                      '${date.hour}:${date.minute < 10 ? '0${date.minute}' : date.minute}:${date.second < 10 ? '0${date.second}' : date.second}'),
+                              scale: TimeScale(formatter: (date) => '${date.hour}:${date.minute < 10 ? '0${date.minute}' : date.minute}:${date.second < 10 ? '0${date.second}' : date.second}'),
                             ),
-                            'altitude': Variable(
-                                accessor: (Log log) => log.gps.altitude,
-                                scale: LinearScale(
-                                    title: 'Altitude',
-                                    formatter: (number) => '$number m')),
+                            'altitude': Variable(accessor: (Log log) => log.gps.altitude, scale: LinearScale(title: 'Altitude', formatter: (number) => '$number m')),
                           },
                           coord: RectCoord(),
                           elements: [LineElement()],
@@ -390,8 +292,7 @@ class TrackMapState extends State<TrackMap> {
                           ],
                         ),
                       ),
-                    ] else if (telemetryViewCharts ==
-                        TelemetryViewLive.course) ...[
+                    ] else if (telemetryViewCharts == TelemetryViewLive.course) ...[
                       SizedBox(
                         height: MediaQuery.of(context).size.height / 4,
                         width: MediaQuery.of(context).size.width,
@@ -402,14 +303,9 @@ class TrackMapState extends State<TrackMap> {
                           variables: {
                             'timestamp': Variable(
                               accessor: (Log log) => log.timestamp,
-                              scale: TimeScale(
-                                  formatter: (date) => ''), //Show nothing
+                              scale: TimeScale(formatter: (date) => ''), //Show nothing
                             ),
-                            'course': Variable(
-                                accessor: (Log log) => log.gps.course,
-                                scale: LinearScale(
-                                    title: 'Course',
-                                    formatter: (number) => '$number °')),
+                            'course': Variable(accessor: (Log log) => log.gps.course, scale: LinearScale(title: 'Course', formatter: (number) => '$number °')),
                           },
                           coord: PolarCoord(),
                           elements: [LineElement()],

@@ -68,8 +68,8 @@ void setup() {
   Serial.begin(9600);
 
   ///ONLY FOR DEBUG
-  /*
-  while (!Serial) {
+
+  /* while (!Serial) {
     ;  // wait for serial port to connect. Needed for native USB port only
   }
   Serial.println("Initialing device...");
@@ -89,6 +89,7 @@ void loop() {
     String input = Serial.readString();  //read until timeout
     input.trim();
     Serial.println(input);
+
     if (input == "DEVICE_INFO") {
       Serial.println(DEVICE_MODEL_NUMBER);
       Serial.println(DEVICE_SERIAL_NUMBER);
@@ -104,6 +105,7 @@ void loop() {
       Serial.println("Operation completed: " + success ? "TRUE" : "FALSE");
     }
   }
+  Serial.println("Searching GPS...");
   /* 
     NO CODE HERE BECAUSE IF YOU PUT LOGIC HERE, OUTSIIDE THE while(GPS.available()) LOOP,
     THE GPS WILL LOSE THE CONNECTION FROM THE SATELLITES 
@@ -148,7 +150,6 @@ void loop() {
                      + "&altitude=" + String(input.altitude[k], 7) + "&speed=" + String(input.speed[k], 7) + "&course="
                      + String(input.course[k], 7) + "&satellites=" + String(input.satellites[k]);
       }
-
       Serial.println(input_data);
       display_freeram();
 
@@ -215,5 +216,4 @@ void initialize() {
 
   ///GPS
   initializationGPS();
-
 }

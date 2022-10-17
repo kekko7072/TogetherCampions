@@ -16,6 +16,10 @@
   Software version, is used as query so remember to insert no space
 */
 #define SOFTWARE_VERSION "1.0.0"
+/*
+  Define if is debugmode or not
+*/
+//#define SOFTWARE_DEBUG_MODE false
 
 //DEVICE
 /*
@@ -38,8 +42,8 @@
 /* 
   Sim parameters for connction of GPRS service
 */
-#define SIM_PIN ""             //[WIND-TRE] "" || [TIM] "" || [THINGS MOBILE] 1503 not working
-#define SIM_APN "internet.it"  // [WIND-TRE] internet.it || [TIM] "ibox.tim.it" || [THINGS MOBILE] TM not working
+#define SIM_PIN "1503"             //[WIND-TRE] "" || [TIM] "" || [THINGS MOBILE] 1503 not working
+#define SIM_APN "TM"  // [WIND-TRE] internet.it || [TIM] "ibox.tim.it" || [THINGS MOBILE] TM not working
 #define SIM_LOGIN ""           // replace with your GPRS login
 #define SIM_PASSWORD ""        // replace with your GPRS password
 

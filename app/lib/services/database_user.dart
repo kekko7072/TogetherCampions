@@ -34,11 +34,11 @@ class DatabaseUser {
       {required bool isCreate,
       required String uid,
       required Session session}) async {
-    print(session.end);
     return await userCollection.doc(uid).update({
       'sessions': isCreate
           ? FieldValue.arrayUnion([
               {
+                'deviceID': session.deviceID,
                 'name': session.name,
                 'start': session.start,
                 'end': session.end,
@@ -46,6 +46,7 @@ class DatabaseUser {
             ])
           : FieldValue.arrayRemove([
               {
+                'deviceID': session.deviceID,
                 'name': session.name,
                 'start': session.start,
                 'end': session.end,

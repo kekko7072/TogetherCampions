@@ -25,16 +25,8 @@ class CardTelemetry extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  session.end
-                      .difference(session.start)
-                      .toString()
-                      .split('.')
-                      .first
-                      .padLeft(8, "0"),
-                  style: Theme.of(context)
-                      .textTheme
-                      .titleLarge!
-                      .copyWith(fontWeight: FontWeight.w600, fontSize: 50),
+                  session.end.difference(session.start).toString().split('.').first.padLeft(8, "0"),
+                  style: Theme.of(context).textTheme.titleLarge!.copyWith(fontWeight: FontWeight.w600, fontSize: 50),
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -77,64 +69,45 @@ class CardTelemetry extends StatelessWidget {
                                   children: [
                                     Text(
                                       'Velocità',
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .titleMedium!
-                                          .copyWith(
-                                              fontWeight: FontWeight.w600),
+                                      style: Theme.of(context).textTheme.titleMedium!.copyWith(fontWeight: FontWeight.w600),
                                     ),
                                     Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                       children: [
                                         Column(
                                           mainAxisSize: MainAxisSize.min,
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
+                                          crossAxisAlignment: CrossAxisAlignment.start,
                                           children: [
                                             Text(
                                               'Media:',
-                                              style: Theme.of(context)
-                                                  .textTheme
-                                                  .titleMedium,
+                                              style: Theme.of(context).textTheme.titleMedium,
                                             ),
                                             Text(
                                               'Max:',
-                                              style: Theme.of(context)
-                                                  .textTheme
-                                                  .titleMedium,
+                                              style: Theme.of(context).textTheme.titleMedium,
                                             ),
                                             Text(
                                               'Min:',
-                                              style: Theme.of(context)
-                                                  .textTheme
-                                                  .titleMedium,
+                                              style: Theme.of(context).textTheme.titleMedium,
                                             ),
                                           ],
                                         ),
                                         const SizedBox(width: 25),
                                         Column(
                                           mainAxisSize: MainAxisSize.min,
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.end,
+                                          crossAxisAlignment: CrossAxisAlignment.end,
                                           children: [
                                             Text(
                                               '${telemetry.speed.medium}   km/h',
-                                              style: Theme.of(context)
-                                                  .textTheme
-                                                  .titleMedium,
+                                              style: Theme.of(context).textTheme.titleMedium,
                                             ),
                                             Text(
                                               '${telemetry.speed.max}   km/h',
-                                              style: Theme.of(context)
-                                                  .textTheme
-                                                  .titleMedium,
+                                              style: Theme.of(context).textTheme.titleMedium,
                                             ),
                                             Text(
                                               '${telemetry.speed.min}   km/h',
-                                              style: Theme.of(context)
-                                                  .textTheme
-                                                  .titleMedium,
+                                              style: Theme.of(context).textTheme.titleMedium,
                                             ),
                                           ],
                                         ),
@@ -154,17 +127,11 @@ class CardTelemetry extends StatelessWidget {
                           const SizedBox(height: 5),
                           Text(
                             '${telemetry.speed.medium.toInt()} km/h',
-                            style: Theme.of(context)
-                                .textTheme
-                                .titleLarge!
-                                .copyWith(fontWeight: FontWeight.w600),
+                            style: Theme.of(context).textTheme.titleLarge!.copyWith(fontWeight: FontWeight.w600),
                           ),
                           Text(
                             'Speed',
-                            style: Theme.of(context)
-                                .textTheme
-                                .titleMedium!
-                                .copyWith(color: Colors.grey),
+                            style: Theme.of(context).textTheme.titleMedium!.copyWith(color: Colors.grey),
                           ),
                         ],
                       ),
@@ -186,64 +153,45 @@ class CardTelemetry extends StatelessWidget {
                                   children: [
                                     Text(
                                       'Altitudine',
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .titleMedium!
-                                          .copyWith(
-                                              fontWeight: FontWeight.w600),
+                                      style: Theme.of(context).textTheme.titleMedium!.copyWith(fontWeight: FontWeight.w600),
                                     ),
                                     Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
+                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                       children: [
                                         Column(
                                           mainAxisSize: MainAxisSize.min,
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
+                                          crossAxisAlignment: CrossAxisAlignment.start,
                                           children: [
                                             Text(
                                               'Media:',
-                                              style: Theme.of(context)
-                                                  .textTheme
-                                                  .titleMedium,
+                                              style: Theme.of(context).textTheme.titleMedium,
                                             ),
                                             Text(
                                               'Max:',
-                                              style: Theme.of(context)
-                                                  .textTheme
-                                                  .titleMedium,
+                                              style: Theme.of(context).textTheme.titleMedium,
                                             ),
                                             Text(
                                               'Min:',
-                                              style: Theme.of(context)
-                                                  .textTheme
-                                                  .titleMedium,
+                                              style: Theme.of(context).textTheme.titleMedium,
                                             ),
                                           ],
                                         ),
                                         const SizedBox(width: 25),
                                         Column(
                                           mainAxisSize: MainAxisSize.min,
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.end,
+                                          crossAxisAlignment: CrossAxisAlignment.end,
                                           children: [
                                             Text(
                                               '${telemetry.altitude.medium}   m',
-                                              style: Theme.of(context)
-                                                  .textTheme
-                                                  .titleMedium,
+                                              style: Theme.of(context).textTheme.titleMedium,
                                             ),
                                             Text(
                                               '${telemetry.altitude.max}   m',
-                                              style: Theme.of(context)
-                                                  .textTheme
-                                                  .titleMedium,
+                                              style: Theme.of(context).textTheme.titleMedium,
                                             ),
                                             Text(
                                               '${telemetry.altitude.min}   m',
-                                              style: Theme.of(context)
-                                                  .textTheme
-                                                  .titleMedium,
+                                              style: Theme.of(context).textTheme.titleMedium,
                                             ),
                                           ],
                                         ),
@@ -263,17 +211,11 @@ class CardTelemetry extends StatelessWidget {
                           const SizedBox(height: 5),
                           Text(
                             '${telemetry.altitude.medium.toInt()} m',
-                            style: Theme.of(context)
-                                .textTheme
-                                .titleLarge!
-                                .copyWith(fontWeight: FontWeight.w600),
+                            style: Theme.of(context).textTheme.titleLarge!.copyWith(fontWeight: FontWeight.w600),
                           ),
                           Text(
                             'Altitude',
-                            style: Theme.of(context)
-                                .textTheme
-                                .titleMedium!
-                                .copyWith(color: Colors.grey),
+                            style: Theme.of(context).textTheme.titleMedium!.copyWith(color: Colors.grey),
                           ),
                         ],
                       ),
@@ -285,10 +227,7 @@ class CardTelemetry extends StatelessWidget {
                         shape: AppStyle.kModalBottomStyle,
                         isScrollControlled: true,
                         isDismissible: true,
-                        builder: (context) => Dismissible(
-                            key: UniqueKey(),
-                            child: ListLogs(
-                                id: id, isSession: true, session: session)),
+                        builder: (context) => Dismissible(key: UniqueKey(), child: ListLogs(id: id, isSession: true, session: session)),
                       ),
                       child: Column(
                         children: [
@@ -299,17 +238,11 @@ class CardTelemetry extends StatelessWidget {
                           const SizedBox(height: 5),
                           Text(
                             '${telemetry.distance.toInt()} km',
-                            style: Theme.of(context)
-                                .textTheme
-                                .titleLarge!
-                                .copyWith(fontWeight: FontWeight.w600),
+                            style: Theme.of(context).textTheme.titleLarge!.copyWith(fontWeight: FontWeight.w600),
                           ),
                           Text(
                             'Distance',
-                            style: Theme.of(context)
-                                .textTheme
-                                .titleMedium!
-                                .copyWith(color: Colors.grey),
+                            style: Theme.of(context).textTheme.titleMedium!.copyWith(color: Colors.grey),
                           ),
                         ],
                       ),

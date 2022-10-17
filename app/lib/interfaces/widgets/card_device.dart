@@ -4,13 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 
 class CardDevice extends StatefulWidget {
-  const CardDevice(
-      {Key? key,
-      required this.device,
-      required this.uid,
-      required this.serialConnected,
-      this.serialPort})
-      : super(key: key);
+  const CardDevice({Key? key, required this.device, required this.uid, required this.serialConnected, this.serialPort}) : super(key: key);
   final Device device;
   final String uid;
   final bool serialConnected;
@@ -34,19 +28,14 @@ class _CardDeviceState extends State<CardDevice> {
     mode = widget.device.mode;
   }
 
-  Timer toastHelper(bool connected, bool isFrequency) =>
-      Timer(const Duration(seconds: 3), () async {
+  Timer toastHelper(bool connected, bool isFrequency) => Timer(const Duration(seconds: 3), () async {
         //if (connected) {
-        EasyLoading.showToast(
-            'Ricordati di spegnere e riaccendere ${widget.device.name} per applicare le modifice.',
-            duration: const Duration(seconds: 7));
+        EasyLoading.showToast('Ricordati di spegnere e riaccendere ${widget.device.name} per applicare le modifice.', duration: const Duration(seconds: 7));
         //}
         if (isFrequency) {
-          await DatabaseDevice().editFrequency(
-              serialNumber: widget.device.serialNumber, frequency: frequency);
+          await DatabaseDevice().editFrequency(serialNumber: widget.device.serialNumber, frequency: frequency);
         } else {
-          await DatabaseDevice()
-              .editMode(serialNumber: widget.device.serialNumber, mode: mode);
+          await DatabaseDevice().editMode(serialNumber: widget.device.serialNumber, mode: mode);
         }
       });
 
@@ -61,17 +50,12 @@ class _CardDeviceState extends State<CardDevice> {
             if (snapshot.hasData) {
               logs = snapshot.data!;
             }
-            bool connected = logs.isNotEmpty
-                ? DateTime.now().isBefore(logs.last.timestamp.add(Duration(
-                    seconds: widget.device.clock * widget.device.frequency)))
-                : false;
+            bool connected = logs.isNotEmpty ? DateTime.now().isBefore(logs.last.timestamp.add(Duration(seconds: widget.device.clock * widget.device.frequency))) : false;
 
             return Container(
               margin: EdgeInsets.zero,
               width: AppStyle.resizeAutomaticallyWidth(context),
-              decoration: BoxDecoration(
-                  borderRadius: const BorderRadius.all(Radius.circular(20)),
-                  color: AppStyle.primaryColor),
+              decoration: BoxDecoration(borderRadius: const BorderRadius.all(Radius.circular(20)), color: AppStyle.primaryColor),
               child: Padding(
                 padding: const EdgeInsets.all(5.0),
                 child: Slidable(
@@ -80,8 +64,7 @@ class _CardDeviceState extends State<CardDevice> {
                     motion: const ScrollMotion(),
                     children: [
                       SlidableAction(
-                        onPressed: (con) async => await DatabaseDevice().delete(
-                            id: widget.device.serialNumber, uid: widget.uid),
+                        onPressed: (con) async => await DatabaseDevice().delete(id: widget.device.serialNumber, uid: widget.uid),
                         backgroundColor: const Color(0xFFFE4A49),
                         foregroundColor: Colors.black,
                         icon: Icons.delete,
@@ -120,22 +103,14 @@ class _CardDeviceState extends State<CardDevice> {
                             children: [
                               Text(
                                 widget.device.name,
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .titleLarge!
-                                    .copyWith(
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white),
+                                style: Theme.of(context).textTheme.titleLarge!.copyWith(fontWeight: FontWeight.bold, color: Colors.white),
                               ),
                               if (connected) ...[
                                 Row(
                                   children: [
                                     BatteryIndicator(
                                       batteryFromPhone: false,
-                                      batteryLevel: CalculationService
-                                          .calculateBatteryPercentage(
-                                              volts:
-                                                  snapshot.data!.last.battery),
+                                      batteryLevel: CalculationService.calculateBatteryPercentage(volts: snapshot.data!.last.battery),
                                       style: BatteryIndicatorStyle.skeumorphism,
                                       colorful: true,
                                       showPercentNum: false,
@@ -146,16 +121,11 @@ class _CardDeviceState extends State<CardDevice> {
                                     const SizedBox(width: 10),
                                     Text(
                                       "${CalculationService.calculateBatteryPercentage(volts: snapshot.data!.last.battery)} %",
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .titleMedium!
-                                          .copyWith(
-                                              fontWeight: FontWeight.bold),
+                                      style: Theme.of(context).textTheme.titleMedium!.copyWith(fontWeight: FontWeight.bold),
                                     ),
                                   ],
                                 )
-                              ] else if (widget.serialConnected &&
-                                  widget.serialPort != null) ...[
+                              ] else if (widget.serialConnected && widget.serialPort != null) ...[
                                 GestureDetector(
                                   behavior: HitTestBehavior.translucent,
                                   onTap: () => showModalBottomSheet(
@@ -176,12 +146,7 @@ class _CardDeviceState extends State<CardDevice> {
                                       padding: const EdgeInsets.all(8.0),
                                       child: Text(
                                         'CONNECTED',
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .titleMedium!
-                                            .copyWith(
-                                                fontWeight: FontWeight.bold,
-                                                color: Colors.white),
+                                        style: Theme.of(context).textTheme.titleMedium!.copyWith(fontWeight: FontWeight.bold, color: Colors.white),
                                       ),
                                     ),
                                   ),
@@ -194,12 +159,7 @@ class _CardDeviceState extends State<CardDevice> {
                                     padding: const EdgeInsets.all(8.0),
                                     child: Text(
                                       'OFFLINE',
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .titleMedium!
-                                          .copyWith(
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.white),
+                                      style: Theme.of(context).textTheme.titleMedium!.copyWith(fontWeight: FontWeight.bold, color: Colors.white),
                                     ),
                                   ),
                                 )
@@ -216,162 +176,86 @@ class _CardDeviceState extends State<CardDevice> {
                                   key: UniqueKey(),
                                   child: DraggableScrollableSheet(
                                       expand: false,
-                                      builder: (BuildContext context,
-                                          ScrollController scrollController) {
+                                      builder: (BuildContext context, ScrollController scrollController) {
                                         return SafeArea(
                                           child: Padding(
-                                            padding: const EdgeInsets.symmetric(
-                                                vertical: 15.0, horizontal: 20),
+                                            padding: const EdgeInsets.symmetric(vertical: 15.0, horizontal: 20),
                                             child: SingleChildScrollView(
                                               child: Column(
                                                 mainAxisSize: MainAxisSize.min,
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
+                                                crossAxisAlignment: CrossAxisAlignment.start,
                                                 children: [
                                                   Text(
                                                     'Informazioni',
-                                                    style: Theme.of(context)
-                                                        .textTheme
-                                                        .titleLarge!
-                                                        .copyWith(
-                                                            fontWeight:
-                                                                FontWeight
-                                                                    .bold),
+                                                    style: Theme.of(context).textTheme.titleLarge!.copyWith(fontWeight: FontWeight.bold),
                                                   ),
                                                   Padding(
-                                                    padding: const EdgeInsets
-                                                            .symmetric(
-                                                        horizontal: 10.0,
-                                                        vertical: 5),
+                                                    padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5),
                                                     child: Row(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .spaceBetween,
+                                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                       children: [
                                                         Text(
                                                           'Numero modello:',
-                                                          style: Theme.of(
-                                                                  context)
-                                                              .textTheme
-                                                              .titleMedium!
-                                                              .copyWith(
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w500),
+                                                          style: Theme.of(context).textTheme.titleMedium!.copyWith(fontWeight: FontWeight.w500),
                                                         ),
                                                         Text(
-                                                          widget.device
-                                                              .modelNumber,
-                                                          style:
-                                                              Theme.of(context)
-                                                                  .textTheme
-                                                                  .titleMedium,
+                                                          widget.device.modelNumber,
+                                                          style: Theme.of(context).textTheme.titleMedium,
                                                         ),
                                                       ],
                                                     ),
                                                   ),
                                                   Padding(
-                                                    padding: const EdgeInsets
-                                                            .symmetric(
-                                                        horizontal: 10.0,
-                                                        vertical: 5),
+                                                    padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5),
                                                     child: Row(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .spaceBetween,
+                                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                       children: [
                                                         Text(
                                                           'Nome modello:',
-                                                          style: Theme.of(
-                                                                  context)
-                                                              .textTheme
-                                                              .titleMedium!
-                                                              .copyWith(
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w500),
+                                                          style: Theme.of(context).textTheme.titleMedium!.copyWith(fontWeight: FontWeight.w500),
                                                         ),
                                                         Text(
-                                                          widget
-                                                              .device.modelName,
-                                                          style:
-                                                              Theme.of(context)
-                                                                  .textTheme
-                                                                  .titleMedium,
+                                                          widget.device.modelName,
+                                                          style: Theme.of(context).textTheme.titleMedium,
                                                         ),
                                                       ],
                                                     ),
                                                   ),
                                                   Padding(
-                                                    padding: const EdgeInsets
-                                                            .symmetric(
-                                                        horizontal: 10.0,
-                                                        vertical: 5),
+                                                    padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5),
                                                     child: Row(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .spaceBetween,
+                                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                       children: [
                                                         Text(
                                                           'Numero di serie:',
-                                                          style: Theme.of(
-                                                                  context)
-                                                              .textTheme
-                                                              .titleMedium!
-                                                              .copyWith(
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w500),
+                                                          style: Theme.of(context).textTheme.titleMedium!.copyWith(fontWeight: FontWeight.w500),
                                                         ),
                                                         Text(
-                                                          widget.device
-                                                              .serialNumber,
-                                                          style:
-                                                              Theme.of(context)
-                                                                  .textTheme
-                                                                  .titleMedium,
+                                                          widget.device.serialNumber,
+                                                          style: Theme.of(context).textTheme.titleMedium,
                                                         ),
                                                       ],
                                                     ),
                                                   ),
                                                   Padding(
-                                                    padding: const EdgeInsets
-                                                            .symmetric(
-                                                        horizontal: 10.0,
-                                                        vertical: 5),
+                                                    padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5),
                                                     child: Row(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .spaceBetween,
+                                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                                       children: [
                                                         Text(
                                                           'Software',
-                                                          style: Theme.of(
-                                                                  context)
-                                                              .textTheme
-                                                              .titleMedium!
-                                                              .copyWith(
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w500),
+                                                          style: Theme.of(context).textTheme.titleMedium!.copyWith(fontWeight: FontWeight.w500),
                                                         ),
                                                         Text(
                                                           "${widget.device.software.version}    ${widget.device.software.name}",
-                                                          style:
-                                                              Theme.of(context)
-                                                                  .textTheme
-                                                                  .titleMedium,
+                                                          style: Theme.of(context).textTheme.titleMedium,
                                                         ),
                                                       ],
                                                     ),
                                                   ),
                                                   const SizedBox(height: 20),
                                                   Center(
-                                                    child:
-                                                        CupertinoButton.filled(
-                                                            child: const Text(
-                                                                'Aggiorna'),
-                                                            onPressed: () {}),
+                                                    child: CupertinoButton.filled(child: const Text('Aggiorna'), onPressed: () {}),
                                                   )
                                                 ],
                                               ),
@@ -383,12 +267,10 @@ class _CardDeviceState extends State<CardDevice> {
                             child: Card(
                                 margin: EdgeInsets.zero,
                                 child: Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 10.0, vertical: 4),
+                                  padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 4),
                                   child: Text(
                                     widget.device.modelNumber,
-                                    style: TextStyle(
-                                        color: Colors.black.withOpacity(0.5)),
+                                    style: TextStyle(color: Colors.black.withOpacity(0.5)),
                                   ),
                                 )),
                           ),
@@ -407,18 +289,14 @@ class _CardDeviceState extends State<CardDevice> {
                                 child: Padding(
                                   padding: const EdgeInsets.all(10.0),
                                   child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
+                                    crossAxisAlignment: CrossAxisAlignment.center,
                                     children: [
                                       Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
+                                        crossAxisAlignment: CrossAxisAlignment.start,
                                         children: [
                                           Text(
                                             'Sincronizzazione',
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .titleMedium,
+                                            style: Theme.of(context).textTheme.titleMedium,
                                           ),
                                           Text(
                                             'Clock:  ${widget.device.clock}',
@@ -431,53 +309,41 @@ class _CardDeviceState extends State<CardDevice> {
                                       const SizedBox(height: 5),
                                       Text(
                                         '${CalculationService.formatTime(seconds: widget.device.clock * frequency)}',
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .titleLarge!
-                                            .copyWith(
-                                                fontWeight: FontWeight.bold),
+                                        style: Theme.of(context).textTheme.titleLarge!.copyWith(fontWeight: FontWeight.bold),
                                       ),
                                       Row(
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
                                           Card(
                                             child: CupertinoButton(
-                                              onPressed: frequency ==
-                                                      kFrequencyMin
+                                              onPressed: frequency == kFrequencyMin
                                                   ? null
                                                   : () {
-                                                      if (timer != null &&
-                                                          timer!.isActive) {
+                                                      if (timer != null && timer!.isActive) {
                                                         timer!.cancel();
                                                       }
                                                       setState(() {
                                                         --frequency;
-                                                        timer = toastHelper(
-                                                            connected, true);
+                                                        timer = toastHelper(connected, true);
                                                       });
                                                     },
-                                              child: const Icon(
-                                                  CupertinoIcons.minus_circle),
+                                              child: const Icon(CupertinoIcons.minus_circle),
                                             ),
                                           ),
                                           Card(
                                             child: CupertinoButton(
-                                              onPressed: frequency ==
-                                                      kFrequencyMax
+                                              onPressed: frequency == kFrequencyMax
                                                   ? null
                                                   : () {
-                                                      if (timer != null &&
-                                                          timer!.isActive) {
+                                                      if (timer != null && timer!.isActive) {
                                                         timer!.cancel();
                                                       }
                                                       setState(() {
                                                         ++frequency;
-                                                        timer = toastHelper(
-                                                            connected, true);
+                                                        timer = toastHelper(connected, true);
                                                       });
                                                     },
-                                              child: const Icon(
-                                                  CupertinoIcons.add_circled),
+                                              child: const Icon(CupertinoIcons.add_circled),
                                             ),
                                           ),
                                         ],
@@ -489,93 +355,58 @@ class _CardDeviceState extends State<CardDevice> {
                               Card(
                                 child: Padding(
                                   padding: const EdgeInsets.all(10.0),
-                                  child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          'Posizione',
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .titleMedium,
-                                        ),
-                                        if (widget.serialConnected) ...[
-                                          Padding(
-                                            padding: const EdgeInsets.symmetric(
-                                                vertical: 4.0),
-                                            child: StreamBuilder<Position>(
-                                                stream: Geolocator
-                                                    .getPositionStream(),
-                                                builder: (context, snapshot) {
-                                                  if (!snapshot.hasData) {
-                                                    return Container();
-                                                  }
-                                                  return DeviceLocation(
-                                                    logs: [
-                                                      Log(
-                                                          id: 'connectedSerial',
-                                                          timestamp:
-                                                              DateTime.now(),
-                                                          battery: 4.2,
-                                                          gps: GPS(
-                                                              latLng: MapLatLng(
-                                                                  snapshot.data!
-                                                                      .latitude,
-                                                                  snapshot.data!
-                                                                      .longitude),
-                                                              altitude: snapshot
-                                                                  .data!
-                                                                  .altitude,
-                                                              speed: snapshot
-                                                                  .data!.speed,
-                                                              course: 0,
-                                                              satellites: 10))
-                                                    ],
-                                                  );
-                                                }),
-                                          ),
-                                        ] else ...[
-                                          Padding(
-                                            padding: const EdgeInsets.symmetric(
-                                                vertical: 4.0),
-                                            child: StreamBuilder<List<Log>>(
-                                                stream: DatabaseLog(
-                                                        id: widget.device
-                                                            .serialNumber)
-                                                    .lastLog,
-                                                builder: (context, snapshot) {
-                                                  if (snapshot.hasData) {
-                                                    return snapshot
-                                                            .data!.isNotEmpty
-                                                        ? DeviceLocation(
-                                                            logs:
-                                                                snapshot.data!,
-                                                          )
-                                                        : const SizedBox(
-                                                            width: 100,
-                                                            height: 130,
-                                                            child: Text(
-                                                              'Mappa non dipsonibile',
-                                                              textAlign:
-                                                                  TextAlign
-                                                                      .center,
-                                                            ),
-                                                          );
-                                                  } else {
-                                                    return const SizedBox(
-                                                      width: 100,
-                                                      height: 130,
-                                                      child: Text(
-                                                        'Caricamento mappa',
-                                                        textAlign:
-                                                            TextAlign.center,
-                                                      ),
-                                                    );
-                                                  }
-                                                }),
-                                          ),
-                                        ],
-                                      ]),
+                                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                                    Text(
+                                      'Posizione',
+                                      style: Theme.of(context).textTheme.titleMedium,
+                                    ),
+                                    if (widget.serialConnected) ...[
+                                      Padding(
+                                        padding: const EdgeInsets.symmetric(vertical: 4.0),
+                                        child: StreamBuilder<Position>(
+                                            stream: Geolocator.getPositionStream(),
+                                            builder: (context, snapshot) {
+                                              if (!snapshot.hasData) {
+                                                return Container();
+                                              }
+                                              return DeviceLocation(
+                                                logs: [Log(id: 'connectedSerial', timestamp: DateTime.now(), battery: 4.2, gps: GPS(latLng: MapLatLng(snapshot.data!.latitude, snapshot.data!.longitude), altitude: snapshot.data!.altitude, speed: snapshot.data!.speed, course: 0, satellites: 10))],
+                                              );
+                                            }),
+                                      ),
+                                    ] else ...[
+                                      Padding(
+                                        padding: const EdgeInsets.symmetric(vertical: 4.0),
+                                        child: StreamBuilder<List<Log>>(
+                                            stream: DatabaseLog(id: widget.device.serialNumber).lastLog,
+                                            builder: (context, snapshot) {
+                                              if (snapshot.hasData) {
+                                                return snapshot.data!.isNotEmpty
+                                                    ? DeviceLocation(
+                                                        logs: snapshot.data!,
+                                                      )
+                                                    : const SizedBox(
+                                                        width: 100,
+                                                        height: 130,
+                                                        child: Text(
+                                                          'Mappa non dipsonibile',
+                                                          textAlign: TextAlign.center,
+                                                        ),
+                                                      );
+                                              } else {
+                                                return const SizedBox(
+                                                  width: 100,
+                                                  height: 130,
+                                                  child: Text(
+                                                    'Caricamento mappa',
+                                                    textAlign: TextAlign.center,
+                                                  ),
+                                                );
+                                              }
+                                            }),
+                                      ),
+                                    ],
+                                  ]),
                                 ),
                               ),
                             ],
@@ -631,8 +462,7 @@ class DeviceLocationState extends State<DeviceLocation> {
         height: 130,
         width: 100,
         clipBehavior: Clip.hardEdge,
-        decoration: const BoxDecoration(
-            borderRadius: BorderRadius.all(Radius.circular(10))),
+        decoration: const BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(10))),
         child: SfMaps(
           layers: <MapLayer>[
             MapTileLayer(
@@ -652,13 +482,7 @@ class DeviceLocationState extends State<DeviceLocation> {
                   longitude: widget.logs[index].gps.latLng.longitude,
                   alignment: Alignment.bottomCenter,
                   child: FittedBox(
-                    child: Icon(Icons.location_on,
-                        color: index == 0 || index == widget.logs.length - 1
-                            ? AppStyle.primaryColor
-                            : AppStyle.primaryColor,
-                        size: index == 0 || index == widget.logs.length - 1
-                            ? 50
-                            : 20),
+                    child: Icon(Icons.location_on, color: index == 0 || index == widget.logs.length - 1 ? AppStyle.primaryColor : AppStyle.primaryColor, size: index == 0 || index == widget.logs.length - 1 ? 50 : 20),
                   ),
                 );
               },

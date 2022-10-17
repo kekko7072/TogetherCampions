@@ -26,15 +26,11 @@ class AppStyle {
   static Color backgroundColor = Color(backgroundColorValue);
 
   ///TextStyle
-  static TextStyle kHomeTitle =
-      const TextStyle(fontWeight: FontWeight.bold, fontSize: 50);
-  static TextStyle kSentence = const TextStyle(
-      fontSize: 15, fontWeight: FontWeight.bold, color: Colors.black);
+  static TextStyle kHomeTitle = const TextStyle(fontWeight: FontWeight.bold, fontSize: 50);
+  static TextStyle kSentence = const TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.black);
 
   ///InputDecoration
-  InputDecoration kTextFieldDecoration(
-          {required IconData icon, required String hintText}) =>
-      InputDecoration(
+  InputDecoration kTextFieldDecoration({required IconData icon, required String hintText}) => InputDecoration(
         prefixIcon: Icon(
           icon,
           color: AppStyle.backgroundColor,
@@ -43,8 +39,7 @@ class AppStyle {
         hintStyle: const TextStyle(
           color: Colors.white60,
         ),
-        contentPadding:
-            const EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
+        contentPadding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
         border: const OutlineInputBorder(
           borderRadius: BorderRadius.all(Radius.circular(32.0)),
         ),
@@ -59,16 +54,10 @@ class AppStyle {
       );
 
   ///ModalBottom
-  static RoundedRectangleBorder kModalBottomStyle =
-      const RoundedRectangleBorder(
-          borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(30), topRight: Radius.circular(30)));
+  static RoundedRectangleBorder kModalBottomStyle = const RoundedRectangleBorder(borderRadius: BorderRadius.only(topLeft: Radius.circular(30), topRight: Radius.circular(30)));
 
   ///WIDTH
-  static double resizeAutomaticallyWidth(BuildContext context) =>
-      MediaQuery.of(context).size.width >= 400
-          ? 400
-          : MediaQuery.of(context).size.width;
+  static double resizeAutomaticallyWidth(BuildContext context) => MediaQuery.of(context).size.width >= 400 ? 400 : MediaQuery.of(context).size.width;
 
   ///MENU
 }

@@ -17,8 +17,7 @@ class _SerialMonitorState extends State<SerialMonitor> {
   List<String> values = [];
   List<DateTime> valuesTimestamp = [];
 
-  void sendCommand(
-      String value, SerialPort serialPort, SerialPortReader serialPortReader) {
+  void sendCommand(String value, SerialPort serialPort, SerialPortReader serialPortReader) {
     serialPort.write(Uint8List.fromList(value.codeUnits));
 
     serialPortReader.stream.listen((data) {
@@ -35,9 +34,7 @@ class _SerialMonitorState extends State<SerialMonitor> {
 
   Stream<SerialPort?> streamPorts() async* {
     await Future.delayed(const Duration(seconds: 1));
-    yield SerialConnectionService.setSerialPorts(
-        availablePorts: SerialPort.availablePorts,
-        serialNumber: widget.device.serialNumber);
+    yield SerialConnectionService.setSerialPorts(availablePorts: SerialPort.availablePorts, serialNumber: widget.device.serialNumber);
     setState(() {});
   }
 
@@ -53,8 +50,7 @@ class _SerialMonitorState extends State<SerialMonitor> {
                   stream: streamPorts(),
                   builder: (context, snapshot) {
                     if (!snapshot.hasData || snapshot.data == null) {
-                      return const Center(
-                          child: Text('No data from serial port'));
+                      return const Center(child: Text('No data from serial port'));
                     }
                     SerialPort serialPort = snapshot.data!;
                     return !serialPort.isOpen && !serialPort.openReadWrite()
@@ -66,60 +62,38 @@ class _SerialMonitorState extends State<SerialMonitor> {
                                 children: [
                                   Text(
                                     'Serial Monitor',
-                                    style:
-                                        Theme.of(context).textTheme.titleLarge,
+                                    style: Theme.of(context).textTheme.titleLarge,
                                   ),
                                   Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        vertical: 10),
+                                    padding: const EdgeInsets.symmetric(vertical: 10),
                                     child: Row(
                                       children: [
                                         Expanded(
                                           child: TextField(
                                             controller: input,
-                                            onSubmitted: (value) => sendCommand(
-                                                value,
-                                                serialPort,
-                                                SerialPortReader(serialPort)),
+                                            onSubmitted: (value) => sendCommand(value, serialPort, SerialPortReader(serialPort)),
                                             decoration: InputDecoration(
                                               hintText: 'Input command',
                                               hintStyle: const TextStyle(
                                                 color: Colors.white60,
                                               ),
-                                              contentPadding:
-                                                  const EdgeInsets.symmetric(
-                                                      vertical: 10.0,
-                                                      horizontal: 20.0),
+                                              contentPadding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
                                               border: const OutlineInputBorder(
-                                                borderRadius: BorderRadius.all(
-                                                    Radius.circular(32.0)),
+                                                borderRadius: BorderRadius.all(Radius.circular(32.0)),
                                               ),
                                               enabledBorder: OutlineInputBorder(
-                                                borderSide: BorderSide(
-                                                    color:
-                                                        AppStyle.primaryColor,
-                                                    width: 2.0),
-                                                borderRadius:
-                                                    const BorderRadius.all(
-                                                        Radius.circular(32.0)),
+                                                borderSide: BorderSide(color: AppStyle.primaryColor, width: 2.0),
+                                                borderRadius: const BorderRadius.all(Radius.circular(32.0)),
                                               ),
                                               focusedBorder: OutlineInputBorder(
-                                                borderSide: BorderSide(
-                                                    color:
-                                                        AppStyle.primaryColor,
-                                                    width: 2.0),
-                                                borderRadius:
-                                                    const BorderRadius.all(
-                                                        Radius.circular(32.0)),
+                                                borderSide: BorderSide(color: AppStyle.primaryColor, width: 2.0),
+                                                borderRadius: const BorderRadius.all(Radius.circular(32.0)),
                                               ),
                                             ),
                                           ),
                                         ),
                                         IconButton(
-                                            onPressed: () => sendCommand(
-                                                input.text,
-                                                serialPort,
-                                                SerialPortReader(serialPort)),
+                                            onPressed: () => sendCommand(input.text, serialPort, SerialPortReader(serialPort)),
                                             icon: Icon(
                                               CupertinoIcons.paperplane_fill,
                                               color: AppStyle.primaryColor,
@@ -128,11 +102,7 @@ class _SerialMonitorState extends State<SerialMonitor> {
                                     ),
                                   ),
                                   Flexible(
-                                    child: ListView.builder(
-                                        shrinkWrap: true,
-                                        itemCount: values.length,
-                                        itemBuilder: (context, index) => Text(
-                                            "${DateFormat("kk:mm:ss").format(valuesTimestamp[index])}  -->  ${values[index]}")),
+                                    child: ListView.builder(shrinkWrap: true, itemCount: values.length, itemBuilder: (context, index) => Text("${DateFormat("kk:mm:ss").format(valuesTimestamp[index])}  -->  ${values[index]}")),
                                   ),
                                 ],
                               ),
@@ -146,26 +116,16 @@ class _SerialMonitorState extends State<SerialMonitor> {
                                               content: Column(
                                                 mainAxisSize: MainAxisSize.min,
                                                 children: [
-                                                  Text(
-                                                      'Description:  ${serialPort.description}'),
-                                                  Text(
-                                                      'Transport: ${serialPort.transport.toTransport()}'),
-                                                  Text(
-                                                      'USB Bus: ${serialPort.busNumber?.toPadded()}'),
-                                                  Text(
-                                                      'USB Device:  ${serialPort.deviceNumber?.toPadded()}'),
-                                                  Text(
-                                                      'Vendor ID: ${serialPort.vendorId?.toHex()}'),
-                                                  Text(
-                                                      'Product ID: ${serialPort.productId?.toHex()}'),
-                                                  Text(
-                                                      'Manufacturer: ${serialPort.manufacturer}'),
-                                                  Text(
-                                                      'Product Name: ${serialPort.productName}'),
-                                                  Text(
-                                                      'Serial Number: ${serialPort.serialNumber}'),
-                                                  Text(
-                                                      'MAC Address: ${serialPort.macAddress}'),
+                                                  Text('Description:  ${serialPort.description}'),
+                                                  Text('Transport: ${serialPort.transport.toTransport()}'),
+                                                  Text('USB Bus: ${serialPort.busNumber?.toPadded()}'),
+                                                  Text('USB Device:  ${serialPort.deviceNumber?.toPadded()}'),
+                                                  Text('Vendor ID: ${serialPort.vendorId?.toHex()}'),
+                                                  Text('Product ID: ${serialPort.productId?.toHex()}'),
+                                                  Text('Manufacturer: ${serialPort.manufacturer}'),
+                                                  Text('Product Name: ${serialPort.productName}'),
+                                                  Text('Serial Number: ${serialPort.serialNumber}'),
+                                                  Text('MAC Address: ${serialPort.macAddress}'),
                                                 ],
                                               ),
                                             )),

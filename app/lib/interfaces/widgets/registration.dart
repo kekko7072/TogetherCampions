@@ -6,8 +6,7 @@ import '../screens/loading_screen.dart';
 class Registration extends StatefulWidget {
   final bool isEdit;
   final UserData? userData;
-  const Registration({Key? key, required this.isEdit, this.userData})
-      : super(key: key);
+  const Registration({Key? key, required this.isEdit, this.userData}) : super(key: key);
 
   @override
   State<Registration> createState() => _RegistrationState();
@@ -59,9 +58,7 @@ class _RegistrationState extends State<Registration> {
                   ),
                   const SizedBox(height: 5),
                   SizedBox(
-                    width: MediaQuery.of(context).size.width < 500
-                        ? MediaQuery.of(context).size.width
-                        : 500,
+                    width: MediaQuery.of(context).size.width < 500 ? MediaQuery.of(context).size.width : 500,
                     child: Form(
                       key: _formKey,
                       child: Column(
@@ -70,37 +67,29 @@ class _RegistrationState extends State<Registration> {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Padding(
-                            padding: const EdgeInsets.symmetric(
-                                vertical: 5.0, horizontal: 20),
+                            padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 20),
                             child: TextFormField(
                               controller: name,
                               textAlign: TextAlign.center,
-                              decoration: AppStyle().kTextFieldDecoration(
-                                  icon: Icons.person,
-                                  hintText: 'Enter your name'),
+                              decoration: AppStyle().kTextFieldDecoration(icon: Icons.person, hintText: 'Enter your name'),
                             ),
                           ),
                           Padding(
-                            padding: const EdgeInsets.symmetric(
-                                vertical: 5.0, horizontal: 20),
+                            padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 20),
                             child: TextFormField(
                               controller: surname,
                               textAlign: TextAlign.center,
-                              decoration: AppStyle().kTextFieldDecoration(
-                                  icon: Icons.person,
-                                  hintText: 'Enter your surname'),
+                              decoration: AppStyle().kTextFieldDecoration(icon: Icons.person, hintText: 'Enter your surname'),
                             ),
                           ),
                           if (!widget.isEdit) ...[
                             Padding(
-                              padding: const EdgeInsets.symmetric(
-                                  vertical: 5.0, horizontal: 20),
+                              padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 20),
                               child: TextFormField(
                                 controller: email,
                                 keyboardType: TextInputType.emailAddress,
                                 textAlign: TextAlign.center,
-                                decoration: AppStyle().kTextFieldDecoration(
-                                    icon: Icons.email, hintText: 'Enter email'),
+                                decoration: AppStyle().kTextFieldDecoration(icon: Icons.email, hintText: 'Enter email'),
                                 validator: (value) {
                                   String pattern = r'\w+@\w+\.\w+';
                                   RegExp regex = RegExp(pattern);
@@ -116,33 +105,25 @@ class _RegistrationState extends State<Registration> {
                               ),
                             ),
                             Padding(
-                              padding: const EdgeInsets.symmetric(
-                                  vertical: 5.0, horizontal: 20),
+                              padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 20),
                               child: TextFormField(
                                 controller: password,
                                 obscureText: showPassword,
                                 textAlign: TextAlign.center,
-                                decoration: AppStyle()
-                                    .kTextFieldDecoration(
-                                        icon: Icons.lock,
-                                        hintText: 'Enter password')
-                                    .copyWith(
+                                decoration: AppStyle().kTextFieldDecoration(icon: Icons.lock, hintText: 'Enter password').copyWith(
                                       suffixIcon: IconButton(
                                         onPressed: () {
                                           setState(() {
                                             showPassword = !showPassword;
                                           });
                                         },
-                                        icon: Icon(!showPassword
-                                            ? Icons.visibility
-                                            : Icons.visibility_off),
+                                        icon: Icon(!showPassword ? Icons.visibility : Icons.visibility_off),
                                       ),
                                     ),
                               ),
                             ),
                             Padding(
-                              padding: const EdgeInsets.symmetric(
-                                  vertical: 5.0, horizontal: 20),
+                              padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 20),
                               child: TextFormField(
                                 controller: confirmPassword,
                                 obscureText: showConfirmPassword,
@@ -150,27 +131,19 @@ class _RegistrationState extends State<Registration> {
                                 validator: (value) {
                                   if (value == null || value.isEmpty) {
                                     return 'Confirm your password';
-                                  } else if (confirmPassword.text !=
-                                      password.text) {
+                                  } else if (confirmPassword.text != password.text) {
                                     return 'Password do not match';
                                   }
                                   return null;
                                 },
-                                decoration: AppStyle()
-                                    .kTextFieldDecoration(
-                                        icon: Icons.lock,
-                                        hintText: 'Confirm password')
-                                    .copyWith(
+                                decoration: AppStyle().kTextFieldDecoration(icon: Icons.lock, hintText: 'Confirm password').copyWith(
                                       suffixIcon: IconButton(
                                         onPressed: () {
                                           setState(() {
-                                            showConfirmPassword =
-                                                !showConfirmPassword;
+                                            showConfirmPassword = !showConfirmPassword;
                                           });
                                         },
-                                        icon: Icon(!showConfirmPassword
-                                            ? Icons.visibility
-                                            : Icons.visibility_off),
+                                        icon: Icon(!showConfirmPassword ? Icons.visibility : Icons.visibility_off),
                                       ),
                                     ),
                               ),
@@ -218,8 +191,7 @@ class _RegistrationState extends State<Registration> {
                                         actions: [
                                           TextButton(
                                             child: const Text('Chiudi'),
-                                            onPressed: () =>
-                                                Navigator.of(context).pop(),
+                                            onPressed: () => Navigator.of(context).pop(),
                                           )
                                         ],
                                       ),

@@ -17,6 +17,9 @@ void initializationLED() {
   pinMode(LED_GREEN, OUTPUT);
   pinMode(LED_YELLOW, OUTPUT);
   pinMode(LED_RED, OUTPUT);
+
+  Serial.print("OK");
+  Serial.println();
 }
 
 /* 
@@ -34,7 +37,7 @@ void initializationGPRS(GSM gsm, GPRS gprs) {
       Serial.print("OK");
     } else {
       Serial.println("Not connected");
-      delay(1000);
+      await_with_blinking_error(10);
     }
   }
 }

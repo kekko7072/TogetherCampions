@@ -248,13 +248,18 @@ class _AddEditSessionState extends State<AddEditSession> {
                           EasyLoading.show();
                           file = result!.files.first;
                           debugPrint(
-                              "NAME: ${file!.name}\nEXTENSION: ${file!.extension}\nSIZE: ${file!.size}\nBYTES AVAILABLE: ${file!.bytes != null}");
+                              "PATH: ${file!.path}\nNAME: ${file!.name}\nEXTENSION: ${file!.extension}\nSIZE: ${file!.size}\nBYTES AVAILABLE: ${file!.bytes != null}");
                           if (file!.bytes != null) {
                             String convertedValue =
                                 String.fromCharCodes(file!.bytes!);
                             setState(() => value = convertedValue.split(","));
-                            debugPrint("LOGS: ${value.length}");
+                          } else {
+                            String convertedValue = String.fromCharCodes(
+                                await File(file!.path!).readAsBytes());
+                            setState(() => value = convertedValue.split(","));
                           }
+
+                          debugPrint("LOGS: ${value.length}");
                           EasyLoading.dismiss();
                         } else {
                           debugPrint("User cancelled");

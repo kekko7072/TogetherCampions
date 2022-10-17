@@ -37,5 +37,7 @@
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>This app connect to bluetooth.</string>
 </dict>
 </plist>
