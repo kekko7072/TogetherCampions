@@ -43,8 +43,10 @@ const int MPU = 0x68;  // I2C address of the MPU-6050
 void setup() {
   if (debug_mode) {
     Serial.begin(9600);  // initialize serial communication
-    while (!Serial)
+    /*while (!Serial)
       ;  //starts the program if we open the serial monitor.
+      */
+      
   }
 
   pinMode(LED_BUILTIN, OUTPUT);  // initialize the built-in LED pin to indicate when a central is connected

@@ -458,9 +458,8 @@ class _CharacteristicTileState extends State<CharacteristicTile> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                      Text(characteristic),
                       Text(
-                          'Start ${DateTime.now().subtract(Duration(microseconds: timestamp))}')
+                          '$characteristic  ${Duration(milliseconds: timestamp).inHours < 1 ? '' : '${Duration(milliseconds: timestamp).inHours}:'}${Duration(milliseconds: timestamp).inMinutes.remainder(60) < 9 ? '0${Duration(milliseconds: timestamp).inMinutes.remainder(60)}' : Duration(milliseconds: timestamp).inMinutes.remainder(60)}:${(Duration(milliseconds: timestamp).inSeconds.remainder(60) < 9 ? '0${Duration(milliseconds: timestamp).inSeconds.remainder(60)}' : Duration(milliseconds: timestamp).inSeconds.remainder(60))}')
                     ],
                   ),
                   contentPadding: const EdgeInsets.all(0.0),
