@@ -3,7 +3,7 @@
     true: data saved successfully
     false: data not saved
 */
-bool sdcard_save(String input_data) {
+bool sdcard_save(String value) {
 
   // Open the file. Note that only one file can be open at a time,  so you have to close this one before opening another.
   File dataFile = SD.open("DATALOG.TXT", FILE_WRITE);
@@ -14,7 +14,7 @@ bool sdcard_save(String input_data) {
 
   //If the file is available, write to it:
   if (dataFile) {
-    dataFile.print(input_data);
+    dataFile.print(value);
     dataFile.print(",");  //This caracter is used to end the clock cycle
     dataFile.close();
     return true;
@@ -56,6 +56,7 @@ String sdcard_read() {
     return "";
   }
 }
+
 bool sdcard_status() {
   /*
 

@@ -35,7 +35,8 @@ class CalculationService {
     double dLong = lng2 - lng1;
     double dLat = lat2 - lat1;
 
-    var res = pow(sin((dLat / 2)), 2) + cos(lat1) * cos(lat2) * pow(sin(dLong / 2), 2);
+    var res = pow(sin((dLat / 2)), 2) +
+        cos(lat1) * cos(lat2) * pow(sin(dLong / 2), 2);
     res = 2 * asin(sqrt(res));
     double R = 6371;
     res = res * R;
@@ -54,7 +55,8 @@ class CalculationService {
     double bx = cos(lat2) * cos(dLong);
     double by = cos(lat2) * sin(dLong);
 
-    double latMidway = toDegrees(atan2(sin(lat1) + sin(lat2), sqrt((cos(lat1) + bx) * (cos(lat1) + bx) + by * by)));
+    double latMidway = toDegrees(atan2(sin(lat1) + sin(lat2),
+        sqrt((cos(lat1) + bx) * (cos(lat1) + bx) + by * by)));
     double lngMidway = toDegrees(lng1 + atan2(by, cos(lat1) + bx));
 
     return MapLatLng(latMidway, lngMidway);
@@ -64,7 +66,8 @@ class CalculationService {
     return double.parse(number.toStringAsFixed(decimal));
   }
 
-  static String formatDate({required DateTime date, required bool year, required bool seconds}) {
+  static String formatDate(
+      {required DateTime date, required bool year, required bool seconds}) {
     if (year) {
       return DateFormat('kk:mm   dd/MM/yyyy').format(date);
     } else {
@@ -72,7 +75,8 @@ class CalculationService {
     }
   }
 
-  static initialCameraPosition({required List<MapLatLng> list, required bool isPreview}) {
+  static initialCameraPosition(
+      {required List<MapLatLng> list, required bool isPreview}) {
     MapLatLng start = list.first;
     MapLatLng end = list.first;
     double distance = 0;
@@ -146,11 +150,14 @@ class CalculationService {
       enableDoubleTapZooming: true,
       focalLatLng: findCenter(start, end),
       showToolbar: !isPreview,
-      toolbarSettings: const MapToolbarSettings(direction: Axis.horizontal, position: MapToolbarPosition.topRight, iconColor: Colors.black),
+      toolbarSettings: const MapToolbarSettings(
+          direction: Axis.horizontal,
+          position: MapToolbarPosition.topRight,
+          iconColor: Colors.black),
     );
   }
 
-  static Telemetry telemetry({
+  static TelemetryData telemetry({
     required List<Log> logs,
     required List<MapLatLng> segment,
   }) {
@@ -176,33 +183,39 @@ class CalculationService {
       speedMedium = speedMedium + log.gps.speed;
 
       if (speedMax < log.gps.speed) {
-        speedMax = CalculationService.roundDouble(number: log.gps.speed, decimal: 3);
+        speedMax =
+            CalculationService.roundDouble(number: log.gps.speed, decimal: 3);
       }
 
       if (speedMin > log.gps.speed) {
-        speedMin = CalculationService.roundDouble(number: log.gps.speed, decimal: 3);
+        speedMin =
+            CalculationService.roundDouble(number: log.gps.speed, decimal: 3);
       }
 
       ///Altitude
       altitudeMedium = altitudeMedium + log.gps.altitude;
 
       if (altitudeMax < log.gps.altitude) {
-        altitudeMax = CalculationService.roundDouble(number: log.gps.altitude, decimal: 3);
+        altitudeMax = CalculationService.roundDouble(
+            number: log.gps.altitude, decimal: 3);
       }
 
       if (altitudeMin > log.gps.altitude) {
-        altitudeMin = CalculationService.roundDouble(number: log.gps.altitude, decimal: 3);
+        altitudeMin = CalculationService.roundDouble(
+            number: log.gps.altitude, decimal: 3);
       }
 
       ///Course
       courseMedium = courseMedium + log.gps.course;
 
       if (courseMax < log.gps.course) {
-        courseMax = CalculationService.roundDouble(number: log.gps.course, decimal: 3);
+        courseMax =
+            CalculationService.roundDouble(number: log.gps.course, decimal: 3);
       }
 
       if (courseMin > log.gps.course) {
-        courseMin = CalculationService.roundDouble(number: log.gps.course, decimal: 3);
+        courseMin =
+            CalculationService.roundDouble(number: log.gps.course, decimal: 3);
       }
 
       ///Satellites
@@ -218,26 +231,31 @@ class CalculationService {
       }
     }
 
-    return Telemetry(
+    return TelemetryData(
         speed: Range(
-          medium: CalculationService.roundDouble(number: speedMedium / logs.length, decimal: 3),
+          medium: CalculationService.roundDouble(
+              number: speedMedium / logs.length, decimal: 3),
           max: speedMax,
           min: speedMin,
         ),
         altitude: Range(
-          medium: CalculationService.roundDouble(number: altitudeMedium / logs.length, decimal: 3),
+          medium: CalculationService.roundDouble(
+              number: altitudeMedium / logs.length, decimal: 3),
           max: altitudeMax,
           min: altitudeMin,
         ),
         course: Range(
-          medium: CalculationService.roundDouble(number: courseMedium / logs.length, decimal: 3),
+          medium: CalculationService.roundDouble(
+              number: courseMedium / logs.length, decimal: 3),
           max: courseMax,
           min: courseMin,
         ),
-        distance: CalculationService.findDistanceFromList(segment).roundToDouble(),
+        distance:
+            CalculationService.findDistanceFromList(segment).roundToDouble(),
         satellites: satellites ~/ logs.length,
         battery: Battery(
-          consumption: CalculationService.roundDouble(number: batteryMax - batteryMin, decimal: 3),
+          consumption: CalculationService.roundDouble(
+              number: batteryMax - batteryMin, decimal: 3),
           maxVoltage: batteryMax,
           minVoltage: batteryMin,
         ));
@@ -266,18 +284,21 @@ class CalculationService {
     return (100 * volts ~/ 4.2);
   }
 
-  static String formatOutputWithNewTimestamp({required String input, required DateTime start}) {
+  static String formatOutputWithNewTimestamp(
+      {required String input, required DateTime start}) {
     ///SPLIT
     debugPrint("\nSPLIT");
     List<String> original = input.split("&");
     //debugPrint("$original");
-    List<String> originalTimestamp = original.where((el) => el.contains("timestamp=")).toList();
+    List<String> originalTimestamp =
+        original.where((el) => el.contains("timestamp=")).toList();
     //debugPrint("ORIGINAL TIMESTAMP: $originalTimestamp");
 
     //New timestamp
     List<String> newTimestamp = [];
     for (String value in originalTimestamp) {
-      newTimestamp.add("timestamp=${(start.millisecondsSinceEpoch + int.parse(value.replaceAll("timestamp=", ""))) ~/ 1000}");
+      newTimestamp.add(
+          "timestamp=${(start.millisecondsSinceEpoch + int.parse(value.replaceAll("timestamp=", ""))) ~/ 1000}");
     }
     //debugPrint("NEW TIMESTAMP: $newTimestamp");
 
@@ -297,16 +318,20 @@ class CalculationService {
     return output;
   }
 
-  static DateTime getLastNewTimestamp({required String lastInput, required DateTime start}) {
+  static DateTime getLastNewTimestamp(
+      {required String lastInput, required DateTime start}) {
     debugPrint(lastInput);
 
     ///SPLIT
     debugPrint("\nSPLIT");
     List<String> original = lastInput.split("&");
     debugPrint("$original");
-    List<String> originalTimestamp = original.where((el) => el.contains("timestamp=")).toList();
+    List<String> originalTimestamp =
+        original.where((el) => el.contains("timestamp=")).toList();
     debugPrint("ORIGINAL TIMESTAMP: $originalTimestamp");
 
-    return start.add(Duration(milliseconds: int.parse(originalTimestamp.last.replaceAll("timestamp=", ""))));
+    return start.add(Duration(
+        milliseconds:
+            int.parse(originalTimestamp.last.replaceAll("timestamp=", ""))));
   }
 }

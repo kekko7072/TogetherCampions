@@ -1,9 +1,16 @@
 import 'imports.dart';
 
 class DatabaseDevice {
-  static CollectionReference<Map<String, dynamic>> deviceCollection = FirebaseFirestore.instance.collection('devices');
+  static CollectionReference<Map<String, dynamic>> deviceCollection =
+      FirebaseFirestore.instance.collection('devices');
 
-  Future register({required String serialNumber, required String modelNumber, required String modelName, required String name, required String uid, required int frequency}) async {
+  Future register(
+      {required String serialNumber,
+      required String modelNumber,
+      required String modelName,
+      required String name,
+      required String uid,
+      required int frequency}) async {
     Map<String, dynamic> value = {
       'modelNumber': modelNumber,
       "modelName": modelName,
@@ -11,7 +18,8 @@ class DatabaseDevice {
       'uid': uid,
       "frequency": frequency,
     };
-    await DatabaseUser.devicesCreateRemove(isCreate: true, uid: uid, id: serialNumber);
+    await DatabaseUser.devicesCreateRemove(
+        isCreate: true, uid: uid, id: serialNumber);
 
     return await deviceCollection.doc(serialNumber).set(value);
   }
@@ -22,7 +30,8 @@ class DatabaseDevice {
     return await deviceCollection.doc(id).delete();
   }
 
-  Future editFrequency({required String serialNumber, required int frequency}) async {
+  Future editFrequency(
+      {required String serialNumber, required int frequency}) async {
     return await deviceCollection.doc(serialNumber).update({
       'frequency': frequency,
     });
@@ -48,7 +57,8 @@ class DatabaseDevice {
     }
   }
 
-  static Device deviceFromSnapshot(DocumentSnapshot<Map<String, dynamic>> snapshot) {
+  static Device deviceFromSnapshot(
+      DocumentSnapshot<Map<String, dynamic>> snapshot) {
     return Device(
         serialNumber: snapshot.id,
         modelNumber: snapshot.data()?['modelNumber'] ?? '',
@@ -65,13 +75,18 @@ class DatabaseDevice {
         ));
   }
 
-  List<Device> deviceListFromSnapshot(QuerySnapshot<Map<String, dynamic>> snapshot) => snapshot.docs.map((snapshot) => deviceFromSnapshot(snapshot)).toList();
+  List<Device> deviceListFromSnapshot(
+          QuerySnapshot<Map<String, dynamic>> snapshot) =>
+      snapshot.docs.map((snapshot) => deviceFromSnapshot(snapshot)).toList();
 
   Stream<Device> device({required String id}) {
     return deviceCollection.doc(id).snapshots().map(deviceFromSnapshot);
   }
 
   Stream<List<Device>> allDevices({required String uid}) {
-    return deviceCollection.where('uid', isEqualTo: uid).snapshots().map(deviceListFromSnapshot);
+    return deviceCollection
+        .where('uid', isEqualTo: uid)
+        .snapshots()
+        .map(deviceListFromSnapshot);
   }
 }

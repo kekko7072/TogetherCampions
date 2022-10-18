@@ -1,6 +1,5 @@
 import 'package:app/interfaces/screens/geolocation_permission.dart';
 import 'package:app/interfaces/screens/loading_screen.dart';
-import 'package:app/services/bluetooth.dart';
 
 import 'package:flutter/cupertino.dart';
 import 'package:app/services/imports.dart';

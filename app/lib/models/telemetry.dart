@@ -4,8 +4,8 @@ enum TelemetryViewLive {
   course,
 }
 
-class Telemetry {
-  Telemetry({
+class TelemetryData {
+  TelemetryData({
     required this.speed,
     required this.altitude,
     required this.course,

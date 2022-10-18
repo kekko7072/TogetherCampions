@@ -3,7 +3,7 @@ description: Tracker app for GPS device.
 
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
-version: 1.0.0+4
+version: 1.0.0+5
 
 environment:
   sdk: ">=2.17.6 <3.0.0"
@@ -13,14 +13,14 @@ dependencies:
     sdk: flutter
 
   #Server
-  firebase_core: ^1.24.0
-  firebase_auth: ^3.11.2
-  cloud_firestore: ^3.5.1
-  cloud_functions: ^3.3.9
+  firebase_core: ^2.0.0
+  firebase_auth: ^4.0.1
+  cloud_firestore: ^4.0.1
+  cloud_functions: ^4.0.1
   #firebase_storage: ^10.3.7
-  firebase_app_check: ^0.0.9+1
+  firebase_app_check: ^0.1.1
  # firebase_messaging: ^13.0.0
-  firebase_crashlytics: ^2.9.0
+  firebase_crashlytics: ^3.0.1
 
   #Basic
   intl: ^0.17.0

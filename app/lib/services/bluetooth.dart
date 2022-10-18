@@ -1,3 +1,7 @@
+// To parse this JSON data, do
+//
+//     final deviceData = deviceDataFromJson(jsonString);
+
 import 'imports.dart';
 
 class FindDevicesScreen extends StatelessWidget {
@@ -459,7 +463,7 @@ class _CharacteristicTileState extends State<CharacteristicTile> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
                       Text(
-                          '$characteristic  ${Duration(milliseconds: timestamp).inHours < 1 ? '' : '${Duration(milliseconds: timestamp).inHours}:'}${Duration(milliseconds: timestamp).inMinutes.remainder(60) < 9 ? '0${Duration(milliseconds: timestamp).inMinutes.remainder(60)}' : Duration(milliseconds: timestamp).inMinutes.remainder(60)}:${(Duration(milliseconds: timestamp).inSeconds.remainder(60) < 9 ? '0${Duration(milliseconds: timestamp).inSeconds.remainder(60)}' : Duration(milliseconds: timestamp).inSeconds.remainder(60))}')
+                          '$characteristic  ${Duration(milliseconds: timestamp).inHours < 1 ? '' : '${Duration(milliseconds: timestamp).inHours}:'}${Duration(milliseconds: timestamp).inMinutes.remainder(60) < 10 ? '0${Duration(milliseconds: timestamp).inMinutes.remainder(60)}' : Duration(milliseconds: timestamp).inMinutes.remainder(60)}:${(Duration(milliseconds: timestamp).inSeconds.remainder(60) < 10 ? '0${Duration(milliseconds: timestamp).inSeconds.remainder(60)}' : Duration(milliseconds: timestamp).inSeconds.remainder(60))}')
                     ],
                   ),
                   contentPadding: const EdgeInsets.all(0.0),
@@ -625,7 +629,49 @@ class _CharacteristicTileState extends State<CharacteristicTile> {
                         style: Theme.of(context).textTheme.subtitle1,
                       ),
                       Text(
-                        '| A |: ${sqrt(pow(acceleration[0] / 16384.0, 2) + pow(acceleration[1] / 16384.0, 2) + pow(acceleration[2] / 16384.0, 2)).toStringAsFixed(2)} g\nAx:  ${(acceleration[0] / 16384.0).toStringAsFixed(2)} g\nAy:  ${(acceleration[1] / 16384.0).toStringAsFixed(2)} g\nAz:  ${(acceleration[2] / 16384.0).toStringAsFixed(2)} g',
+                          '| A |: ${sqrt(pow(acceleration[0] / 16384.0, 2) + pow(acceleration[1] / 16384.0, 2) + pow(acceleration[2] / 16384.0, 2)).toStringAsFixed(2)} g'),
+                      Wrap(
+                        spacing: 10,
+                        children: [
+                          Text(
+                            'Ax: ${(acceleration[0] / 16384.0).toStringAsFixed(2)} g',
+                          ),
+                          Text(
+                            'Ay: ${(acceleration[1] / 16384.0).toStringAsFixed(2)} g',
+                          ),
+                          Text(
+                            'Az: ${(acceleration[2] / 16384.0).toStringAsFixed(2)} g',
+                          ),
+                          /* SizedBox(
+                            height: MediaQuery.of(context).size.height / 4,
+                            width: MediaQuery.of(context).size.width,
+                            //https://medium.com/analytics-vidhya/the-versatility-of-the-grammar-of-graphics-d1366760424d
+
+                            child: Chart(
+                              data: widget.logs,
+                              variables: {
+                                'timestamp': Variable(
+                                  accessor: (Log log) => log.timestamp,
+                                  scale: TimeScale(
+                                      formatter: (date) =>
+                                          '${date.hour}:${date.minute < 10 ? '0${date.minute}' : date.minute}:${date.second < 10 ? '0${date.second}' : date.second}'),
+                                ),
+                                'speed': Variable(
+                                    accessor: (Log log) => log.gps.speed,
+                                    scale: LinearScale(
+                                        title: 'Speed',
+                                        formatter: (number) => '$number km/h')),
+                              },
+                              coord: RectCoord(),
+                              elements: [LineElement()],
+                              rebuild: true,
+                              axes: [
+                                Defaults.horizontalAxis,
+                                Defaults.verticalAxis,
+                              ],
+                            ),
+                          ),*/
+                        ],
                       )
                     ],
                   ),
@@ -634,14 +680,14 @@ class _CharacteristicTileState extends State<CharacteristicTile> {
                 trailing: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
-                    IconButton(
+                    /* IconButton(
                       icon: Icon(
                         Icons.file_download,
                         color:
                             Theme.of(context).iconTheme.color?.withOpacity(0.5),
                       ),
                       onPressed: widget.onReadPressed,
-                    ),
+                    ),*/
                     IconButton(
                       icon: Icon(
                           widget.characteristic.isNotifying
@@ -685,8 +731,22 @@ class _CharacteristicTileState extends State<CharacteristicTile> {
                         style: Theme.of(context).textTheme.subtitle1,
                       ),
                       Text(
-                        '| V |: ${sqrt(pow(speed[0], 2) + pow(speed[1], 2) + pow(speed[2], 2)).toStringAsFixed(2)} m/s\nVx:  ${speed[0].toStringAsFixed(2)} m/s\nVy:  ${speed[1].toStringAsFixed(2)} m/s\nVz:  ${(speed[2]).toStringAsFixed(2)} m/s\n',
-                      )
+                        '| V |: ${sqrt(pow(speed[0], 2) + pow(speed[1], 2) + pow(speed[2], 2)).toStringAsFixed(2)} m/s',
+                      ),
+                      Wrap(
+                        spacing: 10,
+                        children: [
+                          Text(
+                            'Vx: ${speed[0].toStringAsFixed(2)} m/s',
+                          ),
+                          Text(
+                            'Vy: ${speed[1].toStringAsFixed(2)} m/s',
+                          ),
+                          Text(
+                            'Vz: ${(speed[2]).toStringAsFixed(2)} m/s',
+                          ),
+                        ],
+                      ),
                     ],
                   ),
                   contentPadding: const EdgeInsets.all(0.0),
@@ -744,9 +804,17 @@ class _CharacteristicTileState extends State<CharacteristicTile> {
                         characteristic,
                         style: Theme.of(context).textTheme.subtitle1,
                       ),
-                      Text(
-                        'Pitch:  ${gyroscope[0]}°\nRoll:  ${gyroscope[1]}°',
-                      )
+                      Wrap(
+                        spacing: 10,
+                        children: [
+                          Text(
+                            'Pitch: ${gyroscope[0]}°',
+                          ),
+                          Text(
+                            'Roll: ${gyroscope[1]}°',
+                          )
+                        ],
+                      ),
                     ],
                   ),
                   contentPadding: const EdgeInsets.all(0.0),
@@ -802,9 +870,17 @@ class _CharacteristicTileState extends State<CharacteristicTile> {
                         characteristic,
                         style: Theme.of(context).textTheme.subtitle1,
                       ),
-                      Text(
-                        'Lat: ${gps[0]}\nLng: ${gps[1]}',
-                      )
+                      Wrap(
+                        spacing: 10,
+                        children: [
+                          Text(
+                            'Lat: ${gps[0]}',
+                          ),
+                          Text(
+                            'Lng: ${gps[1]}',
+                          )
+                        ],
+                      ),
                     ],
                   ),
                   contentPadding: const EdgeInsets.all(0.0),
@@ -896,6 +972,16 @@ class BLEServiceHelper {
   }
 }
 
+enum BLESystemCharacteristic { timestamp, battery, temperature, unknown }
+
+enum BLETelemetryCharacteristic {
+  accelerometer,
+  speed,
+  gyroscope,
+  gps,
+  unknown
+}
+
 enum BLECharacteristic {
   timestamp,
   batteryLevel,
@@ -919,6 +1005,36 @@ class BLECharacteristicHelper {
         return BLECharacteristic.batteryLevel;
       case kBLETemperatureCharacteristic:
         return BLECharacteristic.temperature;
+
+      ///Telemetry Service
+      case kBLEAccelerometerCharacteristic:
+        return BLECharacteristic.accelerometer;
+      case kBLESpeedCharacteristic:
+        return BLECharacteristic.speed;
+      case kBLEGyroscopeCharacteristic:
+        return BLECharacteristic.gyroscope;
+      case kBLEGpsCharacteristic:
+        return BLECharacteristic.gps;
+    }
+    return BLECharacteristic.unknown;
+  }
+
+  static BLESystemCharacteristic systemCharacteristicPicker(String input) {
+    switch (input) {
+
+      ///System Service
+      case kBLETimestampCharacteristic:
+        return BLESystemCharacteristic.timestamp;
+      case kBLEBatteryLevelCharacteristic:
+        return BLESystemCharacteristic.battery;
+      case kBLETemperatureCharacteristic:
+        return BLESystemCharacteristic.temperature;
+    }
+    return BLESystemCharacteristic.unknown;
+  }
+
+  static BLECharacteristic telemetryCharacteristicPicker(String input) {
+    switch (input) {
 
       ///Telemetry Service
       case kBLEAccelerometerCharacteristic:
