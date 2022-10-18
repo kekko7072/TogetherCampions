@@ -612,9 +612,6 @@ PODS:
     - Firebase/Functions (= 9.6.0)
     - firebase_core
     - Flutter
-  - connectivity_plus (0.0.1):
-    - Flutter
-    - ReachabilitySwift
   - DKImagePickerController/Core (4.3.4):
     - DKImagePickerController/ImageDataManager
     - DKImagePickerController/Resource
@@ -833,25 +830,19 @@ PODS:
     - nanopb/encode (= 2.30909.0)
   - nanopb/decode (2.30909.0)
   - nanopb/encode (2.30909.0)
-  - network_info_plus (0.0.1):
-    - Flutter
   - open_settings (0.0.1):
     - Flutter
   - PromisesObjC (2.1.1)
   - Protobuf (3.21.6)
-  - ReachabilitySwift (5.0.0)
   - SDWebImage (5.13.3):
     - SDWebImage/Core (= 5.13.3)
   - SDWebImage/Core (5.13.3)
   - SwiftyGif (5.4.3)
-  - wifi_iot (0.0.1):
-    - Flutter
 
 DEPENDENCIES:
   - battery_plus (from `.symlinks/plugins/battery_plus/ios`)
   - cloud_firestore (from `.symlinks/plugins/cloud_firestore/ios`)
   - cloud_functions (from `.symlinks/plugins/cloud_functions/ios`)
-  - connectivity_plus (from `.symlinks/plugins/connectivity_plus/ios`)
   - file_picker (from `.symlinks/plugins/file_picker/ios`)
   - firebase_app_check (from `.symlinks/plugins/firebase_app_check/ios`)
   - firebase_auth (from `.symlinks/plugins/firebase_auth/ios`)
@@ -860,9 +851,7 @@ DEPENDENCIES:
   - Flutter (from `Flutter`)
   - flutter_blue_plus (from `.symlinks/plugins/flutter_blue_plus/ios`)
   - geolocator_apple (from `.symlinks/plugins/geolocator_apple/ios`)
-  - network_info_plus (from `.symlinks/plugins/network_info_plus/ios`)
   - open_settings (from `.symlinks/plugins/open_settings/ios`)
-  - wifi_iot (from `.symlinks/plugins/wifi_iot/ios`)
 
 SPEC REPOS:
   trunk:
@@ -895,7 +884,6 @@ SPEC REPOS:
     - nanopb
     - PromisesObjC
     - Protobuf
-    - ReachabilitySwift
     - SDWebImage
     - SwiftyGif
 
@@ -906,8 +894,6 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/cloud_firestore/ios"
   cloud_functions:
     :path: ".symlinks/plugins/cloud_functions/ios"
-  connectivity_plus:
-    :path: ".symlinks/plugins/connectivity_plus/ios"
   file_picker:
     :path: ".symlinks/plugins/file_picker/ios"
   firebase_app_check:
@@ -924,12 +910,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/flutter_blue_plus/ios"
   geolocator_apple:
     :path: ".symlinks/plugins/geolocator_apple/ios"
-  network_info_plus:
-    :path: ".symlinks/plugins/network_info_plus/ios"
   open_settings:
     :path: ".symlinks/plugins/open_settings/ios"
-  wifi_iot:
-    :path: ".symlinks/plugins/wifi_iot/ios"
 
 SPEC CHECKSUMS:
   abseil: ebe5b5529fb05d93a8bdb7951607be08b7fa71bc
@@ -937,7 +919,6 @@ SPEC CHECKSUMS:
   BoringSSL-GRPC: 3175b25143e648463a56daeaaa499c6cb86dad33
   cloud_firestore: 49d69be2b924677f2974d8b38acc705c9908c09b
   cloud_functions: 3cd07c4445edc98e17d5786922c3ebe71146c399
-  connectivity_plus: 413a8857dd5d9f1c399a39130850d02fe0feaf7e
   DKImagePickerController: b512c28220a2b8ac7419f21c491fc8534b7601ac
   DKPhotoGallery: fdfad5125a9fdda9cc57df834d49df790dbb4179
   file_picker: 817ab1d8cd2da9d2da412a417162deee3500fc95
@@ -971,14 +952,11 @@ SPEC CHECKSUMS:
   leveldb-library: 50c7b45cbd7bf543c81a468fe557a16ae3db8729
   Libuv-gRPC: 55e51798e14ef436ad9bc45d12d43b77b49df378
   nanopb: b552cce312b6c8484180ef47159bc0f65a1f0431
-  network_info_plus: b78876159360f5580608c2cea620d6ceffabd0ad
   open_settings: 9628e736cb2738fd1dc84159565755c214478158
   PromisesObjC: ab77feca74fa2823e7af4249b8326368e61014cb
   Protobuf: e7846f61e8542750cf311385fc633c1d00928f9f
-  ReachabilitySwift: 985039c6f7b23a1da463388634119492ff86c825
   SDWebImage: af5bbffef2cde09f148d826f9733dcde1a9414cd
   SwiftyGif: 6c3eafd0ce693cad58bb63d2b2fb9bacb8552780
-  wifi_iot: b5aafd6f9b52f8a357383a1deabab45f31cd602d
 
 PODFILE CHECKSUM: 4e8f8b2be68aeea4c0d5beb6ff1e79fface1d048
 

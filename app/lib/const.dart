@@ -3,16 +3,19 @@ String kServerAddress = "together-champions.ew.r.appspot.com";
 
 String kDeviceName = "TKR1A1";
 
-//Bluetooth
-const String kBLEBatteryLevelService = "2A19";
-const String kBLEAccelerometerService = "2001";
-const String kBLETemperatureService = "2002";
-const String kBLEGyroscopeService = "2003";
-const String kBLEGpsService = "2004";
+///BLUETOOTH SERVICE
+const String kBLESystemService = "1000";
+const String kBLETelemetryService = "2000";
 
-///Clock factory limits
-int kClockMin = 6;
-int kClockMax = 6;
+///BLUETOOTH CHARACTERISTIC
+const String kBLETimestampCharacteristic = "1001";
+const String kBLEBatteryLevelCharacteristic = "1002";
+const String kBLETemperatureCharacteristic = "1003";
+
+const String kBLEAccelerometerCharacteristic = "2001";
+const String kBLESpeedCharacteristic = "2002";
+const String kBLEGyroscopeCharacteristic = "2003";
+const String kBLEGpsCharacteristic = "2004";
 
 ///Frequency factory limits
 int kFrequencyMin = 1;

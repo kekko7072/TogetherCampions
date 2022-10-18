@@ -337,10 +337,6 @@ class ScanResultTile extends StatelessWidget {
       title: _buildTitle(context),
       leading: Text(result.rssi.toString()),
       trailing: ElevatedButton(
-        style: ElevatedButton.styleFrom(
-          primary: Colors.black,
-          onPrimary: Colors.white,
-        ),
         onPressed: (result.advertisementData.connectable) ? onTap : null,
         child: const Text('CONNECT'),
       ),
@@ -431,51 +427,179 @@ class _CharacteristicTileState extends State<CharacteristicTile> {
         debugPrint(
             '\nCharacteristic: ${widget.characteristic.uuid.toString().toUpperCase().substring(4, 8)}\n');
 
+        BLECharacteristic bleCharacteristic =
+            BLECharacteristicHelper.characteristicPicker(widget
+                .characteristic.uuid
+                .toString()
+                .toUpperCase()
+                .substring(4, 8));
+
+        String characteristic =
+            BLECharacteristicHelper.characteristicPickerName(bleCharacteristic);
+
         ///PARSE
-        switch (BLEServiceHelper.servicePicker(widget.characteristic.uuid
-            .toString()
-            .toUpperCase()
-            .substring(4, 8))) {
-          case BLEService.batteryLevel:
-            return ExpansionTile(
-              title: ListTile(
-                title: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
+        switch (bleCharacteristic) {
+          case BLECharacteristic.timestamp:
+            {
+              int timestamp = 0;
+
+              if (value != null) {
+                ByteBuffer buffer = Int8List.fromList(value).buffer;
+                ByteData byteData = ByteData.view(buffer);
+                try {
+                  timestamp = byteData.getInt32(0, Endian.little);
+                } catch (e) {
+                  debugPrint("\nERROR: $e\n");
+                }
+              }
+              return ExpansionTile(
+                title: ListTile(
+                  title: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Text(characteristic),
+                      Text(
+                          'Start ${DateTime.now().subtract(Duration(microseconds: timestamp))}')
+                    ],
+                  ),
+                  contentPadding: const EdgeInsets.all(0.0),
+                ),
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
-                    Text(
-                        '${value.toString().replaceAll('[', "").replaceAll(']', "")} %')
+                    IconButton(
+                      icon: Icon(
+                        Icons.file_download,
+                        color:
+                            Theme.of(context).iconTheme.color?.withOpacity(0.5),
+                      ),
+                      onPressed: widget.onReadPressed,
+                    ),
+                    IconButton(
+                      icon: Icon(
+                          widget.characteristic.isNotifying
+                              ? Icons.sync_disabled
+                              : Icons.sync,
+                          color: Theme.of(context)
+                              .iconTheme
+                              .color
+                              ?.withOpacity(0.5)),
+                      onPressed: widget.onNotificationPressed,
+                    )
                   ],
                 ),
-                contentPadding: const EdgeInsets.all(0.0),
-              ),
-              trailing: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  IconButton(
-                    icon: Icon(
-                      Icons.file_download,
-                      color:
-                          Theme.of(context).iconTheme.color?.withOpacity(0.5),
-                    ),
-                    onPressed: widget.onReadPressed,
+                // children: descriptorTiles,
+              );
+            }
+          case BLECharacteristic.batteryLevel:
+            {
+              int batteryLevel = 0;
+
+              if (value != null) {
+                ByteBuffer buffer = Int8List.fromList(value).buffer;
+                ByteData byteData = ByteData.view(buffer);
+                try {
+                  batteryLevel = byteData.getInt32(0, Endian.little);
+                } catch (e) {
+                  debugPrint("\nERROR: $e\n");
+                }
+              }
+              return ExpansionTile(
+                title: ListTile(
+                  title: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Text(
+                        '$characteristic  $batteryLevel %',
+                        style: Theme.of(context).textTheme.subtitle1,
+                      ),
+                    ],
                   ),
-                  IconButton(
-                    icon: Icon(
-                        widget.characteristic.isNotifying
-                            ? Icons.sync_disabled
-                            : Icons.sync,
-                        color: Theme.of(context)
-                            .iconTheme
-                            .color
-                            ?.withOpacity(0.5)),
-                    onPressed: widget.onNotificationPressed,
-                  )
-                ],
-              ),
-              // children: descriptorTiles,
-            );
-          case BLEService.accelerometer:
+                  contentPadding: const EdgeInsets.all(0.0),
+                ),
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    IconButton(
+                      icon: Icon(
+                        Icons.file_download,
+                        color:
+                            Theme.of(context).iconTheme.color?.withOpacity(0.5),
+                      ),
+                      onPressed: widget.onReadPressed,
+                    ),
+                    IconButton(
+                      icon: Icon(
+                          widget.characteristic.isNotifying
+                              ? Icons.sync_disabled
+                              : Icons.sync,
+                          color: Theme.of(context)
+                              .iconTheme
+                              .color
+                              ?.withOpacity(0.5)),
+                      onPressed: widget.onNotificationPressed,
+                    )
+                  ],
+                ),
+                // children: descriptorTiles,
+              );
+            }
+          case BLECharacteristic.temperature:
+            {
+              double temperature = 0;
+              if (value != null) {
+                ByteBuffer buffer = Int8List.fromList(value).buffer;
+                ByteData byteData = ByteData.view(buffer);
+                try {
+                  temperature = byteData.getFloat32(0, Endian.little);
+                } catch (e) {
+                  debugPrint("\nERROR: $e\n");
+                }
+              }
+              return ExpansionTile(
+                title: ListTile(
+                  title: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Text(
+                        '$characteristic  ${temperature.toStringAsFixed(2)} °C',
+                        style: Theme.of(context).textTheme.subtitle1,
+                      ),
+                    ],
+                  ),
+                  contentPadding: const EdgeInsets.all(0.0),
+                ),
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    IconButton(
+                      icon: Icon(
+                        Icons.file_download,
+                        color:
+                            Theme.of(context).iconTheme.color?.withOpacity(0.5),
+                      ),
+                      onPressed: widget.onReadPressed,
+                    ),
+                    IconButton(
+                      icon: Icon(
+                          widget.characteristic.isNotifying
+                              ? Icons.sync_disabled
+                              : Icons.sync,
+                          color: Theme.of(context)
+                              .iconTheme
+                              .color
+                              ?.withOpacity(0.5)),
+                      onPressed: widget.onNotificationPressed,
+                    )
+                  ],
+                ),
+              );
+            }
+
+          case BLECharacteristic.accelerometer:
             {
               ///X, Y, Z
               List<int> acceleration = [0, 0, 0];
@@ -498,7 +622,11 @@ class _CharacteristicTileState extends State<CharacteristicTile> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
                       Text(
-                        'X:  ${(acceleration[0] / 16384.0).roundToDouble()} g\nY:  ${(acceleration[1] / 16384.0).roundToDouble()} g\nZ:  ${(acceleration[2] / 16384.0).roundToDouble()} g',
+                        characteristic,
+                        style: Theme.of(context).textTheme.subtitle1,
+                      ),
+                      Text(
+                        '| A |: ${sqrt(pow(acceleration[0] / 16384.0, 2) + pow(acceleration[1] / 16384.0, 2) + pow(acceleration[2] / 16384.0, 2)).toStringAsFixed(2)} g\nAx:  ${(acceleration[0] / 16384.0).toStringAsFixed(2)} g\nAy:  ${(acceleration[1] / 16384.0).toStringAsFixed(2)} g\nAz:  ${(acceleration[2] / 16384.0).toStringAsFixed(2)} g',
                       )
                     ],
                   ),
@@ -531,14 +659,18 @@ class _CharacteristicTileState extends State<CharacteristicTile> {
                 // children: descriptorTiles,
               );
             }
-          case BLEService.temperature:
+          case BLECharacteristic.speed:
             {
-              double temperature = 0;
+              ///X, Y, Z
+              List<double> speed = [0, 0, 0];
+
               if (value != null) {
                 ByteBuffer buffer = Int8List.fromList(value).buffer;
                 ByteData byteData = ByteData.view(buffer);
                 try {
-                  temperature = byteData.getFloat32(0, Endian.little);
+                  speed[0] = byteData.getFloat32(0, Endian.little);
+                  speed[1] = byteData.getFloat32(4, Endian.little);
+                  speed[2] = byteData.getFloat32(8, Endian.little);
                 } catch (e) {
                   debugPrint("\nERROR: $e\n");
                 }
@@ -550,7 +682,11 @@ class _CharacteristicTileState extends State<CharacteristicTile> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
                       Text(
-                        '${temperature.roundToDouble()} °C',
+                        characteristic,
+                        style: Theme.of(context).textTheme.subtitle1,
+                      ),
+                      Text(
+                        '| V |: ${sqrt(pow(speed[0], 2) + pow(speed[1], 2) + pow(speed[2], 2)).toStringAsFixed(2)} m/s\nVx:  ${speed[0].toStringAsFixed(2)} m/s\nVy:  ${speed[1].toStringAsFixed(2)} m/s\nVz:  ${(speed[2]).toStringAsFixed(2)} m/s\n',
                       )
                     ],
                   ),
@@ -580,9 +716,11 @@ class _CharacteristicTileState extends State<CharacteristicTile> {
                     )
                   ],
                 ),
+                // children: descriptorTiles,
               );
             }
-          case BLEService.gyroscope:
+
+          case BLECharacteristic.gyroscope:
             {
               ///PITCH, ROLL
               List<int> gyroscope = [0, 0, 0];
@@ -603,6 +741,10 @@ class _CharacteristicTileState extends State<CharacteristicTile> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
+                      Text(
+                        characteristic,
+                        style: Theme.of(context).textTheme.subtitle1,
+                      ),
                       Text(
                         'Pitch:  ${gyroscope[0]}°\nRoll:  ${gyroscope[1]}°',
                       )
@@ -637,7 +779,7 @@ class _CharacteristicTileState extends State<CharacteristicTile> {
                 // children: descriptorTiles,
               );
             }
-          case BLEService.gps:
+          case BLECharacteristic.gps:
             {
               List<double> gps = [0, 0];
 
@@ -657,6 +799,10 @@ class _CharacteristicTileState extends State<CharacteristicTile> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
+                      Text(
+                        characteristic,
+                        style: Theme.of(context).textTheme.subtitle1,
+                      ),
                       Text(
                         'Lat: ${gps[0]}\nLng: ${gps[1]}',
                       )
@@ -691,8 +837,7 @@ class _CharacteristicTileState extends State<CharacteristicTile> {
                 // children: descriptorTiles,
               );
             }
-            break;
-          case BLEService.unknown:
+          case BLECharacteristic.unknown:
             return const Padding(
               padding: EdgeInsets.all(10.0),
               child: CircularProgressIndicator(),
@@ -726,45 +871,90 @@ class AdapterStateTile extends StatelessWidget {
   }
 }
 
-enum BLEService {
-  batteryLevel,
-  accelerometer,
-  temperature,
-  gyroscope,
-  gps,
-  unknown
-}
+enum BLEService { systemService, telemetryService, unknown }
 
 class BLEServiceHelper {
+  ///SERVICE
   static BLEService servicePicker(String input) {
     switch (input) {
-      case kBLEBatteryLevelService:
-        return BLEService.batteryLevel;
-      case kBLEAccelerometerService:
-        return BLEService.accelerometer;
-      case kBLETemperatureService:
-        return BLEService.temperature;
-      case kBLEGyroscopeService:
-        return BLEService.gyroscope;
-      case kBLEGpsService:
-        return BLEService.gps;
+      case kBLESystemService:
+        return BLEService.systemService;
+      case kBLETelemetryService:
+        return BLEService.telemetryService;
     }
     return BLEService.unknown;
   }
 
   static String servicePickerName(BLEService input) {
     switch (input) {
-      case BLEService.batteryLevel:
-        return 'Battery Level';
-      case BLEService.accelerometer:
-        return 'Accelerometer';
-      case BLEService.temperature:
-        return 'Temperature';
-      case BLEService.gyroscope:
-        return 'Gyroscope';
-      case BLEService.gps:
-        return 'GPS';
+      case BLEService.systemService:
+        return 'System Service';
+      case BLEService.telemetryService:
+        return 'Telemetry Service';
       case BLEService.unknown:
+        return 'Unknown';
+    }
+  }
+}
+
+enum BLECharacteristic {
+  timestamp,
+  batteryLevel,
+  temperature,
+  accelerometer,
+  speed,
+  gyroscope,
+  gps,
+  unknown
+}
+
+class BLECharacteristicHelper {
+  ///CHARACTERISTIC
+  static BLECharacteristic characteristicPicker(String input) {
+    switch (input) {
+
+      ///System Service
+      case kBLETimestampCharacteristic:
+        return BLECharacteristic.timestamp;
+      case kBLEBatteryLevelCharacteristic:
+        return BLECharacteristic.batteryLevel;
+      case kBLETemperatureCharacteristic:
+        return BLECharacteristic.temperature;
+
+      ///Telemetry Service
+      case kBLEAccelerometerCharacteristic:
+        return BLECharacteristic.accelerometer;
+      case kBLESpeedCharacteristic:
+        return BLECharacteristic.speed;
+      case kBLEGyroscopeCharacteristic:
+        return BLECharacteristic.gyroscope;
+      case kBLEGpsCharacteristic:
+        return BLECharacteristic.gps;
+    }
+    return BLECharacteristic.unknown;
+  }
+
+  static String characteristicPickerName(BLECharacteristic input) {
+    switch (input) {
+
+      ///System Service
+      case BLECharacteristic.timestamp:
+        return 'Timestamp';
+      case BLECharacteristic.batteryLevel:
+        return 'Battery Level';
+      case BLECharacteristic.temperature:
+        return 'Temperature';
+
+      ///Telemetry Service
+      case BLECharacteristic.accelerometer:
+        return 'Accelerometer';
+      case BLECharacteristic.speed:
+        return 'Speed';
+      case BLECharacteristic.gyroscope:
+        return 'Gyroscope';
+      case BLECharacteristic.gps:
+        return 'Gps';
+      case BLECharacteristic.unknown:
         return 'Unknown';
     }
   }

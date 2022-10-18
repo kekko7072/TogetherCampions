@@ -75,16 +75,6 @@ class Track extends StatefulWidget {
 }
 
 class _TrackState extends State<Track> {
-  final info = NetworkInfo();
-  DeviceData? deviceData;
-
-  int time = 2;
-
-  @override
-  void initState() {
-    super.initState();
-  }
-
   @override
   Widget build(BuildContext context) {
     final userData = Provider.of<UserData?>(context);
