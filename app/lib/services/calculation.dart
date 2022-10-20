@@ -336,6 +336,9 @@ class CalculationService {
             int.parse(originalTimestamp.last.replaceAll("timestamp=", ""))));
   }
 
+  static String chartTimestamp(DateTime date) =>
+      '${date.hour}:${date.minute < 10 ? '0${date.minute}' : date.minute}:${date.second < 10 ? '0${date.second}' : date.second}';
+
   static double mediumAcceleration(ThreeDimensionalValueInt input) =>
       sqrt(pow(input.x / 16384.0, 2) +
           pow(input.y / 16384.0, 2) +

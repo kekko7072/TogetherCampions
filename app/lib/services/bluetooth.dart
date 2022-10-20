@@ -543,12 +543,12 @@ class _CharacteristicTileState extends State<CharacteristicTile> {
                             data: batteryLevels,
                             variables: {
                               'timestamp': Variable(
-                                accessor: (MonoDimensionalValueInt log) =>
-                                    log.timestamp,
-                                scale: TimeScale(
-                                    formatter: (date) =>
-                                        '${date.hour}:${date.minute < 10 ? '0${date.minute}' : date.minute}:${date.second < 10 ? '0${date.second}' : date.second}'),
-                              ),
+                                  accessor: (MonoDimensionalValueInt log) =>
+                                      log.timestamp,
+                                  scale: TimeScale(
+                                      formatter: (date) =>
+                                          CalculationService.chartTimestamp(
+                                              date))),
                               'battery': Variable(
                                 accessor: (MonoDimensionalValueInt log) =>
                                     log.value,
@@ -632,12 +632,12 @@ class _CharacteristicTileState extends State<CharacteristicTile> {
                             data: temperatures,
                             variables: {
                               'timestamp': Variable(
-                                accessor: (MonoDimensionalValueDouble log) =>
-                                    log.timestamp,
-                                scale: TimeScale(
-                                    formatter: (date) =>
-                                        '${date.hour}:${date.minute < 10 ? '0${date.minute}' : date.minute}:${date.second < 10 ? '0${date.second}' : date.second}'),
-                              ),
+                                  accessor: (MonoDimensionalValueDouble log) =>
+                                      log.timestamp,
+                                  scale: TimeScale(
+                                      formatter: (date) =>
+                                          CalculationService.chartTimestamp(
+                                              date))),
                               'temperature': Variable(
                                 accessor: (MonoDimensionalValueDouble log) =>
                                     log.value,
@@ -738,12 +738,13 @@ class _CharacteristicTileState extends State<CharacteristicTile> {
                                 data: accelerations,
                                 variables: {
                                   'timestamp': Variable(
-                                    accessor: (ThreeDimensionalValueInt log) =>
-                                        log.timestamp,
-                                    scale: TimeScale(
-                                        formatter: (date) =>
-                                            '${date.hour}:${date.minute < 10 ? '0${date.minute}' : date.minute}:${date.second < 10 ? '0${date.second}' : date.second}'),
-                                  ),
+                                      accessor:
+                                          (ThreeDimensionalValueInt log) =>
+                                              log.timestamp,
+                                      scale: TimeScale(
+                                          formatter: (date) =>
+                                              CalculationService.chartTimestamp(
+                                                  date))),
                                   'acceleration': Variable(
                                     accessor: (ThreeDimensionalValueInt log) =>
                                         sqrt(pow(log.x / 16384.0, 2) +
@@ -848,13 +849,13 @@ class _CharacteristicTileState extends State<CharacteristicTile> {
                                 data: speeds,
                                 variables: {
                                   'timestamp': Variable(
-                                    accessor:
-                                        (ThreeDimensionalValueDouble log) =>
-                                            log.timestamp,
-                                    scale: TimeScale(
-                                        formatter: (date) =>
-                                            '${date.hour}:${date.minute < 10 ? '0${date.minute}' : date.minute}:${date.second < 10 ? '0${date.second}' : date.second}'),
-                                  ),
+                                      accessor:
+                                          (ThreeDimensionalValueDouble log) =>
+                                              log.timestamp,
+                                      scale: TimeScale(
+                                          formatter: (date) =>
+                                              CalculationService.chartTimestamp(
+                                                  date))),
                                   'speed': Variable(
                                     accessor:
                                         (ThreeDimensionalValueDouble log) =>
@@ -956,13 +957,11 @@ class _CharacteristicTileState extends State<CharacteristicTile> {
                                       data: gyroscopes,
                                       variables: {
                                         'timestamp': Variable(
-                                          accessor:
-                                              (ThreeDimensionalValueInt log) =>
-                                                  log.timestamp,
-                                          scale: TimeScale(
-                                              formatter: (date) =>
-                                                  '${date.hour}:${date.minute < 10 ? '0${date.minute}' : date.minute}:${date.second < 10 ? '0${date.second}' : date.second}'),
-                                        ),
+                                            accessor: (ThreeDimensionalValueInt
+                                                    log) =>
+                                                log.timestamp,
+                                            scale: TimeScale(
+                                                formatter: (date) => '')),
                                         'pitch': Variable(
                                           accessor:
                                               (ThreeDimensionalValueInt log) =>
@@ -1002,8 +1001,7 @@ class _CharacteristicTileState extends State<CharacteristicTile> {
                                               (ThreeDimensionalValueInt log) =>
                                                   log.timestamp,
                                           scale: TimeScale(
-                                              formatter: (date) =>
-                                                  '${date.hour}:${date.minute < 10 ? '0${date.minute}' : date.minute}:${date.second < 10 ? '0${date.second}' : date.second}'),
+                                              formatter: (date) => ''),
                                         ),
                                         'pitch': Variable(
                                           accessor:
@@ -1102,6 +1100,8 @@ class _CharacteristicTileState extends State<CharacteristicTile> {
                           ],
                         ),
                         //TODO add track map
+                      ] else ...[
+                        Text('Waiting $characteristic data...')
                       ],
                     ],
                   ),
