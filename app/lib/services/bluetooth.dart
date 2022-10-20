@@ -553,7 +553,8 @@ class _CharacteristicTileState extends State<CharacteristicTile> {
                                 accessor: (MonoDimensionalValueInt log) =>
                                     log.value,
                                 scale: LinearScale(
-                                    formatter: (number) => '$number %'),
+                                    formatter: (number) =>
+                                        '${number.toInt()} %'),
                               ),
                             },
                             coord: RectCoord(),
@@ -640,7 +641,7 @@ class _CharacteristicTileState extends State<CharacteristicTile> {
                                               date))),
                               'temperature': Variable(
                                 accessor: (MonoDimensionalValueDouble log) =>
-                                    log.value,
+                                    log.value.roundToDouble(),
                                 scale: LinearScale(
                                     formatter: (number) =>
                                         '${number.toStringAsFixed(2)} °C'),
@@ -760,6 +761,95 @@ class _CharacteristicTileState extends State<CharacteristicTile> {
                                 axes: [
                                   Defaults.horizontalAxis,
                                   Defaults.verticalAxis,
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 10),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Expanded(
+                              child: Column(
+                                children: [
+                                  Text(
+                                    'Pitch: ${CalculationService.pitch(accelerations.last)}°',
+                                  ),
+                                  SizedBox(
+                                    height: 100,
+
+                                    //https://medium.com/analytics-vidhya/the-versatility-of-the-grammar-of-graphics-d1366760424d
+
+                                    child: Chart(
+                                      data: accelerations,
+                                      variables: {
+                                        'timestamp': Variable(
+                                            accessor: (ThreeDimensionalValueInt
+                                                    log) =>
+                                                log.timestamp,
+                                            scale: TimeScale(
+                                                formatter: (date) => '')),
+                                        'pitch': Variable(
+                                          accessor:
+                                              (ThreeDimensionalValueInt log) =>
+                                                  CalculationService.pitch(log)
+                                                      .roundToDouble(),
+                                          scale: LinearScale(
+                                              formatter: (number) =>
+                                                  '${number.roundToDouble()} °'),
+                                        ),
+                                      },
+                                      coord: PolarCoord(),
+                                      elements: [LineElement()],
+                                      rebuild: true,
+                                      axes: [
+                                        Defaults.horizontalAxis,
+                                        Defaults.verticalAxis,
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Expanded(
+                              child: Column(
+                                children: [
+                                  Text(
+                                    'Roll: ${CalculationService.roll(accelerations.last)}°',
+                                  ),
+                                  SizedBox(
+                                    height: 100,
+                                    //https://medium.com/analytics-vidhya/the-versatility-of-the-grammar-of-graphics-d1366760424d
+                                    child: Chart(
+                                      data: accelerations,
+                                      variables: {
+                                        'timestamp': Variable(
+                                          accessor:
+                                              (ThreeDimensionalValueInt log) =>
+                                                  log.timestamp,
+                                          scale: TimeScale(
+                                              formatter: (date) => ''),
+                                        ),
+                                        'roll': Variable(
+                                          accessor:
+                                              (ThreeDimensionalValueInt log) =>
+                                                  CalculationService.roll(log)
+                                                      .toInt(),
+                                          scale: LinearScale(
+                                              formatter: (number) =>
+                                                  '${number.toInt()} °'),
+                                        ),
+                                      },
+                                      coord: PolarCoord(),
+                                      elements: [LineElement()],
+                                      rebuild: true,
+                                      axes: [
+                                        Defaults.horizontalAxis,
+                                        Defaults.verticalAxis,
+                                      ],
+                                    ),
+                                  ),
                                 ],
                               ),
                             ),
@@ -937,92 +1027,17 @@ class _CharacteristicTileState extends State<CharacteristicTile> {
                         style: Theme.of(context).textTheme.subtitle1,
                       ),
                       if (gyroscopes.isNotEmpty) ...[
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
+                        Wrap(
+                          spacing: 10,
                           children: [
-                            Expanded(
-                              child: Column(
-                                children: [
-                                  Text(
-                                    'Pitch: ${CalculationService.pitch(gyroscopes.last)}°',
-                                  ),
-                                  SizedBox(
-                                    height:
-                                        MediaQuery.of(context).size.height / 4,
-                                    width:
-                                        MediaQuery.of(context).size.width / 2,
-                                    //https://medium.com/analytics-vidhya/the-versatility-of-the-grammar-of-graphics-d1366760424d
-
-                                    child: Chart(
-                                      data: gyroscopes,
-                                      variables: {
-                                        'timestamp': Variable(
-                                            accessor: (ThreeDimensionalValueInt
-                                                    log) =>
-                                                log.timestamp,
-                                            scale: TimeScale(
-                                                formatter: (date) => '')),
-                                        'pitch': Variable(
-                                          accessor:
-                                              (ThreeDimensionalValueInt log) =>
-                                                  CalculationService.pitch(log),
-                                          scale: LinearScale(
-                                              formatter: (number) =>
-                                                  '${number.toStringAsFixed(2)} °'),
-                                        ),
-                                      },
-                                      coord: PolarCoord(),
-                                      elements: [LineElement()],
-                                      rebuild: true,
-                                      axes: [
-                                        Defaults.horizontalAxis,
-                                        Defaults.verticalAxis,
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
+                            Text(
+                              'Rx: ${(gyroscopes.last.x / 131.0).toStringAsFixed(2)} °',
                             ),
-                            Expanded(
-                              child: Column(
-                                children: [
-                                  Text(
-                                    'Roll: ${CalculationService.roll(gyroscopes.last)}°',
-                                  ),
-                                  SizedBox(
-                                    height:
-                                        MediaQuery.of(context).size.height / 4,
-                                    //https://medium.com/analytics-vidhya/the-versatility-of-the-grammar-of-graphics-d1366760424d
-                                    child: Chart(
-                                      data: gyroscopes,
-                                      variables: {
-                                        'timestamp': Variable(
-                                          accessor:
-                                              (ThreeDimensionalValueInt log) =>
-                                                  log.timestamp,
-                                          scale: TimeScale(
-                                              formatter: (date) => ''),
-                                        ),
-                                        'pitch': Variable(
-                                          accessor:
-                                              (ThreeDimensionalValueInt log) =>
-                                                  CalculationService.roll(log),
-                                          scale: LinearScale(
-                                              formatter: (number) =>
-                                                  '$number °'),
-                                        ),
-                                      },
-                                      coord: PolarCoord(),
-                                      elements: [LineElement()],
-                                      rebuild: true,
-                                      axes: [
-                                        Defaults.horizontalAxis,
-                                        Defaults.verticalAxis,
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
+                            Text(
+                              'Ry: ${(gyroscopes.last.y / 131.0).toStringAsFixed(2)} °',
+                            ),
+                            Text(
+                              'Rz: ${(gyroscopes.last.z / 131.0).toStringAsFixed(2)} °',
                             ),
                           ],
                         ),
