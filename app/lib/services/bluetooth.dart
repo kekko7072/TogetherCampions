@@ -885,14 +885,14 @@ class _CharacteristicTileState extends State<CharacteristicTile> {
                 trailing: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
-                    IconButton(
+                    /*IconButton(
                       icon: Icon(
                         Icons.file_download,
                         color:
                             Theme.of(context).iconTheme.color?.withOpacity(0.5),
                       ),
                       onPressed: widget.onReadPressed,
-                    ),
+                    ),*/
                     IconButton(
                       icon: Icon(
                           widget.characteristic.isNotifying
@@ -936,73 +936,97 @@ class _CharacteristicTileState extends State<CharacteristicTile> {
                         style: Theme.of(context).textTheme.subtitle1,
                       ),
                       if (gyroscopes.isNotEmpty) ...[
-                        Text(
-                          'Pitch: ${CalculationService.pitch(gyroscopes.last)}°',
-                        ),
-                        SizedBox(
-                          height: MediaQuery.of(context).size.height / 4,
-                          width: MediaQuery.of(context).size.width,
-                          //https://medium.com/analytics-vidhya/the-versatility-of-the-grammar-of-graphics-d1366760424d
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Expanded(
+                              child: Column(
+                                children: [
+                                  Text(
+                                    'Pitch: ${CalculationService.pitch(gyroscopes.last)}°',
+                                  ),
+                                  SizedBox(
+                                    height:
+                                        MediaQuery.of(context).size.height / 4,
+                                    width:
+                                        MediaQuery.of(context).size.width / 2,
+                                    //https://medium.com/analytics-vidhya/the-versatility-of-the-grammar-of-graphics-d1366760424d
 
-                          child: Chart(
-                            data: gyroscopes,
-                            variables: {
-                              'timestamp': Variable(
-                                accessor: (ThreeDimensionalValueInt log) =>
-                                    log.timestamp,
-                                scale: TimeScale(
-                                    formatter: (date) =>
-                                        '${date.hour}:${date.minute < 10 ? '0${date.minute}' : date.minute}:${date.second < 10 ? '0${date.second}' : date.second}'),
+                                    child: Chart(
+                                      data: gyroscopes,
+                                      variables: {
+                                        'timestamp': Variable(
+                                          accessor:
+                                              (ThreeDimensionalValueInt log) =>
+                                                  log.timestamp,
+                                          scale: TimeScale(
+                                              formatter: (date) =>
+                                                  '${date.hour}:${date.minute < 10 ? '0${date.minute}' : date.minute}:${date.second < 10 ? '0${date.second}' : date.second}'),
+                                        ),
+                                        'pitch': Variable(
+                                          accessor:
+                                              (ThreeDimensionalValueInt log) =>
+                                                  CalculationService.pitch(log),
+                                          scale: LinearScale(
+                                              formatter: (number) =>
+                                                  '${number.toStringAsFixed(2)} °'),
+                                        ),
+                                      },
+                                      coord: PolarCoord(),
+                                      elements: [LineElement()],
+                                      rebuild: true,
+                                      axes: [
+                                        Defaults.horizontalAxis,
+                                        Defaults.verticalAxis,
+                                      ],
+                                    ),
+                                  ),
+                                ],
                               ),
-                              'pitch': Variable(
-                                accessor: (ThreeDimensionalValueInt log) =>
-                                    CalculationService.pitch(log),
-                                scale: LinearScale(
-                                    formatter: (number) => '$number °'),
+                            ),
+                            Expanded(
+                              child: Column(
+                                children: [
+                                  Text(
+                                    'Roll: ${CalculationService.roll(gyroscopes.last)}°',
+                                  ),
+                                  SizedBox(
+                                    height:
+                                        MediaQuery.of(context).size.height / 4,
+                                    //https://medium.com/analytics-vidhya/the-versatility-of-the-grammar-of-graphics-d1366760424d
+                                    child: Chart(
+                                      data: gyroscopes,
+                                      variables: {
+                                        'timestamp': Variable(
+                                          accessor:
+                                              (ThreeDimensionalValueInt log) =>
+                                                  log.timestamp,
+                                          scale: TimeScale(
+                                              formatter: (date) =>
+                                                  '${date.hour}:${date.minute < 10 ? '0${date.minute}' : date.minute}:${date.second < 10 ? '0${date.second}' : date.second}'),
+                                        ),
+                                        'pitch': Variable(
+                                          accessor:
+                                              (ThreeDimensionalValueInt log) =>
+                                                  CalculationService.roll(log),
+                                          scale: LinearScale(
+                                              formatter: (number) =>
+                                                  '$number °'),
+                                        ),
+                                      },
+                                      coord: PolarCoord(),
+                                      elements: [LineElement()],
+                                      rebuild: true,
+                                      axes: [
+                                        Defaults.horizontalAxis,
+                                        Defaults.verticalAxis,
+                                      ],
+                                    ),
+                                  ),
+                                ],
                               ),
-                            },
-                            coord: RectCoord(),
-                            elements: [LineElement()],
-                            rebuild: true,
-                            axes: [
-                              Defaults.horizontalAxis,
-                              Defaults.verticalAxis,
-                            ],
-                          ),
-                        ),
-                        Text(
-                          'Roll: ${CalculationService.roll(gyroscopes.last)}°',
-                        ),
-                        SizedBox(
-                          height: MediaQuery.of(context).size.height / 4,
-                          width: MediaQuery.of(context).size.width,
-                          //https://medium.com/analytics-vidhya/the-versatility-of-the-grammar-of-graphics-d1366760424d
-
-                          child: Chart(
-                            data: gyroscopes,
-                            variables: {
-                              'timestamp': Variable(
-                                accessor: (ThreeDimensionalValueInt log) =>
-                                    log.timestamp,
-                                scale: TimeScale(
-                                    formatter: (date) =>
-                                        '${date.hour}:${date.minute < 10 ? '0${date.minute}' : date.minute}:${date.second < 10 ? '0${date.second}' : date.second}'),
-                              ),
-                              'pitch': Variable(
-                                accessor: (ThreeDimensionalValueInt log) =>
-                                    CalculationService.roll(log),
-                                scale: LinearScale(
-                                    formatter: (number) => '$number °'),
-                              ),
-                            },
-                            coord: RectCoord(),
-                            elements: [LineElement()],
-                            rebuild: true,
-                            axes: [
-                              Defaults.horizontalAxis,
-                              Defaults.verticalAxis,
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
                       ] else ...[
                         Text('Waiting $characteristic data...')
@@ -1014,14 +1038,14 @@ class _CharacteristicTileState extends State<CharacteristicTile> {
                 trailing: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
-                    IconButton(
+                    /* IconButton(
                       icon: Icon(
                         Icons.file_download,
                         color:
                             Theme.of(context).iconTheme.color?.withOpacity(0.5),
                       ),
                       onPressed: widget.onReadPressed,
-                    ),
+                    ),*/
                     IconButton(
                       icon: Icon(
                           widget.characteristic.isNotifying
