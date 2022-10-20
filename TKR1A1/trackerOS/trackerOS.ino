@@ -1,7 +1,5 @@
 #include <ArduinoBLE.h>
 #include <Arduino_MKRGPS.h>
-#include <SPI.h>
-#include <SD.h>
 #include <Wire.h>
 #include "timestamp.h"
 #include "battery.h"
@@ -41,12 +39,12 @@ const int MPU = 0x68;  // I2C address of the MPU-6050
 
 
 void setup() {
-  if (debug_mode) {
+  
     Serial.begin(9600);  // initialize serial communication
     /*while (!Serial)
       ;  //starts the program if we open the serial monitor.
       */
-  }
+  
 
   pinMode(LED_BUILTIN, OUTPUT);  // initialize the built-in LED pin to indicate when a central is connected
 
@@ -56,13 +54,12 @@ void setup() {
 
   //BLE
   if (!BLE.begin()) {
-    if (debug_mode)
+  
       Serial.println("Starting Bluetooth® Low Energy failed!");
     while (1)
       ;
   }
-  BLE.setEventHandler(BLEConnected, ConnectHandler);
-  BLE.setEventHandler(BLEDisconnected, DisconnectHandler);
+
 
   // set advertised local name and service UUID:
   BLE.setDeviceName("TKR1A1");  //Setting a name that will appear when scanning for Bluetooth® devices
@@ -101,32 +98,39 @@ void setup() {
   Wire.write(0);     // set to zero (wakes up the MPU-6050)
   Wire.endTransmission(true);
 
-  //GPS
-  if (debug_mode)
-    Serial.print("Intializing  GPS:  ");
-  if (!GPS.begin()) {
-    if (debug_mode)
+  //GPS 
+  
+  /*
+  !!!GPS USING I2C IS MAKING DEVICE NOT WORKING ON REBOOT 
+  AFTHER TEST PASS ON BEGIN GPS.begin(GPS_MODE_SHIELD) so it will work on reboot.
+  1)Soder the given pin to the GPS board
+  2)Test mounting the shield as hat to arduino mkr
+  3)Test on rebot using sampel created on desktop (GPS_TEST)
+
+    Serial.print("Intializing  GPS:  "); 
+  if (!GPS.begin(GPS_MODE_SHIELD)) {
+   
       Serial.println("Failed to initialize GPS!");
     while (1)
       ;
   }
-  if (debug_mode) {
+  
     Serial.print("OK");
     Serial.println();
-  }
+  */
 
-  if (debug_mode)
     Serial.println(" Bluetooth® device active, waiting for connections...");
 }
 
 void loop() {
+  
   BLEDevice central = BLE.central();  // wait for a Bluetooth® Low Energy central
-  //BLE.poll();
+ 
   if (central) {  // if a central is connected to the peripheral
-    if (debug_mode) {
+   
       Serial.print("Connected to central: ");
       Serial.println(central.address());  // print the central's BT address
-    }
+    
 
     digitalWrite(LED_BUILTIN, HIGH);  // turn on the LED to indicate the connection
 
@@ -135,43 +139,25 @@ void loop() {
       long currentMillis = millis();
 
       if (currentMillis - previousMillis >= measurements_milliseconds) {
-        //System
-        updateTimestamp(timestampCharacteristic);
-        updateBatteryLevel(batteryLevelCharacteristic, oldBatteryLevel);
-        updateTemperature(temperatureCharacteristic, MPU);
+      //System
+      updateTimestamp(timestampCharacteristic);
+      updateBatteryLevel(batteryLevelCharacteristic);
+      updateTemperature(temperatureCharacteristic, MPU);
 
-        //Telemetry
-        updateAcceleration(accelerometerCharacteristic, MPU);
-        updateSpeed(currentMillis - previousMillis, speedCharacteristic, MPU);
-        updateGyroscope(gyroscopeCharacteristic, MPU);
-        updateGps(gpsCharacteristic);
+      //Telemetry
+       updateAcceleration(accelerometerCharacteristic, MPU);
+      updateSpeed(currentMillis - previousMillis, speedCharacteristic, MPU);
+      updateGyroscope(gyroscopeCharacteristic, MPU);
+      //updateGps(gpsCharacteristic);
 
         previousMillis = currentMillis;  //Clean to re-run cicle
       }
     }
     //Disconnected
     digitalWrite(LED_BUILTIN, LOW);
-    if (debug_mode) {
+    
       Serial.print("Disconnected from central: ");
       Serial.println(central.address());
-    }
+    
   }
-}
-
-void ConnectHandler(BLEDevice central) {
-  // central connected event handler
-  if (debug_mode) {
-    Serial.print("Connected event, central: ");
-    Serial.println(central.address());
-  }
-  BLE.advertise();
-}
-
-void DisconnectHandler(BLEDevice central) {
-  // central disconnected event handlerù
-  if (debug_mode) {
-    Serial.print("Disconnected event, central: ");
-    Serial.println(central.address());
-  }
-  BLE.advertise();
 }

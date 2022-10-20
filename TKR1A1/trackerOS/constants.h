@@ -1,12 +1,9 @@
-/*
-  Define if running on debug or production
-*/
-#define debug_mode true
+
 
 /*
   Define time between each measurements in ms
 */
-#define measurements_milliseconds 200
+#define measurements_milliseconds 333
 /*
   SD CARD chip protocol
 */

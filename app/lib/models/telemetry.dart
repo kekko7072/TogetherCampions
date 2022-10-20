@@ -45,3 +45,51 @@ class Battery {
   final double maxVoltage;
   final double minVoltage;
 }
+
+class MonoDimensionalValueInt {
+  MonoDimensionalValueInt({
+    required this.value,
+    required this.timestamp,
+  });
+
+  final int value;
+  final DateTime timestamp;
+}
+
+class MonoDimensionalValueDouble {
+  MonoDimensionalValueDouble({
+    required this.value,
+    required this.timestamp,
+  });
+
+  final double value;
+  final DateTime timestamp;
+}
+
+class ThreeDimensionalValueInt {
+  ThreeDimensionalValueInt({
+    required this.x,
+    required this.y,
+    required this.z,
+    required this.timestamp,
+  });
+
+  final int x;
+  final int y;
+  final int z;
+  final DateTime timestamp;
+}
+
+class ThreeDimensionalValueDouble {
+  ThreeDimensionalValueDouble({
+    required this.x,
+    required this.y,
+    required this.z,
+    required this.timestamp,
+  });
+
+  final double x;
+  final double y;
+  final double z;
+  final DateTime timestamp;
+}

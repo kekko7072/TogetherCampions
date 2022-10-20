@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'imports.dart';
 
 class CalculationService {
+  ///MAP
   static int findFastestLogFromList(List<Log> list) {
     int i = 0;
     double speed = 0;
@@ -334,4 +335,19 @@ class CalculationService {
         milliseconds:
             int.parse(originalTimestamp.last.replaceAll("timestamp=", ""))));
   }
+
+  static double mediumAcceleration(ThreeDimensionalValueInt input) =>
+      sqrt(pow(input.x / 16384.0, 2) +
+          pow(input.y / 16384.0, 2) +
+          pow(input.z / 16384.0, 2));
+
+  static double mediumSpeed(ThreeDimensionalValueDouble input) =>
+      sqrt(pow(input.x, 2) + pow(input.y, 2) + pow(input.z, 2));
+
+  static int pitch(ThreeDimensionalValueInt input) =>
+      (atan2(input.x, sqrt(input.y * input.y + input.z * input.z)) * 57.3)
+          .toInt();
+
+  static int roll(ThreeDimensionalValueInt input) =>
+      (atan2(input.y, input.z) * 57.3).toInt();
 }
