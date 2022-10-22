@@ -1,4 +1,4 @@
-import 'package:flutter_blue_plus/flutter_blue_plus.dart';
+import 'imports.dart';
 
 class BluetoothHelper {
   static String formatUUID(Guid uuid) =>

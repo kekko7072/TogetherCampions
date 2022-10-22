@@ -1,4 +1,3 @@
-import '../widgets/ble_device_screen.dart';
 import '../../services/imports.dart';
 
 class BLEFindDevices extends StatelessWidget {

@@ -51,7 +51,8 @@ export 'package:app/interfaces/pages/track.dart';
 
 ///##Screens
 export 'package:app/interfaces/screens/session_map.dart';
-export 'package:app/interfaces/widgets/track_map.dart';
+export 'package:app/interfaces/screens/ble_find_device.dart';
+export 'package:app/interfaces/screens/ble_device_screen.dart';
 
 ///##Widgets
 export 'package:app/interfaces/widgets/card_telemetry.dart';
@@ -64,12 +65,15 @@ export 'package:app/interfaces/widgets/card_log.dart';
 export 'package:app/interfaces/widgets/card_device.dart';
 export 'package:app/interfaces/widgets/add_edit_device.dart';
 export 'package:app/interfaces/widgets/data_visualization.dart';
+export 'package:app/interfaces/widgets/track_map.dart';
 
 ///MODELS
 export 'package:app/models/device.dart';
 export 'package:app/models/log.dart';
 export 'package:app/models/user.dart';
 export 'package:app/models/telemetry.dart';
+export 'package:app/models/ble_characteristic.dart';
+export 'package:app/models/ble_service.dart';
 
 ///SERVICES
 export 'package:app/services/database_log.dart';
@@ -78,4 +82,5 @@ export 'package:app/services/database_device.dart';
 export 'package:app/services/auth.dart';
 export 'package:app/services/calculation.dart';
 export 'package:app/services/style.dart';
-export '../../services/map_helper.dart';
+export 'package:app/services/map_helper.dart';
+export 'package:app/services/bluetooth_helper.dart';

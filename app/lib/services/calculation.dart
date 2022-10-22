@@ -1,12 +1,7 @@
-import 'package:app/interfaces/screens/ble_find_device.dart';
-import 'package:app/services/map_helper.dart';
 import 'package:intl/intl.dart';
-
 import 'imports.dart';
 
 class CalculationService {
-  ///MAP
-
   static double roundDouble({required double number, required int decimal}) {
     return double.parse(number.toStringAsFixed(decimal));
   }

@@ -1,10 +1,6 @@
 import 'package:app/services/imports.dart';
 import 'package:flutter/cupertino.dart';
 
-import '../../models/ble_characteristic.dart';
-import '../screens/ble_find_device.dart';
-import '../../services/bluetooth_helper.dart';
-
 class BLEDeviceScreen extends StatefulWidget {
   const BLEDeviceScreen({Key? key, required this.device}) : super(key: key);
 
