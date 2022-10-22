@@ -31,8 +31,8 @@ class TrackMapState extends State<TrackMap> {
 
     _mapController = MapTileLayerController();
 
-    _zoomPanBehavior = CalculationService.initialCameraPosition(
-        list: polylinePoints, isPreview: false);
+    _zoomPanBehavior =
+        MapHelper.initialCameraPosition(list: polylinePoints, isPreview: false);
   }
 
   @override
@@ -428,6 +428,83 @@ class TrackMapState extends State<TrackMap> {
           ),
         ),
       ],
+    );
+  }
+}
+
+///NEW TRACK MAP BUT USE OLD STYLE
+class DeviceLocationBLE extends StatefulWidget {
+  const DeviceLocationBLE({Key? key, required this.logs}) : super(key: key);
+  final List<Log> logs;
+
+  @override
+  State<DeviceLocationBLE> createState() => DeviceLocationBLEState();
+}
+
+class DeviceLocationBLEState extends State<DeviceLocationBLE> {
+  late Log start;
+
+  late MapTileLayerController _mapController;
+
+  late MapZoomPanBehavior _zoomPanBehavior;
+
+  @override
+  void initState() {
+    super.initState();
+
+    start = widget.logs.first;
+
+    _mapController = MapTileLayerController();
+
+    _zoomPanBehavior = MapZoomPanBehavior(
+      zoomLevel: 15,
+      minZoomLevel: 3,
+      maxZoomLevel: 30,
+      focalLatLng: start.gps.latLng,
+      showToolbar: false,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 130,
+      width: MediaQuery.of(context).size.width,
+      clipBehavior: Clip.hardEdge,
+      decoration: const BoxDecoration(
+          borderRadius: BorderRadius.all(Radius.circular(10))),
+      child: SfMaps(
+        layers: <MapLayer>[
+          MapTileLayer(
+            urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+            zoomPanBehavior: _zoomPanBehavior,
+            controller: _mapController,
+            initialMarkersCount: widget.logs.length,
+            tooltipSettings: const MapTooltipSettings(
+              color: Colors.white,
+            ),
+            markerTooltipBuilder: (BuildContext context, int index) {
+              return Container();
+            },
+            markerBuilder: (BuildContext context, int index) {
+              return MapMarker(
+                latitude: widget.logs[index].gps.latLng.latitude,
+                longitude: widget.logs[index].gps.latLng.longitude,
+                alignment: Alignment.bottomCenter,
+                child: FittedBox(
+                  child: Icon(Icons.location_on,
+                      color: index == 0 || index == widget.logs.length - 1
+                          ? AppStyle.primaryColor
+                          : AppStyle.primaryColor,
+                      size: index == 0 || index == widget.logs.length - 1
+                          ? 50
+                          : 20),
+                ),
+              );
+            },
+          ),
+        ],
+      ),
     );
   }
 }

@@ -68,30 +68,42 @@ class _AddEditDeviceState extends State<AddEditDevice> {
                       spacing: 10,
                       children: [
                         FilterChip(
-                            backgroundColor: model.text == 'TKR1A1' ? AppStyle.primaryColor : Colors.white,
+                            backgroundColor: model.text == 'TKR1A1'
+                                ? AppStyle.primaryColor
+                                : Colors.white,
                             label: Text(
                               'TKR1A1',
-                              style: TextStyle(fontWeight: model.text == 'TKR1A1' ? FontWeight.bold : FontWeight.normal, color: Colors.white),
+                              style: TextStyle(
+                                  fontWeight: model.text == 'TKR1A1'
+                                      ? FontWeight.bold
+                                      : FontWeight.normal,
+                                  color: Colors.white),
                             ),
-                            onSelected: (value) => setState(() => model.text = 'TKR1A1')),
+                            onSelected: (value) =>
+                                setState(() => model.text = 'TKR1A1')),
                       ],
                     ),
                     Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 20),
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 5.0, horizontal: 20),
                       child: TextFormField(
                         controller: id,
                         textAlign: TextAlign.center,
-                        decoration: AppStyle().kTextFieldDecoration(icon: CupertinoIcons.number, hintText: 'Enter device serial number'),
+                        decoration: AppStyle().kTextFieldDecoration(
+                            icon: CupertinoIcons.number,
+                            hintText: 'Enter device serial number'),
                       ),
                     ),
                   ],
                   const SizedBox(height: 10),
                   Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 20),
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 5.0, horizontal: 20),
                     child: TextFormField(
                       controller: name,
                       textAlign: TextAlign.center,
-                      decoration: AppStyle().kTextFieldDecoration(icon: Icons.edit, hintText: 'Enter device name'),
+                      decoration: AppStyle().kTextFieldDecoration(
+                          icon: Icons.edit, hintText: 'Enter device name'),
                     ),
                   ),
                   Row(
@@ -99,7 +111,9 @@ class _AddEditDeviceState extends State<AddEditDevice> {
                       Expanded(
                         flex: 1,
                         child: CupertinoButton(
-                          onPressed: clock == kFrequencyMin ? null : () => setState(() => --frequency),
+                          onPressed: clock == 1
+                              ? null
+                              : () => setState(() => --frequency),
                           child: const Icon(CupertinoIcons.minus_circle),
                         ),
                       ),
@@ -113,7 +127,9 @@ class _AddEditDeviceState extends State<AddEditDevice> {
                       Expanded(
                         flex: 1,
                         child: CupertinoButton(
-                          onPressed: clock == kFrequencyMax ? null : () => setState(() => ++frequency),
+                          onPressed: clock == 12
+                              ? null
+                              : () => setState(() => ++frequency),
                           child: const Icon(CupertinoIcons.add_circled),
                         ),
                       ),

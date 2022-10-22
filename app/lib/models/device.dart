@@ -1,3 +1,4 @@
+@Deprecated('WITH BLE DEVICE IS NO MORE NECESSARY')
 enum Mode { realtime, record, sync }
 
 class Device {
@@ -19,12 +20,18 @@ class Device {
   final String modelName;
   final String uid;
   final String name;
+  @Deprecated('WITH BLE DEVICE IS NO MORE NECESSARY')
   final int clock;
+  @Deprecated('WITH BLE DEVICE IS NO MORE NECESSARY')
   final int frequency;
+  @Deprecated('WITH BLE DEVICE IS NO MORE NECESSARY')
   final bool sdCardAvailable;
   //@Deprecated
+  @Deprecated('WITH BLE DEVICE IS NO MORE NECESSARY')
   final Mode mode;
   final Software software;
+
+  ///TODO add DEVICE POSITION IN SPACE (x,y,z) to create an inertial system
 }
 
 class Software {

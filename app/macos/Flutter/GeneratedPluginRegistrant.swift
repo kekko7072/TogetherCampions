@@ -5,7 +5,7 @@
 import FlutterMacOS
 import Foundation
 
-import battery_plus_macos
+import battery_plus
 import cloud_firestore
 import cloud_functions
 import firebase_app_check

@@ -3,7 +3,7 @@
 #
 
 list(APPEND FLUTTER_PLUGIN_LIST
-  battery_plus_windows
+  battery_plus
   flutter_libserialport
   geolocator_windows
 )

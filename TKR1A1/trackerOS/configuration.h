@@ -33,45 +33,23 @@
 */
 #define DEVICE_SERIAL_NUMBER "AAAA0000AAAA"
 
-/*
-  CLOCK: Is the time the code run in loop fetching data from GPS to SERVER [aproximatly]. 
-    Ex. clock = 60  Means run 60 times then data are send
-*/
-#define DEVICE_CLOCK 6
 
-/* 
-  Sim parameters for connction of GPRS service
-*/
-#define SIM_PIN "1503"             //[WIND-TRE] "" || [TIM] "" || [THINGS MOBILE] 1503 not working
-#define SIM_APN "TM"  // [WIND-TRE] internet.it || [TIM] "ibox.tim.it" || [THINGS MOBILE] TM not working
-#define SIM_LOGIN ""           // replace with your GPRS login
-#define SIM_PASSWORD ""        // replace with your GPRS password
+
 
 
 
 /// ADVANCED SETTINGS
-
+//MUX
+#define MUX_ADDR 0x70  // TCA9548A Encoders address
+//MPU-6050
+#define MPU_ADDR 0x68  // I2C address of the MPU-6050
+//COMPASS
+#define HMC5883L_ADDR 0x1E  //0011110b, I2C 7bit address of HMC5883
 /*
-  Server address and enpionds witch are used to store data on the cloud.
-  Link to dashboard: https://console.cloud.google.com/appengine?project=together-champions&supportedpurview=project&serviceId=default
+  Define time between each measurements in ms
 */
-#define SERVER_ADDRESS "together-champions.ew.r.appspot.com"
-#define SERVER_SETTINGS "/settings?serialNumber="
-#define SERVER_INITIALIZE "/initialize?serialNumber="
-#define SERVER_POST "/post?serialNumber="
-
+#define measurements_milliseconds 333
 /*
-  SWITCH meaning and pinouts
-    CLOUD_SDCARD: Switch beteen CLOUD or SDCARD
+  SD CARD chip protocol
 */
-#define CLOUD_SDCARD 1
-
-/*
-  LED meaning and pinouts
-    GREEN: System ok all working
-    YELLOW: System saving on SDCARD
-    RED: Error on system
-*/
-#define LED_GREEN 2
-#define LED_YELLOW 3
-#define LED_RED 4
+#define chip_select 4

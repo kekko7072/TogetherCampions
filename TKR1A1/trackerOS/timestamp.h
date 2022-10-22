@@ -1,4 +1,4 @@
-#include "constants.h"
+
 
 void updateTimestamp(BLECharacteristic characteristic) {
   /* 
@@ -6,5 +6,5 @@ void updateTimestamp(BLECharacteristic characteristic) {
   */
   int timestamp = millis();
 
-  characteristic.setValue((byte *)&timestamp, 12);
+  characteristic.setValue((byte *)&timestamp, 4);
 }

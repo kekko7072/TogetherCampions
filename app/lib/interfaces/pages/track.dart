@@ -1,6 +1,6 @@
 import 'package:app/services/imports.dart';
 import 'package:flutter/cupertino.dart';
-import '../../services/bluetooth.dart';
+import '../screens/ble_find_device.dart';
 
 class Track extends StatefulWidget {
   const Track({Key? key}) : super(key: key);
@@ -55,7 +55,7 @@ class _TrackState extends State<Track> {
 
                           return snapshot.hasData
                               ? state == BluetoothState.on
-                                  ? const FindDevicesScreen()
+                                  ? const BLEFindDevices()
                                   : Column(
                                       mainAxisAlignment:
                                           MainAxisAlignment.center,

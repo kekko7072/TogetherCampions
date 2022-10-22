@@ -1,8 +1,16 @@
-void updateAcceleration(BLECharacteristic characteristic, int MPU) {
-  Wire.beginTransmission(MPU);
+void setupMPU() {
+  Wire.begin();
+  Wire.beginTransmission(MPU_ADDR);
+  Wire.write(0x6B);  // PWR_MGMT_1 register
+  Wire.write(0);     // set to zero (wakes up the MPU-6050)
+  Wire.endTransmission(true);
+}
+
+void updateAcceleration(BLECharacteristic characteristic) {
+  Wire.beginTransmission(MPU_ADDR);
   Wire.write(0x3B);  // starting with register 0x3B (ACCEL_XOUT_H)
   Wire.endTransmission(false);
-  Wire.requestFrom(MPU, 14, true);               // request a total of 14 registers
+  Wire.requestFrom(MPU_ADDR, 14, true);          // request a total of 14 registers
   int16_t AcX = Wire.read() << 8 | Wire.read();  // 0x3B (ACCEL_XOUT_H) & 0x3C (ACCEL_XOUT_L)
   int16_t AcY = Wire.read() << 8 | Wire.read();  // 0x3D (ACCEL_YOUT_H) & 0x3E (ACCEL_YOUT_L)
   int16_t AcZ = Wire.read() << 8 | Wire.read();  // 0x3F (ACCEL_ZOUT_H) & 0x40 (ACCEL_ZOUT_L)
@@ -17,20 +25,22 @@ void updateAcceleration(BLECharacteristic characteristic, int MPU) {
   Serial.println(AcZ - 16384.0);  //AcZ - 16384.0 to make it inertail from the device position
 
 
-  int eulers[3];
+  int eulers[4];
   eulers[0] = AcX;
   eulers[1] = AcY;
-  eulers[2] = AcZ - 16384.0;
+  eulers[2] = AcZ;
+  eulers[3] = millis();
 
   // Send 3x eulers over bluetooth as 1x byte array
-  characteristic.setValue((byte *)&eulers, 12);
+  characteristic.setValue((byte *)&eulers, 16);
 }
 
-void updateSpeed(int timePassed, BLECharacteristic characteristic, int MPU) {
-  Wire.beginTransmission(MPU);
+/*
+void updateSpeed(int timePassed, BLECharacteristic characteristic) {
+  Wire.beginTransmission(MPU_ADDR);
   Wire.write(0x3B);  // starting with register 0x3B (ACCEL_XOUT_H)
   Wire.endTransmission(false);
-  Wire.requestFrom(MPU, 14, true);               // request a total of 14 registers
+  Wire.requestFrom(MPU_ADDR, 14, true);          // request a total of 14 registers
   int16_t AcX = Wire.read() << 8 | Wire.read();  // 0x3B (ACCEL_XOUT_H) & 0x3C (ACCEL_XOUT_L)
   int16_t AcY = Wire.read() << 8 | Wire.read();  // 0x3D (ACCEL_YOUT_H) & 0x3E (ACCEL_YOUT_L)
   int16_t AcZ = Wire.read() << 8 | Wire.read();  // 0x3F (ACCEL_ZOUT_H) & 0x40 (ACCEL_ZOUT_L)
@@ -60,38 +70,36 @@ void updateSpeed(int timePassed, BLECharacteristic characteristic, int MPU) {
 
   // Send 3x eulers over bluetooth as 1x byte array
   characteristic.setValue((byte *)&eulers, 12);
-}
+}*/
 
-void updateTemperature(BLECharacteristic characteristic, int MPU) {
-  Wire.beginTransmission(MPU);
-  Wire.write(0x3B);  // starting with register 0x3B (ACCEL_XOUT_H)
+void updateTemperature(BLECharacteristic characteristic) {
+
+  Wire.beginTransmission(MPU_ADDR);
+  Wire.write(0x41);  // starting with register 0x3B (ACCEL_XOUT_H)
   Wire.endTransmission(false);
-  Wire.requestFrom(MPU, 14, true);               // request a total of 14 registers
-  int16_t AcX = Wire.read() << 8 | Wire.read();  // 0x3B (ACCEL_XOUT_H) & 0x3C (ACCEL_XOUT_L)
-  int16_t AcY = Wire.read() << 8 | Wire.read();  // 0x3D (ACCEL_YOUT_H) & 0x3E (ACCEL_YOUT_L)
-  int16_t AcZ = Wire.read() << 8 | Wire.read();  // 0x3F (ACCEL_ZOUT_H) & 0x40 (ACCEL_ZOUT_L)
-  int16_t Tmp = Wire.read() << 8 | Wire.read();  // 0x41 (TEMP_OUT_H) & 0x42 (TEMP_OUT_L)
+  Wire.requestFrom(MPU_ADDR, 14, true);          // request a total of 14 registers
+  int16_t temperature = Wire.read() << 8 | Wire.read();  // 0x41 (TEMP_OUT_H) & 0x42 (TEMP_OUT_L)
 
   //equation for temperature in degrees C from datasheet
-  float temperature = Tmp / 340.00 + 36.53;
+  //float temperature = Tmp / 340.00 + 36.53;
 
   Serial.print("Temperature: ");
   Serial.print(temperature);
   Serial.println(" C ");
 
+  int eulers[2];
+  eulers[0] = temperature;
+  eulers[1] = millis();
 
-  characteristic.setValue((byte *)&temperature, 12);
+  characteristic.setValue((byte *)&eulers, 8);
 }
 
-void updateGyroscope(BLECharacteristic characteristic, int MPU) {
-  Wire.beginTransmission(MPU);
-  Wire.write(0x3B);  // starting with register 0x3B (ACCEL_XOUT_H)
+void updateGyroscope(BLECharacteristic characteristic) {
+  Wire.beginTransmission(MPU_ADDR);
+  Wire.write(0x43);  // starting with register 0x3B (ACCEL_XOUT_H)
   Wire.endTransmission(false);
-  Wire.requestFrom(MPU, 14, true);               // request a total of 14 registers
-  int16_t AcX = Wire.read() << 8 | Wire.read();  // 0x3B (ACCEL_XOUT_H) & 0x3C (ACCEL_XOUT_L)
-  int16_t AcY = Wire.read() << 8 | Wire.read();  // 0x3D (ACCEL_YOUT_H) & 0x3E (ACCEL_YOUT_L)
-  int16_t AcZ = Wire.read() << 8 | Wire.read();  // 0x3F (ACCEL_ZOUT_H) & 0x40 (ACCEL_ZOUT_L)
-  int16_t Tmp = Wire.read() << 8 | Wire.read();  // 0x41 (TEMP_OUT_H) & 0x42 (TEMP_OUT_L)
+  Wire.requestFrom(MPU_ADDR, 14, true);  // request a total of 14 registers
+
   int16_t GyX = Wire.read() << 8 | Wire.read();  // 0x43 (GYRO_XOUT_H) & 0x44 (GYRO_XOUT_L)
   int16_t GyY = Wire.read() << 8 | Wire.read();  // 0x45 (GYRO_YOUT_H) & 0x46 (GYRO_YOUT_L)
   int16_t GyZ = Wire.read() << 8 | Wire.read();  // 0x47 (GYRO_ZOUT_H) & 0x48 (GYRO_ZOUT_L)
@@ -106,22 +114,16 @@ void updateGyroscope(BLECharacteristic characteristic, int MPU) {
   Serial.print(" | Z = ");
   Serial.println(GyZ);
   Serial.println(" ");
-  //PITC pitch = 180 * atan2(accelX, sqrt(accelY*accelY + accelZ*accelZ))/PI;
-  Serial.print("Pitch: ");
-  Serial.print(atan2(AcX, sqrt(AcY * AcY + AcZ * AcZ)) * 57.3);
-  //roll = 180 * atan2(accelY, sqrt(accelX*accelX + accelZ*accelZ))/PI
-  Serial.print(" | Roll: ");
-  Serial.print(atan2(AcY, AcZ) * 57.3);
-  Serial.println(" ");
 
 
-  int eulers[3];
-  eulers[0] = AcX;
-  eulers[1] = AcY;
-  eulers[2] = AcZ;
+  int eulers[4];
+  eulers[0] = GyX;
+  eulers[1] = GyY;
+  eulers[2] = GyZ;
+  eulers[3] = millis();
 
   // Send 3x eulers over bluetooth as 1x byte array
-  characteristic.setValue((byte *)&eulers, 12);
+  characteristic.setValue((byte *)&eulers, 16);
 
   //Save data on SDCARD
 }

@@ -53,7 +53,7 @@ class MonoDimensionalValueInt {
   });
 
   final int value;
-  final DateTime timestamp;
+  final int timestamp;
 }
 
 class MonoDimensionalValueDouble {
@@ -63,7 +63,7 @@ class MonoDimensionalValueDouble {
   });
 
   final double value;
-  final DateTime timestamp;
+  final int timestamp;
 }
 
 class ThreeDimensionalValueInt {
@@ -77,7 +77,7 @@ class ThreeDimensionalValueInt {
   final int x;
   final int y;
   final int z;
-  final DateTime timestamp;
+  final int timestamp;
 }
 
 class ThreeDimensionalValueDouble {
@@ -91,5 +91,5 @@ class ThreeDimensionalValueDouble {
   final double x;
   final double y;
   final double z;
-  final DateTime timestamp;
+  final int timestamp;
 }

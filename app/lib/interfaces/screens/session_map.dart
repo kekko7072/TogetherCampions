@@ -47,12 +47,12 @@ class SessionMapState extends State<SessionMap>
     telemetry = CalculationService.telemetry(
         logs: widget.logs, segment: polylinePoints);
 
-    indexFastestLog = CalculationService.findFastestLogFromList(widget.logs);
+    indexFastestLog = MapHelper.findFastestLogFromList(widget.logs);
 
     _mapController = MapTileLayerController();
 
-    _zoomPanBehavior = CalculationService.initialCameraPosition(
-        list: polylinePoints, isPreview: false);
+    _zoomPanBehavior =
+        MapHelper.initialCameraPosition(list: polylinePoints, isPreview: false);
 
     _animationController = AnimationController(
       duration: Duration(seconds: widget.logs.length ~/ durationDivision),

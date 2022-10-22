@@ -1,11 +1,13 @@
-#include "constants.h"
-
 void updateBatteryLevel(BLECharacteristic characteristic) {
   /* Read the current voltage level on the A0 analog input pin.
      This is used here to simulate the charge level of a battery.
   */
-  float voltage = analogRead(ADC_BATTERY) * 5.0 / 1023;  //(4.3 / 1023.0)
-  int batteryLevel = map(voltage, 3.6, 4.2, 0, 100);
+  
+  int batteryLevel = map(analogRead(ADC_BATTERY), 713, 1023, 0, 100);
+
+  int eulers[2];
+  eulers[0] = batteryLevel;
+  eulers[1] = millis();
 
   // if (batteryLevel != oldBatteryLevel) {
   // if the battery level has changed
@@ -13,7 +15,7 @@ void updateBatteryLevel(BLECharacteristic characteristic) {
   Serial.println(batteryLevel);
 
 
-  characteristic.setValue((byte *)&batteryLevel, 12);
+  characteristic.setValue((byte *)&batteryLevel, 8);
   //oldBatteryLevel = batteryLevel;  // save the level for next comparison
   //  }
 }
