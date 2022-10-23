@@ -1,5 +1,4 @@
 import 'package:app/services/imports.dart';
-import 'package:flutter/cupertino.dart';
 
 class Sessions extends StatefulWidget {
   const Sessions({Key? key, required this.userData}) : super(key: key);
@@ -11,13 +10,11 @@ class Sessions extends StatefulWidget {
 
 class _SessionsState extends State<Sessions> {
   late String deviceID;
-  List<Session> sessions = [];
 
   @override
   void initState() {
     super.initState();
     deviceID = widget.userData.devices.first;
-    sessions = widget.userData.sessions.where((element) => deviceID == element.deviceID).toList();
   }
 
   @override
@@ -42,63 +39,89 @@ class _SessionsState extends State<Sessions> {
                         children: [
                           for (String id in userData.devices) ...[
                             FilterChip(
-                                backgroundColor: deviceID == id ? AppStyle.primaryColor : Colors.black12,
+                                backgroundColor: deviceID == id
+                                    ? AppStyle.primaryColor
+                                    : Colors.black12,
                                 label: StreamBuilder<Device>(
                                     stream: DatabaseDevice().device(id: id),
                                     builder: (context, snapshot) {
                                       return Text(
-                                        snapshot.data?.name ?? id,
-                                        style: TextStyle(fontWeight: deviceID == id ? FontWeight.bold : FontWeight.normal, color: Colors.white),
+                                        snapshot.data?.name ?? '',
+                                        style: TextStyle(
+                                            fontWeight: deviceID == id
+                                                ? FontWeight.bold
+                                                : FontWeight.normal,
+                                            color: Colors.white),
                                       );
                                     }),
                                 onSelected: (value) => setState(() {
                                       deviceID = id;
-                                      sessions = userData.sessions.where((element) => deviceID == element.deviceID).toList();
                                     })),
                           ],
                         ],
                       ),
                       const SizedBox(height: 10),
-                      Center(
-                        child: Wrap(
-                          direction: Axis.horizontal,
-                          spacing: 5,
-                          runSpacing: 5,
-                          children: [
-                            for (Session session in sessions) ...[
-                              StreamBuilder<List<Log>>(
-                                  stream: DatabaseLog(id: deviceID).sessionLogs(session: session),
-                                  builder: (context, snapshot) {
-                                    if (!snapshot.hasData) {
-                                      return const Center(
-                                          child: Padding(
-                                        padding: EdgeInsets.all(20.0),
-                                        child: CircularProgressIndicator(),
-                                      ));
-                                    } else if (snapshot.data!.isEmpty) {
-                                      return const Center(child: Text('No data available'));
-                                    }
+                      StreamBuilder<List<Session>>(
+                          stream:
+                              DatabaseSession(deviceID: deviceID).streamList,
+                          builder: (context, snapshot) {
+                            final List<Session> sessions =
+                                snapshot.hasData ? snapshot.data! : [];
 
-                                    return CardSession(
-                                      userData: userData,
-                                      id: deviceID,
-                                      session: session,
-                                      logs: snapshot.data!,
-                                    );
-                                  }),
-                            ]
-                          ],
-                        ),
-                      ),
-                      CupertinoButton(
+                            return Center(
+                              child: Wrap(
+                                direction: Axis.horizontal,
+                                spacing: 5,
+                                runSpacing: 5,
+                                children: [
+                                  for (Session session in sessions) ...[
+                                    StreamBuilder<List<GPS>>(
+                                        stream: DatabaseGps(
+                                                deviceID: deviceID,
+                                                sessionID: session.id)
+                                            .streamList,
+                                        builder: (context, snapshot) {
+                                          if (!snapshot.hasData) {
+                                            return const Center(
+                                                child: Padding(
+                                              padding: EdgeInsets.all(20.0),
+                                              child:
+                                                  CircularProgressIndicator(),
+                                            ));
+                                          } else if (snapshot.data!.isEmpty) {
+                                            return const Center(
+                                                child:
+                                                    Text('No data available'));
+                                          }
+
+                                          return CardSession(
+                                            userData: userData,
+                                            session: session,
+                                            gps: snapshot.data!,
+                                          );
+                                        }),
+                                  ]
+                                ],
+                              ),
+                            );
+                          }),
+                      /* CupertinoButton(
                         child: const Text(
                           'Load more',
                         ),
-                        onPressed: () => setState(() => sessions.addAll(userData.sessions.sublist(
-                              widget.userData.sessions.length - sessions.length > 5 ? widget.userData.sessions.length - sessions.length - 5 : widget.userData.sessions.length - sessions.length,
+                        onPressed: () => setState(() =>
+                            sessions.addAll(userData.sessions.sublist(
+                              widget.userData.sessions.length -
+                                          sessions.length >
+                                      5
+                                  ? widget.userData.sessions.length -
+                                      sessions.length -
+                                      5
+                                  : widget.userData.sessions.length -
+                                      sessions.length,
                               widget.userData.sessions.length - sessions.length,
                             ))),
-                      ),
+                      ),*/
                       const SizedBox(height: 60),
                     ],
                   ),

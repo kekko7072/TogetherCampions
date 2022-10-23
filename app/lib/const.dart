@@ -1,7 +1,8 @@
 ///SERVER ENDPOINT
 String kServerAddress = "together-champions.ew.r.appspot.com";
 
-String kDeviceName = "TKR1A1";
+String kDeviceModelTKR1A1 = "TKR1A1";
+String kDeviceModelTKR1B1 = "TKR1B1"; //Only for future support of other devices
 
 ///BLUETOOTH SERVICE
 const String kBLESystemService = "1000";

@@ -1,6 +1,6 @@
 import 'imports.dart';
 
-class MapHelper {
+class MapService {
   static MapLatLng findCenter(MapLatLng from, MapLatLng to) {
     //Find the center of the two points
     double lat1 = CalculationService.toRadian(from.latitude);
@@ -21,13 +21,13 @@ class MapHelper {
     return MapLatLng(latMidway, lngMidway);
   }
 
-  static int findFastestLogFromList(List<Log> list) {
+  static int findFastestLogFromList(List<GPS> list) {
     int i = 0;
     double speed = 0;
     int index = 0;
     for (i = 0; i < list.length - 1; i++) {
-      if (list[i].gps.speed > speed) {
-        speed = list[i].gps.speed;
+      if (list[i].speed > speed) {
+        speed = list[i].speed;
         index = i;
       }
     }

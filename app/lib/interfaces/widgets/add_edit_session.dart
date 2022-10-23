@@ -27,22 +27,24 @@ class _AddEditSessionState extends State<AddEditSession> {
   DateTime start = DateTime.now();
   DateTime end = DateTime.now();
 
+  ThreeDimensionalValueInt devicePosition =
+      ThreeDimensionalValueInt(x: 0, y: 0, z: 0, timestamp: 0);
+
   FilePickerResult? result;
   PlatformFile? file;
   List<String> value = [];
   int progress = 0;
-  String deviceId = '';
+  String deviceID = '';
 
   @override
   void initState() {
     super.initState();
-    deviceId = widget.userData.devices.first;
+    deviceID = widget.userData.devices.first;
 
     if (widget.isEdit && widget.session != null) {
-      name.text = widget.session!.name;
-      start = widget.session!.start;
-      end = widget.session!.end;
-      deviceId = widget.session!.deviceID;
+      name.text = widget.session!.info.name;
+      start = widget.session!.info.start;
+      end = widget.session!.info.end;
     }
   }
 
@@ -128,6 +130,7 @@ class _AddEditSessionState extends State<AddEditSession> {
                       ],
                     ),
                   ],
+
                   Wrap(
                     alignment: WrapAlignment.start,
                     direction: Axis.horizontal,
@@ -135,22 +138,25 @@ class _AddEditSessionState extends State<AddEditSession> {
                     children: [
                       for (String deviceID in widget.userData.devices) ...[
                         FilterChip(
-                            backgroundColor: deviceId == deviceID
+                            backgroundColor: deviceID == deviceID
                                 ? AppStyle.primaryColor
                                 : Colors.black12,
                             label: Text(
                               deviceID,
                               style: TextStyle(
-                                  fontWeight: deviceId == deviceID
+                                  fontWeight: deviceID == deviceID
                                       ? FontWeight.bold
                                       : FontWeight.normal,
                                   color: Colors.white),
                             ),
                             onSelected: (value) =>
-                                setState(() => deviceId = deviceID)),
+                                setState(() => deviceID = deviceID)),
                       ],
                     ],
                   ),
+
+                  ///TODO add configuration for device position
+
                   Padding(
                     padding: const EdgeInsets.only(left: 20.0),
                     child: Row(
@@ -200,27 +206,22 @@ class _AddEditSessionState extends State<AddEditSession> {
                       onPressed: () async {
                         setState(() => showLoading = true);
                         if (widget.isEdit) {
-                          await DatabaseUser.sessionEdit(
-                                  uid: widget.userData.uid,
-                                  oldSession: widget.session!,
-                                  newSession: Session(
-                                      name: name.text,
-                                      start: start,
-                                      end: end,
-                                      deviceID: deviceId))
-                              .then((value) {
-                            setState(() => showLoading = false);
-                            Navigator.of(context).pop();
-                          });
+                          //TODO edit
                         } else {
-                          await DatabaseUser.sessionCreateRemove(
-                                  isCreate: true,
-                                  uid: widget.userData.uid,
+                          await DatabaseSession(deviceID: deviceID)
+                              .add(
                                   session: Session(
-                                      name: name.text,
-                                      start: start,
-                                      end: end,
-                                      deviceID: deviceId))
+                                      id: const Uuid().v4(),
+                                      info: SessionInfo(
+                                          name: name.text,
+                                          start: start,
+                                          end: end),
+                                      devicePosition: ThreeDimensionalValueInt(
+                                        x: devicePosition.x,
+                                        y: devicePosition.y,
+                                        z: devicePosition.z,
+                                        timestamp: devicePosition.timestamp,
+                                      )))
                               .then((value) {
                             setState(() => showLoading = false);
                             Navigator.of(context).pop();
@@ -281,7 +282,7 @@ class _AddEditSessionState extends State<AddEditSession> {
                               CalculationService.formatOutputWithNewTimestamp(
                                   input: value[progress], start: start);
                           Uri url = Uri.https(kServerAddress, 'post',
-                              {'serialNumber': deviceId});
+                              {'serialNumber': deviceID});
                           var response = await post(
                             url,
                             headers: {
@@ -301,7 +302,8 @@ class _AddEditSessionState extends State<AddEditSession> {
                           }
                         }
 
-                        await DatabaseUser.sessionCreateRemove(
+                        //TODO DECIDE HOW FORMAT DATA FROM SD CARD AND UPLOAD SESSION AND OOTHER TELEMETRY ETCC..
+                        /* await DatabaseUser.sessionCreateRemove(
                                 isCreate: true,
                                 uid: widget.userData.uid,
                                 session: Session(
@@ -313,11 +315,11 @@ class _AddEditSessionState extends State<AddEditSession> {
                                                 element.contains("timestamp="))
                                             .last,
                                         start: start),
-                                    deviceID: deviceId))
+                                    deviceID: deviceID))
                             .then((value) {
                           setState(() => showLoading = false);
                           Navigator.of(context).pop();
-                        });
+                        });*/
                       },
                       child: Text(
                         widget.isEdit ? 'Modifica' : 'Carica',

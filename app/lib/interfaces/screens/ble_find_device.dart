@@ -47,7 +47,8 @@ class BLEFindDevices extends StatelessWidget {
                 initialData: const [],
                 builder: (c, snapshot) => Column(
                   children: snapshot.data!
-                      .where((element) => element.device.name == kDeviceName)
+                      .where((element) =>
+                          element.device.name == kDeviceModelTKR1A1)
                       .map(
                         (r) => ScanResultTile(
                           result: r,
@@ -177,7 +178,13 @@ class ScanResultTile extends StatelessWidget {
 
     return ExpansionTile(
       title: _buildTitle(context),
-      leading: Text(result.rssi.toString()),
+      leading: Image(
+        image: AssetImage(
+          'assets/${result.device.name}.png',
+        ),
+        fit: BoxFit.cover,
+        height: 150,
+      ),
       trailing: ElevatedButton(
         onPressed: (result.advertisementData.connectable) ? onTap : null,
         child: const Text('CONNECT'),

@@ -1,8 +1,8 @@
 import 'package:app/services/imports.dart';
 
 class CardLog extends StatelessWidget {
-  const CardLog({Key? key, required this.log}) : super(key: key);
-  final Log log;
+  const CardLog({Key? key, required this.gps}) : super(key: key);
+  final GPS gps;
 
   @override
   Widget build(BuildContext context) {
@@ -12,24 +12,24 @@ class CardLog extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(
-            'Lat: ${log.gps.latLng.latitude}',
+            'Lat: ${gps.latLng.latitude}',
             style: Theme.of(context).textTheme.titleSmall,
           ),
           Text(
-            'Lng: ${log.gps.latLng.longitude}',
+            'Lng: ${gps.latLng.longitude}',
             style: Theme.of(context).textTheme.titleSmall,
           ),
         ],
       ),
-      title: Text(CalculationService.formatDate(date: log.timestamp, year: true, seconds: true)),
+      title: Text('${gps.timestamp}'),
       subtitle: Wrap(
         spacing: 10,
         children: [
-          Text('Speed: ${log.gps.speed} km/h'),
-          Text('Course: ${log.gps.course} deg'),
-          Text('Altitude: ${log.gps.altitude} m'),
-          Text('Satellites: ${log.gps.satellites}'),
-          Text('Battery: ${log.battery} V'),
+          Text('Speed: ${gps.speed} km/h'),
+          Text('Course: ${gps.course} deg'),
+          Text('Altitude: ${gps.altitude} m'),
+          Text('Satellites: ${gps.satellites}'),
+          //Text('Battery: ${gps.battery} V'),
         ],
       ),
     );

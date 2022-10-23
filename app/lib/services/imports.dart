@@ -69,18 +69,24 @@ export 'package:app/interfaces/widgets/track_map.dart';
 
 ///MODELS
 export 'package:app/models/device.dart';
-export 'package:app/models/log.dart';
+export 'package:app/models/session.dart';
 export 'package:app/models/user.dart';
-export 'package:app/models/telemetry.dart';
+export 'package:app/models/telemetry_analytics.dart';
 export 'package:app/models/ble_characteristic.dart';
 export 'package:app/models/ble_service.dart';
+export 'package:app/models/dimensional_value.dart';
+export 'package:app/models/gps.dart';
+export 'package:app/models/telemetry_analytics.dart';
 
 ///SERVICES
-export 'package:app/services/database_log.dart';
+export 'package:app/services/database_session.dart';
+export '../../services/session/database_gps.dart';
+export 'package:app/services/session/database_telemetry.dart';
+export 'package:app/services/session/database_services.dart';
 export 'package:app/services/database_user.dart';
 export 'package:app/services/database_device.dart';
 export 'package:app/services/auth.dart';
 export 'package:app/services/calculation.dart';
 export 'package:app/services/style.dart';
-export 'package:app/services/map_helper.dart';
+export 'package:app/services/map.dart';
 export 'package:app/services/bluetooth_helper.dart';

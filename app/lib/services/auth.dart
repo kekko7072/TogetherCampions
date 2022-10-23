@@ -29,7 +29,6 @@ class AuthService {
         uid: user.uid,
         profile: Profile(name: name, surname: surname, email: email),
         devices: [],
-        sessions: [],
       );
       await DatabaseUser.createEdit(isEdit: false, userData: userData);
 

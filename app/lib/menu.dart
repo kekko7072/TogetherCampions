@@ -139,7 +139,7 @@ class MenuState extends State<Menu> {
                                     NavigationRailDestination(
                                       icon: Badge(
                                         badgeContent: Text(
-                                          '${snapshot.data!.where((element) => element.device.name == kDeviceName).length}',
+                                          '${snapshot.data!.where((element) => element.device.name == kDeviceModelTKR1A1).length}',
                                           style: const TextStyle(
                                               fontWeight: FontWeight.bold,
                                               color: Colors.white),
@@ -150,7 +150,7 @@ class MenuState extends State<Menu> {
                                         showBadge: snapshot.data!
                                             .where((element) =>
                                                 element.device.name ==
-                                                kDeviceName)
+                                                kDeviceModelTKR1A1)
                                             .isNotEmpty,
                                         child: const Icon(
                                           FontAwesomeIcons.chartSimple,
@@ -214,7 +214,7 @@ class MenuState extends State<Menu> {
                                       NavigationDestination(
                                           icon: Badge(
                                             badgeContent: Text(
-                                              '${snapshot.data!.where((element) => element.device.name == kDeviceName).length}',
+                                              '${snapshot.data!.where((element) => element.device.name == kDeviceModelTKR1A1).length}',
                                               style: const TextStyle(
                                                   fontWeight: FontWeight.bold,
                                                   color: Colors.white),
@@ -225,7 +225,7 @@ class MenuState extends State<Menu> {
                                             showBadge: snapshot.data!
                                                 .where((element) =>
                                                     element.device.name ==
-                                                    kDeviceName)
+                                                    kDeviceModelTKR1A1)
                                                 .isNotEmpty,
                                             child: const Icon(
                                               FontAwesomeIcons.chartSimple,

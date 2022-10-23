@@ -24,8 +24,8 @@ class _AddEditDeviceState extends State<AddEditDevice> {
   TextEditingController model = TextEditingController(text: 'TKR1A1');
   TextEditingController modelName = TextEditingController(text: 'BlackStone 1');
   TextEditingController name = TextEditingController(text: 'BlackStone 1');
-  int clock = 6;
-  int frequency = 10;
+
+  List<ScanResult> devices = [];
 
   @override
   void initState() {
@@ -33,8 +33,8 @@ class _AddEditDeviceState extends State<AddEditDevice> {
     if (widget.isEdit && widget.device != null) {
       id.text = widget.device!.serialNumber;
       name.text = widget.device!.name;
-      clock = widget.device!.clock;
-      frequency = widget.device!.frequency;
+    } else {
+      FlutterBluePlus.instance.startScan(timeout: const Duration(seconds: 4));
     }
   }
 
@@ -45,9 +45,33 @@ class _AddEditDeviceState extends State<AddEditDevice> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(
-            '${widget.isEdit ? 'Modifica' : 'Aggiungi'} dispositivo',
-            style: Theme.of(context).textTheme.titleLarge,
+          Stack(
+            alignment: Alignment.center,
+            children: [
+              Text(
+                widget.isEdit ? 'Modifica' : 'Aggiungi',
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
+              if (!widget.isEdit) ...[
+                Align(
+                  alignment: Alignment.topRight,
+                  child: Padding(
+                    padding: const EdgeInsets.only(right: 10.0),
+                    child: FilterChip(
+                      backgroundColor: AppStyle.primaryColor,
+                      label: const Icon(
+                        Icons.search,
+                        color: Colors.white,
+                      ),
+                      onSelected: (bool value) {
+                        FlutterBluePlus.instance
+                            .startScan(timeout: const Duration(seconds: 4));
+                      },
+                    ),
+                  ),
+                ),
+              ]
+            ],
           ),
           if (showLoading) ...[
             const Padding(
@@ -68,34 +92,85 @@ class _AddEditDeviceState extends State<AddEditDevice> {
                       spacing: 10,
                       children: [
                         FilterChip(
-                            backgroundColor: model.text == 'TKR1A1'
+                            backgroundColor: model.text == kDeviceModelTKR1A1
                                 ? AppStyle.primaryColor
                                 : Colors.white,
                             label: Text(
-                              'TKR1A1',
+                              kDeviceModelTKR1A1,
                               style: TextStyle(
-                                  fontWeight: model.text == 'TKR1A1'
+                                  fontWeight: model.text == kDeviceModelTKR1A1
                                       ? FontWeight.bold
                                       : FontWeight.normal,
-                                  color: Colors.white),
+                                  color: model.text == kDeviceModelTKR1A1
+                                      ? Colors.white
+                                      : AppStyle.primaryColor),
                             ),
-                            onSelected: (value) =>
-                                setState(() => model.text = 'TKR1A1')),
+                            onSelected: (value) => setState(
+                                () => model.text = kDeviceModelTKR1A1)),
+                        FilterChip(
+                            backgroundColor: model.text == kDeviceModelTKR1B1
+                                ? AppStyle.primaryColor
+                                : Colors.white,
+                            label: Text(
+                              kDeviceModelTKR1B1,
+                              style: TextStyle(
+                                  fontWeight: model.text == kDeviceModelTKR1B1
+                                      ? FontWeight.bold
+                                      : FontWeight.normal,
+                                  color: model.text == kDeviceModelTKR1B1
+                                      ? Colors.white
+                                      : AppStyle.primaryColor),
+                            ),
+                            onSelected: (value) => setState(
+                                () => model.text = kDeviceModelTKR1B1)),
                       ],
                     ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 5.0, horizontal: 20),
-                      child: TextFormField(
-                        controller: id,
-                        textAlign: TextAlign.center,
-                        decoration: AppStyle().kTextFieldDecoration(
-                            icon: CupertinoIcons.number,
-                            hintText: 'Enter device serial number'),
-                      ),
+                    StreamBuilder<List<ScanResult>>(
+                      stream: FlutterBluePlus.instance.scanResults,
+                      initialData: const [],
+                      builder: (c, snapshot) {
+                        devices = snapshot.hasData ? snapshot.data! : [];
+                        return Column(
+                          children: snapshot.data!
+                              .where((element) =>
+                                  element.device.name == model.text)
+                              .map(
+                                (r) => GestureDetector(
+                                  onTap: () => setState(
+                                      () => id.text = r.device.id.toString()),
+                                  child: ListTile(
+                                    leading: Image(
+                                      image: AssetImage(
+                                        'assets/${model.text}.png',
+                                      ),
+                                      fit: BoxFit.cover,
+                                      height: 150,
+                                    ),
+                                    title: Text(
+                                      r.device.name,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                    subtitle: Text(
+                                      r.device.id.id,
+                                      overflow: TextOverflow.clip,
+                                    ),
+                                    trailing: TextButton(
+                                      onPressed: () => setState(() =>
+                                          id.text = r.device.id.toString()),
+                                      child: Icon(
+                                          id.text == r.device.id.toString()
+                                              ? CupertinoIcons.minus_circle_fill
+                                              : CupertinoIcons.add_circled),
+                                    ),
+                                  ),
+                                ),
+                              )
+                              .toList(),
+                        );
+                      },
                     ),
                   ],
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 20),
                   Padding(
                     padding: const EdgeInsets.symmetric(
                         vertical: 5.0, horizontal: 20),
@@ -106,72 +181,29 @@ class _AddEditDeviceState extends State<AddEditDevice> {
                           icon: Icons.edit, hintText: 'Enter device name'),
                     ),
                   ),
-                  Row(
-                    children: [
-                      Expanded(
-                        flex: 1,
-                        child: CupertinoButton(
-                          onPressed: clock == 1
-                              ? null
-                              : () => setState(() => --frequency),
-                          child: const Icon(CupertinoIcons.minus_circle),
-                        ),
-                      ),
-                      Expanded(
-                        flex: 2,
-                        child: Text(
-                          'Frequenza: $frequency',
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                      Expanded(
-                        flex: 1,
-                        child: CupertinoButton(
-                          onPressed: clock == 12
-                              ? null
-                              : () => setState(() => ++frequency),
-                          child: const Icon(CupertinoIcons.add_circled),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const Text(
-                    'Durata sincronizzazione dati:',
-                    textAlign: TextAlign.center,
-                  ),
-                  Text(
-                    '${clock * frequency} s',
-                    textAlign: TextAlign.center,
-                  ),
                   const SizedBox(height: 10),
                   CupertinoButton.filled(
-                    onPressed: () async {
-                      setState(() => showLoading = true);
+                    onPressed: id.text.isEmpty
+                        ? null
+                        : () async {
+                            setState(() => showLoading = true);
 
-                      await DatabaseDevice()
-                          .register(
-                        serialNumber: id.text,
-                        modelNumber: model.text,
-                        modelName: modelName.text,
-                        uid: widget.uid,
-                        name: name.text,
-                        frequency: frequency,
-                      )
-                          .then((value) {
-                        setState(() => showLoading = false);
-                        Navigator.of(context).pop();
-                      });
-                    },
+                            await DatabaseDevice()
+                                .register(
+                              serialNumber: id.text,
+                              modelNumber: model.text,
+                              modelName: modelName.text,
+                              uid: widget.uid,
+                              name: name.text,
+                            )
+                                .then((value) {
+                              setState(() => showLoading = false);
+                              Navigator.of(context).pop();
+                            });
+                          },
                     child: Text(
                       widget.isEdit ? 'Modifica' : 'Crea',
                       style: const TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                  const Padding(
-                    padding: EdgeInsets.all(10),
-                    child: Text(
-                      'NOTA: Una volta salvate le modifiche via app devi riavviare il dispositivo per applicarci le modifiche.',
-                      textAlign: TextAlign.center,
                     ),
                   ),
                 ],

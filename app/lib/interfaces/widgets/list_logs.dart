@@ -1,7 +1,10 @@
 import 'package:app/services/imports.dart';
+import 'package:app/services/session/database_gps.dart';
 
 class ListLogs extends StatefulWidget {
-  const ListLogs({Key? key, required this.id, required this.isSession, this.session}) : super(key: key);
+  const ListLogs(
+      {Key? key, required this.id, required this.isSession, this.session})
+      : super(key: key);
   final String id;
   final bool isSession;
   final Session? session;
@@ -28,8 +31,10 @@ class _ListLogsState extends State<ListLogs> {
                       'Telemetria completa',
                       style: Theme.of(context).textTheme.titleLarge,
                     ),
-                    StreamBuilder<List<Log>>(
-                        stream: widget.isSession ? DatabaseLog(id: widget.id).sessionLogs(session: widget.session!) : DatabaseLog(id: widget.id).allLogs,
+                    /*StreamBuilder<List<Telemetry>>(
+                        stream: widget.isSession
+                            ? DatabaseGps(deviceID:  widget.id).streamList
+                            : DatabaseSession(id: widget.id).allLogs,
                         builder: (context, snapshot) {
                           if (snapshot.hasError) {
                             return Center(
@@ -40,11 +45,17 @@ class _ListLogsState extends State<ListLogs> {
                               child: CircularProgressIndicator(),
                             );
                           }
-                          List<Log> logs = snapshot.data ?? [];
+                          List<Telemetry> logs = snapshot.data ?? [];
 
-                          return ListView.builder(shrinkWrap: true, reverse: true, physics: const NeverScrollableScrollPhysics(), itemCount: snapshot.data!.length, itemBuilder: (context, index) => CardLog(log: logs[index]));
+                          return ListView.builder(
+                              shrinkWrap: true,
+                              reverse: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              itemCount: snapshot.data!.length,
+                              itemBuilder: (context, index) =>
+                                  CardLog(gps: logs[index]));
                         }),
-                    /*  CupertinoButton(
+                      CupertinoButton(
                         child: Text('Load more'),
                         onPressed: () =>
                             setState(() => loadLimit = loadLimit + 50))*/

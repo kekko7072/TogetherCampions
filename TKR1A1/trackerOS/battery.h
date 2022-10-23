@@ -1,4 +1,4 @@
-void updateBatteryLevel(BLECharacteristic characteristic) {
+void updateBatteryLevel(BLECharacteristic characteristic, int timestamp) {
   /* Read the current voltage level on the A0 analog input pin.
      This is used here to simulate the charge level of a battery.
   */
@@ -7,7 +7,7 @@ void updateBatteryLevel(BLECharacteristic characteristic) {
 
   int eulers[2];
   eulers[0] = batteryLevel;
-  eulers[1] = millis();
+  eulers[1] = timestamp;
 
   // if (batteryLevel != oldBatteryLevel) {
   // if the battery level has changed

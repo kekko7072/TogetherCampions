@@ -9,7 +9,7 @@ class CardTelemetry extends StatelessWidget {
     required this.session,
   }) : super(key: key);
 
-  final TelemetryData telemetry;
+  final TelemetryAnalytics telemetry;
   final String id;
   final Session session;
 
@@ -25,8 +25,8 @@ class CardTelemetry extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  session.end
-                      .difference(session.start)
+                  session.info.end
+                      .difference(session.info.start)
                       .toString()
                       .split('.')
                       .first

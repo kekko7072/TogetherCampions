@@ -15,8 +15,8 @@ class CalculationService {
     }
   }
 
-  static TelemetryData telemetry({
-    required List<Log> logs,
+  static TelemetryAnalytics telemetry({
+    required List<GPS> gps,
     required List<MapLatLng> segment,
   }) {
     double speedMedium = 0;
@@ -36,86 +36,87 @@ class CalculationService {
     double batteryMax = 0;
     double batteryMin = 10000;
 
-    for (Log log in logs) {
+    for (GPS log in gps) {
       ///Speed
-      speedMedium = speedMedium + log.gps.speed;
+      speedMedium = speedMedium + log.speed;
 
-      if (speedMax < log.gps.speed) {
+      if (speedMax < log.speed) {
         speedMax =
-            CalculationService.roundDouble(number: log.gps.speed, decimal: 3);
+            CalculationService.roundDouble(number: log.speed, decimal: 3);
       }
 
-      if (speedMin > log.gps.speed) {
+      if (speedMin > log.speed) {
         speedMin =
-            CalculationService.roundDouble(number: log.gps.speed, decimal: 3);
+            CalculationService.roundDouble(number: log.speed, decimal: 3);
       }
 
       ///Altitude
-      altitudeMedium = altitudeMedium + log.gps.altitude;
+      altitudeMedium = altitudeMedium + log.altitude;
 
-      if (altitudeMax < log.gps.altitude) {
-        altitudeMax = CalculationService.roundDouble(
-            number: log.gps.altitude, decimal: 3);
+      if (altitudeMax < log.altitude) {
+        altitudeMax =
+            CalculationService.roundDouble(number: log.altitude, decimal: 3);
       }
 
-      if (altitudeMin > log.gps.altitude) {
-        altitudeMin = CalculationService.roundDouble(
-            number: log.gps.altitude, decimal: 3);
+      if (altitudeMin > log.altitude) {
+        altitudeMin =
+            CalculationService.roundDouble(number: log.altitude, decimal: 3);
       }
 
       ///Course
-      courseMedium = courseMedium + log.gps.course;
+      courseMedium = courseMedium + log.course;
 
-      if (courseMax < log.gps.course) {
+      if (courseMax < log.course) {
         courseMax =
-            CalculationService.roundDouble(number: log.gps.course, decimal: 3);
+            CalculationService.roundDouble(number: log.course, decimal: 3);
       }
 
-      if (courseMin > log.gps.course) {
+      if (courseMin > log.course) {
         courseMin =
-            CalculationService.roundDouble(number: log.gps.course, decimal: 3);
+            CalculationService.roundDouble(number: log.course, decimal: 3);
       }
 
       ///Satellites
-      satellites = satellites + log.gps.satellites;
+      satellites = satellites + log.satellites;
 
-      ///Battery
-      if (batteryMax < log.battery) {
+      /*///Battery
+      if (batteryMax < log.) {
         batteryMax = log.battery;
       }
 
       if (batteryMin > log.battery) {
         batteryMin = log.battery;
-      }
+      }*/
     }
 
-    return TelemetryData(
-        speed: Range(
-          medium: CalculationService.roundDouble(
-              number: speedMedium / logs.length, decimal: 3),
-          max: speedMax,
-          min: speedMin,
-        ),
-        altitude: Range(
-          medium: CalculationService.roundDouble(
-              number: altitudeMedium / logs.length, decimal: 3),
-          max: altitudeMax,
-          min: altitudeMin,
-        ),
-        course: Range(
-          medium: CalculationService.roundDouble(
-              number: courseMedium / logs.length, decimal: 3),
-          max: courseMax,
-          min: courseMin,
-        ),
-        distance: MapHelper.findDistanceFromList(segment).roundToDouble(),
-        satellites: satellites ~/ logs.length,
-        battery: Battery(
-          consumption: CalculationService.roundDouble(
-              number: batteryMax - batteryMin, decimal: 3),
-          maxVoltage: batteryMax,
-          minVoltage: batteryMin,
-        ));
+    return TelemetryAnalytics(
+      speed: RangeAnalytics(
+        medium: CalculationService.roundDouble(
+            number: speedMedium / gps.length, decimal: 3),
+        max: speedMax,
+        min: speedMin,
+      ),
+      altitude: RangeAnalytics(
+        medium: CalculationService.roundDouble(
+            number: altitudeMedium / gps.length, decimal: 3),
+        max: altitudeMax,
+        min: altitudeMin,
+      ),
+      course: RangeAnalytics(
+        medium: CalculationService.roundDouble(
+            number: courseMedium / gps.length, decimal: 3),
+        max: courseMax,
+        min: courseMin,
+      ),
+      distance: MapService.findDistanceFromList(segment).roundToDouble(),
+      satellites: satellites ~/ gps.length,
+      /* battery: Battery(
+        consumption: CalculationService.roundDouble(
+            number: batteryMax - batteryMin, decimal: 3),
+        start: batteryMax,
+        minVoltage: batteryMin,
+      ),*/
+    );
   }
 
   static double toRadian(double degree) {

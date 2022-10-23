@@ -6,7 +6,7 @@ void setupMPU() {
   Wire.endTransmission(true);
 }
 
-void updateAcceleration(BLECharacteristic characteristic) {
+void updateAcceleration(BLECharacteristic characteristic, int timestamp) {
   Wire.beginTransmission(MPU_ADDR);
   Wire.write(0x3B);  // starting with register 0x3B (ACCEL_XOUT_H)
   Wire.endTransmission(false);
@@ -72,12 +72,12 @@ void updateSpeed(int timePassed, BLECharacteristic characteristic) {
   characteristic.setValue((byte *)&eulers, 12);
 }*/
 
-void updateTemperature(BLECharacteristic characteristic) {
+void updateTemperature(BLECharacteristic characteristic, int timestamp) {
 
   Wire.beginTransmission(MPU_ADDR);
   Wire.write(0x41);  // starting with register 0x3B (ACCEL_XOUT_H)
   Wire.endTransmission(false);
-  Wire.requestFrom(MPU_ADDR, 14, true);          // request a total of 14 registers
+  Wire.requestFrom(MPU_ADDR, 14, true);                  // request a total of 14 registers
   int16_t temperature = Wire.read() << 8 | Wire.read();  // 0x41 (TEMP_OUT_H) & 0x42 (TEMP_OUT_L)
 
   //equation for temperature in degrees C from datasheet
@@ -89,12 +89,12 @@ void updateTemperature(BLECharacteristic characteristic) {
 
   int eulers[2];
   eulers[0] = temperature;
-  eulers[1] = millis();
+  eulers[1] = timestamp;
 
   characteristic.setValue((byte *)&eulers, 8);
 }
 
-void updateGyroscope(BLECharacteristic characteristic) {
+void updateGyroscope(BLECharacteristic characteristic, int timestamp) {
   Wire.beginTransmission(MPU_ADDR);
   Wire.write(0x43);  // starting with register 0x3B (ACCEL_XOUT_H)
   Wire.endTransmission(false);

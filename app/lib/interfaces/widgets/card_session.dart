@@ -7,14 +7,13 @@ class CardSession extends StatefulWidget {
   const CardSession(
       {Key? key,
       required this.userData,
-      required this.id,
       required this.session,
-      required this.logs})
+      required this.gps})
       : super(key: key);
   final UserData userData;
-  final String id;
+
   final Session session;
-  final List<Log> logs;
+  final List<GPS> gps;
 
   @override
   State<CardSession> createState() => _CardSessionState();
@@ -26,9 +25,8 @@ class _CardSessionState extends State<CardSession> {
   @override
   void initState() {
     super.initState();
-
-    for (Log log in widget.logs) {
-      polylinePoints.add(log.gps.latLng);
+    for (GPS log in widget.gps) {
+      polylinePoints.add(log.latLng);
     }
   }
 
@@ -48,11 +46,9 @@ class _CardSessionState extends State<CardSession> {
             motion: const ScrollMotion(),
             children: [
               SlidableAction(
-                onPressed: (con) async =>
-                    await DatabaseUser.sessionCreateRemove(
-                        isCreate: false,
-                        uid: widget.userData.uid,
-                        session: widget.session),
+                onPressed: (con) async {
+                  //TODO REMOVE
+                },
                 backgroundColor: CupertinoColors.destructiveRed,
                 foregroundColor: Colors.black,
                 icon: Icons.delete,
@@ -93,7 +89,7 @@ class _CardSessionState extends State<CardSession> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              widget.session.name,
+                              widget.session.info.name,
                               style: Theme.of(context)
                                   .textTheme
                                   .titleLarge!
@@ -112,7 +108,7 @@ class _CardSessionState extends State<CardSession> {
                                 const SizedBox(width: 10),
                                 Text(
                                   DateFormat('EEE dd')
-                                      .format(widget.session.start),
+                                      .format(widget.session.info.start),
                                   style: const TextStyle(
                                     color: Colors.white70,
                                   ),
@@ -127,7 +123,7 @@ class _CardSessionState extends State<CardSession> {
                                 const SizedBox(width: 5),
                                 Text(
                                   DateFormat('kk:mm')
-                                      .format(widget.session.start),
+                                      .format(widget.session.info.start),
                                   style: const TextStyle(
                                     color: Colors.white70,
                                   ),
@@ -144,7 +140,7 @@ class _CardSessionState extends State<CardSession> {
                                 ),
                                 const SizedBox(width: 10),
                                 Text(
-                                  '${CalculationService.telemetry(logs: widget.logs, segment: polylinePoints).distance} km',
+                                  '${CalculationService.telemetry(gps: widget.gps, segment: polylinePoints).distance} km',
                                   style: const TextStyle(
                                     color: Colors.white70,
                                   ),
@@ -155,13 +151,13 @@ class _CardSessionState extends State<CardSession> {
                         ),
                       ),
                     ),
-                    if (widget.logs.isEmpty) ...[
+                    if (widget.gps.isEmpty) ...[
                       const Text('No data from GPS found...')
                     ] else ...[
                       Expanded(
                         flex: 2,
                         child: TrackPreview(
-                          logs: widget.logs,
+                          gps: widget.gps,
                         ),
                       )
                     ]
@@ -169,14 +165,13 @@ class _CardSessionState extends State<CardSession> {
                 ),
               ),
               onTap: () {
-                if (widget.logs.isNotEmpty) {
+                if (widget.gps.isNotEmpty) {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
                         builder: (context) => SessionMap(
-                              id: widget.id,
                               session: widget.session,
-                              logs: widget.logs,
+                              gps: widget.gps,
                             )),
                   );
                 }
@@ -188,16 +183,16 @@ class _CardSessionState extends State<CardSession> {
 }
 
 class TrackPreview extends StatefulWidget {
-  const TrackPreview({Key? key, required this.logs}) : super(key: key);
-  final List<Log> logs;
+  const TrackPreview({Key? key, required this.gps}) : super(key: key);
+  final List<GPS> gps;
 
   @override
   State<TrackPreview> createState() => TrackPreviewState();
 }
 
 class TrackPreviewState extends State<TrackPreview> {
-  late Log start;
-  late Log end;
+  late GPS start;
+  late GPS end;
 
   List<MapLatLng> segment = [];
 
@@ -208,17 +203,17 @@ class TrackPreviewState extends State<TrackPreview> {
   @override
   void initState() {
     super.initState();
-    start = widget.logs.first;
-    end = widget.logs.last;
+    start = widget.gps.first;
+    end = widget.gps.last;
 
-    for (Log log in widget.logs) {
-      segment.add(log.gps.latLng);
+    for (GPS log in widget.gps) {
+      segment.add(log.latLng);
     }
 
     _mapController = MapTileLayerController();
 
     _zoomPanBehavior =
-        MapHelper.initialCameraPosition(list: segment, isPreview: true);
+        MapService.initialCameraPosition(list: segment, isPreview: true);
   }
 
   @override

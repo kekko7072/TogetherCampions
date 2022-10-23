@@ -13,7 +13,6 @@ class DatabaseUser {
         'email': userData.profile.email,
       },
       'devices': userData.devices,
-      'sessions': isEdit ? userData.sessions : [],
     };
     return isEdit
         ? await userCollection.doc(userData.uid).update(value)
@@ -33,68 +32,17 @@ class DatabaseUser {
   static Future sessionCreateRemove(
       {required bool isCreate,
       required String uid,
-      required Session session}) async {
+      required String sessionID}) async {
     return await userCollection.doc(uid).update({
       'sessions': isCreate
-          ? FieldValue.arrayUnion([
-              {
-                'deviceID': session.deviceID,
-                'name': session.name,
-                'start': session.start,
-                'end': session.end,
-              }
-            ])
-          : FieldValue.arrayRemove([
-              {
-                'deviceID': session.deviceID,
-                'name': session.name,
-                'start': session.start,
-                'end': session.end,
-              }
-            ])
-    });
-  }
-
-  static Future sessionEdit(
-      {required String uid,
-      required Session oldSession,
-      required Session newSession}) async {
-    await userCollection.doc(uid).update({
-      'sessions': FieldValue.arrayRemove([
-        {
-          'name': oldSession.name,
-          'start': oldSession.start,
-          'end': oldSession.end,
-        },
-      ]),
-    });
-    return await userCollection.doc(uid).update({
-      'sessions': FieldValue.arrayUnion([
-        {
-          'name': newSession.name,
-          'start': newSession.start,
-          'end': newSession.end,
-        },
-      ]),
+          ? FieldValue.arrayUnion([sessionID])
+          : FieldValue.arrayRemove([sessionID])
     });
   }
 
   ///SERIALIZATION
   static UserData userDataFromSnapshot(
       DocumentSnapshot<Map<String, dynamic>> snapshot) {
-    List<Session> sessions = [];
-    int i = 0;
-    for (i = 0; i < snapshot.data()?['sessions'].length; i++) {
-      sessions.add(Session(
-        name: snapshot.data()?['sessions'][i]['name'],
-        start: snapshot.data()?['sessions'][i]['start'].toDate(),
-        end: snapshot.data()?['sessions'][i]['end'].toDate(),
-        deviceID: snapshot.data()?['sessions'][i]['deviceID'],
-      ));
-    }
-
-    sessions.sort((a, b) => a.start.compareTo(b.start));
-
     return UserData(
       uid: snapshot.id,
       profile: Profile(
@@ -107,7 +55,6 @@ class DatabaseUser {
               .map((item) => item as String)
               .toList()
           : [],
-      sessions: sessions,
     );
   }
 

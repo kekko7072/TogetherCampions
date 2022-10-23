@@ -3,12 +3,11 @@ import 'package:flutter/cupertino.dart';
 import 'package:intl/intl.dart';
 
 class SessionMap extends StatefulWidget {
-  const SessionMap(
-      {Key? key, required this.id, required this.session, required this.logs})
+  const SessionMap({Key? key, required this.session, required this.gps})
       : super(key: key);
-  final String id;
+
   final Session session;
-  final List<Log> logs;
+  final List<GPS> gps;
 
   @override
   State<SessionMap> createState() => SessionMapState();
@@ -16,10 +15,10 @@ class SessionMap extends StatefulWidget {
 
 class SessionMapState extends State<SessionMap>
     with SingleTickerProviderStateMixin {
-  late Log start;
-  late Log end;
+  late GPS start;
+  late GPS end;
 
-  late TelemetryData telemetry;
+  late TelemetryAnalytics telemetry;
 
   List<MapLatLng> polylinePoints = [];
 
@@ -37,25 +36,25 @@ class SessionMapState extends State<SessionMap>
   @override
   void initState() {
     super.initState();
-    start = widget.logs.first;
-    end = widget.logs.last;
+    start = widget.gps.first;
+    end = widget.gps.last;
 
-    for (Log log in widget.logs) {
-      polylinePoints.add(log.gps.latLng);
+    for (GPS log in widget.gps) {
+      polylinePoints.add(log.latLng);
     }
 
-    telemetry = CalculationService.telemetry(
-        logs: widget.logs, segment: polylinePoints);
+    telemetry =
+        CalculationService.telemetry(gps: widget.gps, segment: polylinePoints);
 
-    indexFastestLog = MapHelper.findFastestLogFromList(widget.logs);
+    indexFastestLog = MapService.findFastestLogFromList(widget.gps);
 
     _mapController = MapTileLayerController();
 
-    _zoomPanBehavior =
-        MapHelper.initialCameraPosition(list: polylinePoints, isPreview: false);
+    _zoomPanBehavior = MapService.initialCameraPosition(
+        list: polylinePoints, isPreview: false);
 
     _animationController = AnimationController(
-      duration: Duration(seconds: widget.logs.length ~/ durationDivision),
+      duration: Duration(seconds: widget.gps.length ~/ durationDivision),
       vsync: this,
     );
 
@@ -64,7 +63,7 @@ class SessionMapState extends State<SessionMap>
       curve: Curves.easeInCirc,
     );
 
-    _animationController?.forward(from: widget.logs.length - 1);
+    _animationController?.forward(from: widget.gps.length - 1);
   }
 
   @override
@@ -91,7 +90,7 @@ class SessionMapState extends State<SessionMap>
                     Expanded(
                       flex: 2,
                       child: TrackPreview(
-                        logs: widget.logs,
+                        gps: widget.gps,
                       ),
                     ),
                     Expanded(
@@ -104,7 +103,7 @@ class SessionMapState extends State<SessionMap>
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              widget.session.name,
+                              widget.session.info.name,
                               style: Theme.of(context)
                                   .textTheme
                                   .titleLarge!
@@ -123,7 +122,7 @@ class SessionMapState extends State<SessionMap>
                                 const SizedBox(width: 10),
                                 Text(
                                   DateFormat('EEE dd MMM yyyy')
-                                      .format(widget.session.start),
+                                      .format(widget.session.info.start),
                                   style: const TextStyle(
                                     color: Colors.white70,
                                   ),
@@ -141,7 +140,7 @@ class SessionMapState extends State<SessionMap>
                                 const SizedBox(width: 10),
                                 Text(
                                   DateFormat('kk:mm')
-                                      .format(widget.session.start),
+                                      .format(widget.session.info.start),
                                   style: const TextStyle(
                                     color: Colors.white70,
                                   ),
@@ -156,7 +155,7 @@ class SessionMapState extends State<SessionMap>
                                 const SizedBox(width: 5),
                                 Text(
                                   DateFormat('kk:mm')
-                                      .format(widget.session.end),
+                                      .format(widget.session.info.end),
                                   style: const TextStyle(
                                     color: Colors.white70,
                                   ),
@@ -207,7 +206,7 @@ class SessionMapState extends State<SessionMap>
                                   'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
                               zoomPanBehavior: _zoomPanBehavior,
                               controller: _mapController,
-                              initialMarkersCount: widget.logs.length,
+                              initialMarkersCount: widget.gps.length,
                               tooltipSettings: const MapTooltipSettings(
                                 color: Colors.white,
                               ),
@@ -236,11 +235,11 @@ class SessionMapState extends State<SessionMap>
                                                   index == 0
                                                       ? 'Start'
                                                       : index ==
-                                                              widget.logs
+                                                              widget.gps
                                                                       .length -
                                                                   1
                                                           ? 'End'
-                                                          : 'Speed: ${widget.logs[index].gps.speed.roundToDouble()} km/h',
+                                                          : 'Speed: ${widget.gps[index].speed.roundToDouble()} km/h',
                                                   style: const TextStyle(
                                                       fontSize: 14,
                                                       color: Colors.black,
@@ -254,14 +253,14 @@ class SessionMapState extends State<SessionMap>
                                                   child: Column(
                                                     children: [
                                                       Text(
-                                                        'Altitude: ${widget.logs[index].gps.altitude.roundToDouble()} m',
+                                                        'Altitude: ${widget.gps[index].altitude.roundToDouble()} m',
                                                         style: const TextStyle(
                                                             fontSize: 10,
                                                             color:
                                                                 Colors.black),
                                                       ),
                                                       Text(
-                                                        'Course: ${widget.logs[index].gps.course.roundToDouble()}°',
+                                                        'Course: ${widget.gps[index].course.roundToDouble()}°',
                                                         style: const TextStyle(
                                                             fontSize: 10,
                                                             color:
@@ -277,21 +276,19 @@ class SessionMapState extends State<SessionMap>
                               },
                               markerBuilder: (BuildContext context, int index) {
                                 return MapMarker(
-                                  latitude:
-                                      widget.logs[index].gps.latLng.latitude,
-                                  longitude:
-                                      widget.logs[index].gps.latLng.longitude,
+                                  latitude: widget.gps[index].latLng.latitude,
+                                  longitude: widget.gps[index].latLng.longitude,
                                   alignment: Alignment.bottomCenter,
                                   child: FittedBox(
                                     child: Icon(Icons.location_on,
                                         color: index == 0 ||
-                                                index == widget.logs.length - 1
+                                                index == widget.gps.length - 1
                                             ? AppStyle.primaryColor
                                             : index == indexFastestLog
                                                 ? Colors.green
                                                 : Colors.transparent,
                                         size: index == 0 ||
-                                                index == widget.logs.length - 1
+                                                index == widget.gps.length - 1
                                             ? 50
                                             : 20),
                                   ),
@@ -323,11 +320,11 @@ class SessionMapState extends State<SessionMap>
                             ),
                           ],
                         ),
-                        CardTelemetry(
+                        /* CardTelemetry(
                           id: widget.id,
                           telemetry: telemetry,
                           session: widget.session,
-                        ),
+                        ),*/
                         Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
@@ -384,7 +381,7 @@ class SessionMapState extends State<SessionMap>
                                       _animationController?.stop();
                                       durationDivision = durationDivision * 2;
                                       _animationController!.duration = Duration(
-                                          seconds: widget.logs.length ~/
+                                          seconds: widget.gps.length ~/
                                               durationDivision);
 
                                       _animationController?.forward();

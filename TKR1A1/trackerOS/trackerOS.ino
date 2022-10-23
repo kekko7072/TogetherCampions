@@ -139,14 +139,14 @@ void loop() {
 
     if (currentMillis - previousMillis >= measurements_milliseconds) {
       //System
-      updateTimestamp(timestampCharacteristic);
-      updateBatteryLevel(batteryLevelCharacteristic);
-      updateTemperature(temperatureCharacteristic);
+      timestampCharacteristic.setValue((byte *)&currentMillis, 4);
+      updateBatteryLevel(batteryLevelCharacteristic, currentMillis);
+      updateTemperature(temperatureCharacteristic, currentMillis);
 
       //Telemetry
-      updateAcceleration(accelerometerCharacteristic);
+      updateAcceleration(accelerometerCharacteristic, currentMillis);
       //updateSpeed(currentMillis - previousMillis, speedCharacteristic);
-      updateGyroscope(gyroscopeCharacteristic);
+      updateGyroscope(gyroscopeCharacteristic, currentMillis);
       //updateCompass(compassCharacteristic);
       //updateGps(gpsCharacteristic, gps_data);
       gpsCharacteristic.setValue((byte *)&GPSData, 20);

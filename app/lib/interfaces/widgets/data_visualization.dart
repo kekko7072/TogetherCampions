@@ -1,8 +1,6 @@
 import 'package:app/services/imports.dart';
 import 'package:flutter/cupertino.dart';
 
-import '../../services/bluetooth_helper.dart';
-
 class DataChartVisualizationBattery extends StatefulWidget {
   const DataChartVisualizationBattery({Key? key, required this.service})
       : super(key: key);
