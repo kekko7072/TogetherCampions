@@ -31,7 +31,7 @@ class CalculationService {
     double courseMax = 0;
     double courseMin = 10000;
 
-    int satellites = 0;
+    double variation = 0;
 
     double batteryMax = 0;
     double batteryMin = 10000;
@@ -77,7 +77,7 @@ class CalculationService {
       }
 
       ///Satellites
-      satellites = satellites + log.satellites;
+      variation = variation + log.variation;
 
       /*///Battery
       if (batteryMax < log.) {
@@ -109,7 +109,7 @@ class CalculationService {
         min: courseMin,
       ),
       distance: MapService.findDistanceFromList(segment).roundToDouble(),
-      satellites: satellites ~/ gps.length,
+      variation: variation ~/ gps.length,
       /* battery: Battery(
         consumption: CalculationService.roundDouble(
             number: batteryMax - batteryMin, decimal: 3),

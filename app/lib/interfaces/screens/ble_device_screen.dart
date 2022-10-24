@@ -545,18 +545,8 @@ class _BLEDeviceScreenState extends State<BLEDeviceScreen> {
                   case BLETelemetryCharacteristic.mpu:
                     {
                       if (value != null) {
-                        ByteBuffer buffer = Int8List.fromList(value).buffer;
-                        ByteData byteData = ByteData.view(buffer);
                         try {
-                          mpu.add(Mpu(
-                            timestamp: byteData.getInt32(0, Endian.little),
-                            aX: byteData.getInt32(4, Endian.little),
-                            aY: byteData.getInt32(8, Endian.little),
-                            aZ: byteData.getInt32(12, Endian.little),
-                            gX: byteData.getInt32(16, Endian.little),
-                            gY: byteData.getInt32(20, Endian.little),
-                            gZ: byteData.getInt32(20, Endian.little),
-                          ));
+                          mpu.add(Mpu.formListInt(value));
                         } catch (e) {
                           debugPrint("\nERROR: $e\n");
                         }
@@ -761,22 +751,8 @@ class _BLEDeviceScreenState extends State<BLEDeviceScreen> {
                   case BLETelemetryCharacteristic.gps:
                     {
                       if (value != null) {
-                        ByteBuffer buffer = Int8List.fromList(value).buffer;
-                        ByteData byteData = ByteData.view(buffer);
                         try {
-                          gps.add(Gps(
-                            timestamp:
-                                byteData.getFloat32(16, Endian.little).toInt(),
-                            available:
-                                byteData.getFloat32(0, Endian.little) == 0.0,
-                            latLng: MapLatLng(
-                                byteData.getFloat32(4, Endian.little),
-                                byteData.getFloat32(8, Endian.little)),
-                            altitude: 1,
-                            speed: byteData.getFloat32(12, Endian.little),
-                            course: byteData.getFloat32(16, Endian.little),
-                            satellites: 12,
-                          ));
+                          gps.add(Gps.formListInt(value));
                         } catch (e) {
                           debugPrint("\n\n\n\nERROR ADDING GPS: $e\n");
                         }

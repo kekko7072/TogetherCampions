@@ -23,7 +23,7 @@ class DatabaseGps {
       'altitude': gps.altitude,
       'speed': gps.speed,
       'course': gps.course,
-      'satellites': gps.satellites,
+      'satellites': gps.variation,
     });
   }
 
@@ -39,7 +39,7 @@ class DatabaseGps {
           available ? snapshot.data()!['altitude']?.toDouble() ?? 0.0 : 0.0,
       speed: available ? snapshot.data()!['speed']?.toDouble() ?? 0.0 : 0.0,
       course: available ? snapshot.data()!['course']?.toDouble() ?? 0.0 : 0.0,
-      satellites: available ? snapshot.data()!['satellites']?.toInt() ?? 0 : 0,
+      variation: available ? snapshot.data()!['satellites']?.toInt() ?? 0 : 0,
     );
   }
 

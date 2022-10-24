@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 class Mpu {
   Mpu({
     required this.timestamp,
@@ -16,6 +18,21 @@ class Mpu {
   final int gX;
   final int gY;
   final int gZ;
+
+  factory Mpu.formListInt(List<int> bit) {
+    ByteBuffer buffer = Int8List.fromList(bit).buffer;
+    ByteData byteData = ByteData.view(buffer);
+    return Mpu(
+      timestamp: byteData.getInt32(0, Endian.little),
+      aX: byteData.getInt32(4, Endian.little),
+      aY: byteData.getInt32(8, Endian.little),
+      aZ: byteData.getInt32(12, Endian.little),
+      gX: byteData.getInt32(16, Endian.little),
+      gY: byteData.getInt32(20, Endian.little),
+      gZ: byteData.getInt32(20, Endian.little),
+    );
+  }
+
   factory Mpu.fromJson(Map<String, dynamic> json) => Mpu(
         timestamp: json["timestamp"],
         aX: json["aX"],

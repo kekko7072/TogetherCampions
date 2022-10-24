@@ -16,13 +16,13 @@
 // Bluetooth® Low Energy Battery Service
 BLEService systemService("00001000-0000-1000-8000-00805F9B34FB");
 
-BLECharacteristic systemCharacteristic("00001001-0000-1000-8000-00805F9B34FB", BLERead | BLENotify, 28);  //SYSTEM 1001 28 bit
+BLECharacteristic systemCharacteristic("00001001-0000-1000-8000-00805F9B34FB", BLERead | BLENotify, 12);  //SYSTEM 1001 12 bit
 
 // Telemetry
 BLEService telemetryService("00002000-0000-1000-8000-00805F9B34FB");
 
-BLECharacteristic gpsCharacteristic("00002001-0000-1000-8000-00805F9B34FB", BLERead | BLENotify, 20);  //GPS 2005 1 bit
-BLECharacteristic mpuCharacteristic("00002002-0000-1000-8000-00805F9B34FB", BLERead | BLENotify, 28);  //MPU 2001 28 bit
+BLECharacteristic gpsCharacteristic("00002001-0000-1000-8000-00805F9B34FB", BLERead | BLENotify, 32);  //GPS 2001 32 bit
+BLECharacteristic mpuCharacteristic("00002002-0000-1000-8000-00805F9B34FB", BLERead | BLENotify, 28);  //MPU 2002 28 bit
 
 
 //SERVICES
@@ -106,20 +106,20 @@ void setup() {
   Serial.println(" Bluetooth® device active, waiting for connections...");
 }
 
-float GPSData[7];
+float GPSData[8];
 
 void loop() {
 
   BLEDevice central = BLE.central();  // wait for a Bluetooth® Low Energy central
 
   GPSData[0] = millis();
-  GPSData[1] = GPS.available() ? 0.0 : 1.1;  //Passing custom values to make sure system works as espected
+  GPSData[1] = GPS.available() ? 0 : 1.1;  //Passing custom values to make sure system works as espected
   GPSData[2] = GPS.available() ? isnan(GPS.latitude()) ? 0.0 : GPS.latitude() : 0.0;
   GPSData[3] = GPS.available() ? isnan(GPS.longitude()) ? 0.0 : GPS.longitude() : 0.0;
-  GPSData[4] = GPS.available() ? isnan(GPS.longitude()) ? 0.0 : GPS.speed() : 0.0;
-  GPSData[5] = GPS.available() ? isnan(GPS.longitude()) ? 0.0 : GPS.course() : 0.0;     // Track angle in degrees
-  GPSData[6] = GPS.available() ? isnan(GPS.longitude()) ? 0.0 : GPS.variation() : 0.0;  // Magnetic Variation
-
+  GPSData[4] = GPS.available() ? isnan(GPS.speed()) ? 0.0 : GPS.speed() : 0.0;
+  GPSData[5] = GPS.available() ? isnan(GPS.speed()) ? 0.0 : GPS.speed() : 0.0;
+  GPSData[6] = GPS.available() ? isnan(GPS.course()) ? 0.0 : GPS.course() : 0.0;        // Track angle in degrees
+  GPSData[7] = GPS.available() ? isnan(GPS.variation()) ? 0.0 : GPS.variation() : 0.0;  // Magnetic Variation
 
 
   if (central.connected()) {
@@ -131,7 +131,11 @@ void loop() {
 
       //Telemetry
       updateMpu(mpuCharacteristic, currentMillis);
-      gpsCharacteristic.setValue((byte *)&GPSData, 20);
+      gpsCharacteristic.setValue((byte *)&GPSData, 32);
+
+      Serial.println(GPSData[1]); 
+      Serial.println(GPSData[2], 7);
+      Serial.println(GPSData[3], 7);
 
       previousMillis = currentMillis;  //Clean to re-run cicle
     }

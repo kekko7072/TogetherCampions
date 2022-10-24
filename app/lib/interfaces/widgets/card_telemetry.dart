@@ -48,7 +48,7 @@ class CardTelemetry extends StatelessWidget {
                     ),
                     const SizedBox(width: 5),
                     Text(
-                      '${telemetry.satellites} satellites',
+                      '${telemetry.variation} satellites',
                       style: const TextStyle(
                         color: Colors.grey,
                       ),
