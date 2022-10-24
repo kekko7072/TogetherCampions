@@ -1,3 +1,4 @@
+import 'package:app/interfaces/widgets/upload_session_dialog.dart';
 import 'package:app/services/imports.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:intl/intl.dart';
@@ -153,72 +154,26 @@ class _BLEDeviceScreenState extends State<BLEDeviceScreen> {
                       ),
                       actions: [
                         CupertinoActionSheetAction(
-                            onPressed: () async {
-                              EasyLoading.show();
-                              String sessionID = const Uuid().v4();
-                              debugPrint('\n\n\n\n\n\n\n\n\n\n\n\n');
-                              try {
+                            onPressed: () async =>
+
                                 ///0.Stop notifying
+                                await widget.device
+                                    .disconnect()
+                                    .then((value) => showCupertinoDialog(
+                                        context: context,
+                                        builder: (_) => UploadSessionDialog(
+                                              device: widget.device,
 
-                                ///1. Create Session
-                                await DatabaseSession(
-                                        deviceID: widget.device.id.id)
-                                    .add(
-                                        session: Session(
-                                            id: sessionID,
-                                            info: SessionInfo(
-                                                name: DateFormat.yMd()
-                                                    .add_Hms()
-                                                    .format(DateTime.now()),
-                                                start: DateTime.now().subtract(
-                                                    Duration(
-                                                        milliseconds: system
-                                                            .last.timestamp)),
-                                                end: DateTime.now()),
-                                            devicePosition: DevicePosition(
-                                              x: 0,
-                                              y: 0,
-                                              z: 0,
-                                            )));
-
-                                //TODO create json to save locally
-                                Directory appDocDir =
-                                    await getApplicationDocumentsDirectory();
-                                String appDocPath = appDocDir.path;
-
-                                ///1. Add System
-                                for (System sys in system) {
-                                  await DatabaseSystem(
-                                          deviceID: widget.device.id.id,
-                                          sessionID: sessionID)
-                                      .add(sys);
-                                }
-
-                                ///2. Add Gps
-                                for (Gps gps in gps) {
-                                  await DatabaseGps(
-                                          deviceID: widget.device.id.id,
-                                          sessionID: sessionID)
-                                      .add(gps);
-                                }
-
-                                ///3. Add Mpu
-                                for (Mpu mpu in mpu) {
-                                  await DatabaseMpu(
-                                          deviceID: widget.device.id.id,
-                                          sessionID: sessionID)
-                                      .add(mpu);
-                                }
-                              } catch (e) {
-                                print(
-                                    "\n\n\n\n\n\n\n\n\n\n\n\nERRRORRR: $e\n\n\n\n\n\n\n\n\n\n\n\n");
-                              }
-                              await widget.device.disconnect().then((value) {
-                                Navigator.of(context).pop();
-                                Navigator.of(context).pop();
-                              });
-                              EasyLoading.dismiss();
-                            },
+                                              ///TODO LOAD DEVICE POSITION
+                                              devicePosition: DevicePosition(
+                                                x: 0,
+                                                y: 0,
+                                                z: 0,
+                                              ),
+                                              system: system,
+                                              gps: gps,
+                                              mpu: mpu,
+                                            ))),
                             isDefaultAction: true,
                             child: const Text('End'))
                       ],
@@ -464,21 +419,10 @@ class _BLEDeviceScreenState extends State<BLEDeviceScreen> {
     List<Widget> list = [];
     for (BluetoothService service in services) {
       if (BluetoothHelper.formatUUID(service.uuid) == kBLESystemService) {
-        /*BluetoothCharacteristic? temperatureCharacteristic =
-            BluetoothHelper.characteristic(
-                service, kBLETemperatureCharacteristic);
-
-        enableNotification(temperatureCharacteristic);*/
-
         BluetoothCharacteristic? systemCharacteristic =
             BluetoothHelper.characteristic(service, kBLESystemCharacteristic);
 
         enableNotification(systemCharacteristic);
-
-        /*BluetoothCharacteristic? batteryCharacteristic =
-            BluetoothHelper.characteristic(service, kBLEBatteryCharacteristic);
-
-        enableNotification(batteryCharacteristic);*/
 
         list.add(Padding(
           padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 10),
@@ -493,11 +437,10 @@ class _BLEDeviceScreenState extends State<BLEDeviceScreen> {
                 final value = snapshot.data;
 
                 if (value != null) {
-                  System? sys = System.formListInt(value);
-                  if (sys != null) {
-                    system.add(sys);
-                  } else {
-                    debugPrint("ERROR: SYSTEM IS NULL");
+                  try {
+                    system.add(System.formListInt(value));
+                  } catch (e) {
+                    print('\n\n\n\nERROR PARSING VALUE SYSTEM: $e');
                   }
                 }
                 return systemCharacteristic != null &&
@@ -835,7 +778,7 @@ class _BLEDeviceScreenState extends State<BLEDeviceScreen> {
                             satellites: 12,
                           ));
                         } catch (e) {
-                          debugPrint("\nERROR: $e\n");
+                          debugPrint("\n\n\n\nERROR ADDING GPS: $e\n");
                         }
                       }
                       return ListTile(

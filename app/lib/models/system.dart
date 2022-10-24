@@ -10,19 +10,25 @@ class System {
   final int battery;
   final double temperature;
 
-  static System? formListInt(List<int> bit) {
+  factory System.formListInt(List<int> bit) {
     ByteBuffer buffer = Int8List.fromList(bit).buffer;
     ByteData byteData = ByteData.view(buffer);
-    try {
-      return System(
-        timestamp: byteData.getInt32(0, Endian.little),
-        battery: byteData.getInt32(4, Endian.little),
-        temperature:
-            CalculationService.temperature(byteData.getInt32(8, Endian.little)),
-      );
-    } catch (e) {
-      debugPrint("\nERROR: $e\n");
-      return null;
-    }
+    return System(
+      timestamp: byteData.getInt32(0, Endian.little),
+      battery: byteData.getInt32(4, Endian.little),
+      temperature:
+          CalculationService.temperature(byteData.getInt32(8, Endian.little)),
+    );
   }
+
+  factory System.fromJson(Map<String, dynamic> json) => System(
+        timestamp: json["timestamp"],
+        battery: json["battery"],
+        temperature: json["temperature"],
+      );
+  Map<String, dynamic> toJson() => {
+        "timestamp": timestamp,
+        "battery": battery,
+        "temperature": temperature,
+      };
 }

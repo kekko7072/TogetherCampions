@@ -4,7 +4,6 @@
 #include <QMC5883LCompass.h>
 #include "configuration.h"
 #include "system.h"
-#include "battery.h"
 #include "mpu.h"
 #include "compass.h"
 #include "gps.h"
@@ -17,20 +16,13 @@
 // Bluetooth® Low Energy Battery Service
 BLEService systemService("00001000-0000-1000-8000-00805F9B34FB");
 
-BLECharacteristic systemCharacteristic("00001001-0000-1000-8000-00805F9B34FB", BLERead | BLENotify, 12);     //TIMESTAMP 1001 4 bit
-//BLECharacteristic batteryLevelCharacteristic("00001002-0000-1000-8000-00805F9B34FB", BLERead | BLENotify, 8);  //BATTERY LEVEL 1002 8 bit
-//BLECharacteristic temperatureCharacteristic("00001003-0000-1000-8000-00805F9B34FB", BLERead | BLENotify, 8);   //TEMPERATURE 1003 8 bit
-
+BLECharacteristic systemCharacteristic("00001001-0000-1000-8000-00805F9B34FB", BLERead | BLENotify, 28);  //SYSTEM 1001 28 bit
 
 // Telemetry
 BLEService telemetryService("00002000-0000-1000-8000-00805F9B34FB");
 
-BLECharacteristic gpsCharacteristic("00002001-0000-1000-8000-00805F9B34FB", BLERead | BLENotify, 20);            //GPS 2005 1 bit
+BLECharacteristic gpsCharacteristic("00002001-0000-1000-8000-00805F9B34FB", BLERead | BLENotify, 20);  //GPS 2005 1 bit
 BLECharacteristic mpuCharacteristic("00002002-0000-1000-8000-00805F9B34FB", BLERead | BLENotify, 28);  //MPU 2001 28 bit
-//BLECharacteristic speedCharacteristic("00002002-0000-1000-8000-00805F9B34FB", BLERead | BLENotify, 12);          //SPEED 2002
-//BLECharacteristic gyroscopeCharacteristic("00002003-0000-1000-8000-00805F9B34FB", BLERead | BLENotify, 16);  //GYROSCOPE 2003 16 bit
-//BLECharacteristic compassCharacteristic("00002004-0000-1000-8000-00805F9B34FB", BLERead | BLENotify, 12);        //COMPASS 2004
-
 
 
 //SERVICES
@@ -67,16 +59,10 @@ void setup() {
   BLE.setAdvertisedService(systemService);
   BLE.setAdvertisedService(telemetryService);
 
-  systemService.addCharacteristic(systemCharacteristic);     // Timestamp characteristic
-  //systemService.addCharacteristic(batteryLevelCharacteristic);  // BatteryLevel characteristic
-  //systemService.addCharacteristic(temperatureCharacteristic);   // Temperature characteristic
+  systemService.addCharacteristic(systemCharacteristic);  // Timestamp characteristic
 
-  telemetryService.addCharacteristic(gpsCharacteristic);            // Gps characteristic
+  telemetryService.addCharacteristic(gpsCharacteristic);  // Gps characteristic
   telemetryService.addCharacteristic(mpuCharacteristic);  // Acceleration characteristic
-  //telemetryService.addCharacteristic(speedCharacteristic);          // Speed characteristic
-  //telemetryService.addCharacteristic(gyroscopeCharacteristic);  // Gyroscope characteristic
-  //telemetryService.addCharacteristic(compassCharacteristic);        // Gyroscope characteristic
-
 
 
   BLE.addService(systemService);     // System service
@@ -84,10 +70,11 @@ void setup() {
 
 
 
-  // batteryLevelChar.writeValue(oldBatteryLevel);  // set initial value for this characteristic
-
-
   BLE.advertise();  //start advertising the service
+
+  // assign event handlers for connected, disconnected to peripheral
+  BLE.setEventHandler(BLEConnected, ConnectHandler);
+  BLE.setEventHandler(BLEDisconnected, DisconnectHandler);
 
   Wire.begin();
   delay(100);
@@ -119,19 +106,20 @@ void setup() {
   Serial.println(" Bluetooth® device active, waiting for connections...");
 }
 
-float GPSData[5];
+float GPSData[7];
 
 void loop() {
 
   BLEDevice central = BLE.central();  // wait for a Bluetooth® Low Energy central
 
-  GPSData[0] = GPS.available() ? 0.0 : 1.1;  //Passing custom values to make sure system works as espected
-  GPSData[1] = GPS.available() ? isnan(GPS.latitude()) ? 0.0 : GPS.latitude() : 0.0;
-  GPSData[2] = GPS.available() ? isnan(GPS.longitude()) ? 0.0 : GPS.longitude() : 0.0;
-  GPSData[3] = GPS.available() ? isnan(GPS.longitude()) ? 0.0 : GPS.speed() : 0.0;
-  //  eulers[3] = GPS.available() ? isnan(GPS.longitude()) ? 0.0 : GPS.course(): 0.0;    // Track angle in degrees
-  // eulers[4] = GPS.available() ? isnan(GPS.longitude()) ? 0.0 : GPS.variation(): 0.0;  // Magnetic Variation
-  GPSData[4] = millis();
+  GPSData[0] = millis();
+  GPSData[1] = GPS.available() ? 0.0 : 1.1;  //Passing custom values to make sure system works as espected
+  GPSData[2] = GPS.available() ? isnan(GPS.latitude()) ? 0.0 : GPS.latitude() : 0.0;
+  GPSData[3] = GPS.available() ? isnan(GPS.longitude()) ? 0.0 : GPS.longitude() : 0.0;
+  GPSData[4] = GPS.available() ? isnan(GPS.longitude()) ? 0.0 : GPS.speed() : 0.0;
+  GPSData[5] = GPS.available() ? isnan(GPS.longitude()) ? 0.0 : GPS.course() : 0.0;     // Track angle in degrees
+  GPSData[6] = GPS.available() ? isnan(GPS.longitude()) ? 0.0 : GPS.variation() : 0.0;  // Magnetic Variation
+
 
 
   if (central.connected()) {
@@ -139,19 +127,31 @@ void loop() {
 
     if (currentMillis - previousMillis >= measurements_milliseconds) {
       //System
-      //systemCharacteristic.setValue((byte *)&currentMillis, 4);
       updateSystem(systemCharacteristic, currentMillis);
-      //updateTemperature(temperatureCharacteristic, currentMillis);
 
       //Telemetry
       updateMpu(mpuCharacteristic, currentMillis);
-      //updateSpeed(currentMillis - previousMillis, speedCharacteristic);
-      //updateGyroscope(gyroscopeCharacteristic, currentMillis);
-      //updateCompass(compassCharacteristic);
-      //updateGps(gpsCharacteristic, gps_data);
       gpsCharacteristic.setValue((byte *)&GPSData, 20);
 
       previousMillis = currentMillis;  //Clean to re-run cicle
     }
   }
+}
+
+void ConnectHandler(BLEDevice central) {
+  // central connected event handler
+
+  Serial.print("Connected event, central: ");
+  Serial.println(central.address());
+
+  BLE.advertise();
+}
+
+void DisconnectHandler(BLEDevice central) {
+  // central disconnected event handlerù
+
+  Serial.print("Disconnected event, central: ");
+  Serial.println(central.address());
+
+  BLE.advertise();
 }
