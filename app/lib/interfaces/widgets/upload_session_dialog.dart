@@ -78,23 +78,6 @@ class _UploadSessionDialogState extends State<UploadSessionDialog> {
             try {
               setState(() => showUploading = true);
 
-              ///0.Stop notifying
-              await widget.device.disconnect();
-
-              ///1. Create Session
-              await DatabaseSession(deviceID: widget.device.id.id).add(
-                  session: Session(
-                      id: sessionID,
-                      info: SessionInfo(
-                          name: DateFormat.yMd()
-                              .add_Hms()
-                              .format(DateTime.now())
-                              .toString(),
-                          start: DateTime.now().subtract(Duration(
-                              milliseconds: widget.system.last.timestamp)),
-                          end: DateTime.now()),
-                      devicePosition: widget.devicePosition));
-
               ///1. Add System
               List<Map> systemListJSON = [];
               for (System sys in widget.system) {
@@ -152,13 +135,12 @@ class _UploadSessionDialogState extends State<UploadSessionDialog> {
                 "gyroscope": gyroscopeListJSON,
               };
 
-              print(content);
               final Directory directory =
                   await getApplicationDocumentsDirectory();
               final File file = File('${directory.path}/$sessionID.json');
               await file.writeAsString(jsonEncode(content));
             } catch (e) {
-              print(
+              debugPrint(
                   "\n\n\n\n\n\n\n\n\n\n\n\nERRRORRR: $e\n\n\n\n\n\n\n\n\n\n\n\n");
             }
 
@@ -174,12 +156,9 @@ class _UploadSessionDialogState extends State<UploadSessionDialog> {
             setState(() => showUploading = true);
 
             String sessionID = const Uuid().v4();
-            debugPrint('\n\n\n\n\n\n\n\n\n\n\n\n');
+
             try {
               setState(() => showUploading = true);
-
-              ///0.Stop notifying
-              await widget.device.disconnect();
 
               ///1. Create Session
               await DatabaseSession(deviceID: widget.device.id.id).add(
@@ -202,7 +181,6 @@ class _UploadSessionDialogState extends State<UploadSessionDialog> {
                         deviceID: widget.device.id.toString(),
                         sessionID: sessionID)
                     .add(sys);
-                print('\n\n${sys.toJson()}\n\n');
               }
 
               ///2. Add Gps
@@ -237,7 +215,7 @@ class _UploadSessionDialogState extends State<UploadSessionDialog> {
                     .add(mpu);
               }
             } catch (e) {
-              print(
+              debugPrint(
                   "\n\n\n\n\n\n\n\n\n\n\n\nERRRORRR: $e\n\n\n\n\n\n\n\n\n\n\n\n");
             }
 
