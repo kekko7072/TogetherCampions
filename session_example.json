@@ -23,27 +23,40 @@
       "temperature": 12.2
     }
   ],
-  "mpu": [
-    {
-      "timestamp": 123,
-      "a_x": 12,
-      "a_y": 12,
-      "a_z": 12,
-      "g_x": 12,
-      "g_y": 11,
-      "g_z": 12
-    }
-  ],
-  "gps": [
+  "gps_position": [
     {
       "timestamp": 0,
       "available": true,
       "lat": 112.2,
       "lng": 12.2,
       "speed": 13.2,
-      "course": 121,
-      "variation": 121,
-      "satellites": 12
     }
   ]
+  "gps_navigation": [
+    {
+      "timestamp": 0,
+      "available": true,
+      "altitude": 12
+      "course": 121,
+      "variation": 121
+      
+    }
+  ]
+  "accelerometer": [
+    {
+      "timestamp": 123,
+      "a_x": 12,
+      "a_y": 12,
+      "a_z": 12
+    }
+  ],
+  "gyroscope": [
+    {
+      "timestamp": 123,
+      "g_x": 12,
+      "g_y": 11,
+      "g_z": 12
+    }
+  ]
+ 
 }
