@@ -3,7 +3,7 @@
 #include <Wire.h>
 #include <QMC5883LCompass.h>
 #include "configuration.h"
-#include "timestamp.h"
+#include "system.h"
 #include "battery.h"
 #include "mpu.h"
 #include "compass.h"
@@ -17,18 +17,18 @@
 // Bluetooth® Low Energy Battery Service
 BLEService systemService("00001000-0000-1000-8000-00805F9B34FB");
 
-BLECharacteristic timestampCharacteristic("00001001-0000-1000-8000-00805F9B34FB", BLERead | BLENotify, 4);     //TIMESTAMP 1001 4 bit
-BLECharacteristic batteryLevelCharacteristic("00001002-0000-1000-8000-00805F9B34FB", BLERead | BLENotify, 8);  //BATTERY LEVEL 1002 8 bit
-BLECharacteristic temperatureCharacteristic("00001003-0000-1000-8000-00805F9B34FB", BLERead | BLENotify, 8);   //TEMPERATURE 1003 8 bit
+BLECharacteristic systemCharacteristic("00001001-0000-1000-8000-00805F9B34FB", BLERead | BLENotify, 12);     //TIMESTAMP 1001 4 bit
+//BLECharacteristic batteryLevelCharacteristic("00001002-0000-1000-8000-00805F9B34FB", BLERead | BLENotify, 8);  //BATTERY LEVEL 1002 8 bit
+//BLECharacteristic temperatureCharacteristic("00001003-0000-1000-8000-00805F9B34FB", BLERead | BLENotify, 8);   //TEMPERATURE 1003 8 bit
 
 
 // Telemetry
 BLEService telemetryService("00002000-0000-1000-8000-00805F9B34FB");
 
 BLECharacteristic gpsCharacteristic("00002001-0000-1000-8000-00805F9B34FB", BLERead | BLENotify, 20);            //GPS 2005 1 bit
-BLECharacteristic accelerometerCharacteristic("00002002-0000-1000-8000-00805F9B34FB", BLERead | BLENotify, 16);  //ACCELERATION 2001 16 bit
+BLECharacteristic mpuCharacteristic("00002002-0000-1000-8000-00805F9B34FB", BLERead | BLENotify, 28);  //MPU 2001 28 bit
 //BLECharacteristic speedCharacteristic("00002002-0000-1000-8000-00805F9B34FB", BLERead | BLENotify, 12);          //SPEED 2002
-BLECharacteristic gyroscopeCharacteristic("00002003-0000-1000-8000-00805F9B34FB", BLERead | BLENotify, 16);  //GYROSCOPE 2003 16 bit
+//BLECharacteristic gyroscopeCharacteristic("00002003-0000-1000-8000-00805F9B34FB", BLERead | BLENotify, 16);  //GYROSCOPE 2003 16 bit
 //BLECharacteristic compassCharacteristic("00002004-0000-1000-8000-00805F9B34FB", BLERead | BLENotify, 12);        //COMPASS 2004
 
 
@@ -67,14 +67,14 @@ void setup() {
   BLE.setAdvertisedService(systemService);
   BLE.setAdvertisedService(telemetryService);
 
-  systemService.addCharacteristic(timestampCharacteristic);     // Timestamp characteristic
-  systemService.addCharacteristic(batteryLevelCharacteristic);  // BatteryLevel characteristic
-  systemService.addCharacteristic(temperatureCharacteristic);   // Temperature characteristic
+  systemService.addCharacteristic(systemCharacteristic);     // Timestamp characteristic
+  //systemService.addCharacteristic(batteryLevelCharacteristic);  // BatteryLevel characteristic
+  //systemService.addCharacteristic(temperatureCharacteristic);   // Temperature characteristic
 
   telemetryService.addCharacteristic(gpsCharacteristic);            // Gps characteristic
-  telemetryService.addCharacteristic(accelerometerCharacteristic);  // Acceleration characteristic
+  telemetryService.addCharacteristic(mpuCharacteristic);  // Acceleration characteristic
   //telemetryService.addCharacteristic(speedCharacteristic);          // Speed characteristic
-  telemetryService.addCharacteristic(gyroscopeCharacteristic);  // Gyroscope characteristic
+  //telemetryService.addCharacteristic(gyroscopeCharacteristic);  // Gyroscope characteristic
   //telemetryService.addCharacteristic(compassCharacteristic);        // Gyroscope characteristic
 
 
@@ -139,14 +139,14 @@ void loop() {
 
     if (currentMillis - previousMillis >= measurements_milliseconds) {
       //System
-      timestampCharacteristic.setValue((byte *)&currentMillis, 4);
-      updateBatteryLevel(batteryLevelCharacteristic, currentMillis);
-      updateTemperature(temperatureCharacteristic, currentMillis);
+      //systemCharacteristic.setValue((byte *)&currentMillis, 4);
+      updateSystem(systemCharacteristic, currentMillis);
+      //updateTemperature(temperatureCharacteristic, currentMillis);
 
       //Telemetry
-      updateAcceleration(accelerometerCharacteristic, currentMillis);
+      updateMpu(mpuCharacteristic, currentMillis);
       //updateSpeed(currentMillis - previousMillis, speedCharacteristic);
-      updateGyroscope(gyroscopeCharacteristic, currentMillis);
+      //updateGyroscope(gyroscopeCharacteristic, currentMillis);
       //updateCompass(compassCharacteristic);
       //updateGps(gpsCharacteristic, gps_data);
       gpsCharacteristic.setValue((byte *)&GPSData, 20);

@@ -13,7 +13,7 @@ class CardSession extends StatefulWidget {
   final UserData userData;
 
   final Session session;
-  final List<GPS> gps;
+  final List<Gps> gps;
 
   @override
   State<CardSession> createState() => _CardSessionState();
@@ -25,7 +25,7 @@ class _CardSessionState extends State<CardSession> {
   @override
   void initState() {
     super.initState();
-    for (GPS log in widget.gps) {
+    for (Gps log in widget.gps) {
       polylinePoints.add(log.latLng);
     }
   }
@@ -184,15 +184,15 @@ class _CardSessionState extends State<CardSession> {
 
 class TrackPreview extends StatefulWidget {
   const TrackPreview({Key? key, required this.gps}) : super(key: key);
-  final List<GPS> gps;
+  final List<Gps> gps;
 
   @override
   State<TrackPreview> createState() => TrackPreviewState();
 }
 
 class TrackPreviewState extends State<TrackPreview> {
-  late GPS start;
-  late GPS end;
+  late Gps start;
+  late Gps end;
 
   List<MapLatLng> segment = [];
 
@@ -206,7 +206,7 @@ class TrackPreviewState extends State<TrackPreview> {
     start = widget.gps.first;
     end = widget.gps.last;
 
-    for (GPS log in widget.gps) {
+    for (Gps log in widget.gps) {
       segment.add(log.latLng);
     }
 

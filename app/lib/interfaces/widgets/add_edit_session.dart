@@ -27,8 +27,7 @@ class _AddEditSessionState extends State<AddEditSession> {
   DateTime start = DateTime.now();
   DateTime end = DateTime.now();
 
-  ThreeDimensionalValueInt devicePosition =
-      ThreeDimensionalValueInt(x: 0, y: 0, z: 0, timestamp: 0);
+  DevicePosition devicePosition = DevicePosition(x: 0, y: 0, z: 0);
 
   FilePickerResult? result;
   PlatformFile? file;
@@ -216,11 +215,10 @@ class _AddEditSessionState extends State<AddEditSession> {
                                           name: name.text,
                                           start: start,
                                           end: end),
-                                      devicePosition: ThreeDimensionalValueInt(
+                                      devicePosition: DevicePosition(
                                         x: devicePosition.x,
                                         y: devicePosition.y,
                                         z: devicePosition.z,
-                                        timestamp: devicePosition.timestamp,
                                       )))
                               .then((value) {
                             setState(() => showLoading = false);

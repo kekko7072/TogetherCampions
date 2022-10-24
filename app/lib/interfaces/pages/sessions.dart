@@ -75,7 +75,7 @@ class _SessionsState extends State<Sessions> {
                                 runSpacing: 5,
                                 children: [
                                   for (Session session in sessions) ...[
-                                    StreamBuilder<List<GPS>>(
+                                    StreamBuilder<List<Gps>>(
                                         stream: DatabaseGps(
                                                 deviceID: deviceID,
                                                 sessionID: session.id)
@@ -128,7 +128,7 @@ class _SessionsState extends State<Sessions> {
                 ),
               ),
             ),
-            floatingActionButton: TextButton(
+            /* floatingActionButton: TextButton(
               onPressed: () async => showModalBottomSheet(
                 context: context,
                 shape: AppStyle.kModalBottomStyle,
@@ -149,7 +149,7 @@ class _SessionsState extends State<Sessions> {
                       size: 30,
                     ),
                   )),
-            ),
+            ),*/
           )
         : const Center(
             child: CircularProgressIndicator(),

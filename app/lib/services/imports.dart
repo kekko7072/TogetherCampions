@@ -26,6 +26,7 @@ export 'package:firebase_crashlytics/firebase_crashlytics.dart';
 
 ///Basic
 export 'package:provider/provider.dart';
+export 'package:path_provider/path_provider.dart';
 export 'package:uuid/uuid.dart';
 export 'package:syncfusion_flutter_maps/maps.dart';
 export 'package:file_picker/file_picker.dart';
@@ -74,15 +75,16 @@ export 'package:app/models/user.dart';
 export 'package:app/models/telemetry_analytics.dart';
 export 'package:app/models/ble_characteristic.dart';
 export 'package:app/models/ble_service.dart';
-export 'package:app/models/dimensional_value.dart';
+export 'package:app/models/mpu.dart';
 export 'package:app/models/gps.dart';
+export 'package:app/models/system.dart';
 export 'package:app/models/telemetry_analytics.dart';
 
 ///SERVICES
 export 'package:app/services/database_session.dart';
 export '../../services/session/database_gps.dart';
-export 'package:app/services/session/database_telemetry.dart';
-export 'package:app/services/session/database_services.dart';
+export 'package:app/services/session/database_mpu.dart';
+export 'package:app/services/session/database_system.dart';
 export 'package:app/services/database_user.dart';
 export 'package:app/services/database_device.dart';
 export 'package:app/services/auth.dart';

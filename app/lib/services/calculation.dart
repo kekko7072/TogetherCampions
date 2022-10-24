@@ -16,7 +16,7 @@ class CalculationService {
   }
 
   static TelemetryAnalytics telemetry({
-    required List<GPS> gps,
+    required List<Gps> gps,
     required List<MapLatLng> segment,
   }) {
     double speedMedium = 0;
@@ -36,7 +36,7 @@ class CalculationService {
     double batteryMax = 0;
     double batteryMin = 10000;
 
-    for (GPS log in gps) {
+    for (Gps log in gps) {
       ///Speed
       speedMedium = speedMedium + log.speed;
 
@@ -204,18 +204,14 @@ class CalculationService {
 
   static double temperature(int input) => (input / 340.00) + 36.53;
 
-  static double mediumAcceleration(ThreeDimensionalValueInt input) =>
-      sqrt(pow(input.x / 16384.0, 2) +
-          pow(input.y / 16384.0, 2) +
-          pow(input.z / 16384.0, 2));
+  static double mediumAcceleration(Mpu input) =>
+      sqrt(pow(input.aX / 16384.0, 2) +
+          pow(input.aY / 16384.0, 2) +
+          pow(input.aZ / 16384.0, 2));
 
-  static double mediumSpeed(ThreeDimensionalValueDouble input) =>
-      sqrt(pow(input.x, 2) + pow(input.y, 2) + pow(input.z, 2));
-
-  static int pitch(ThreeDimensionalValueInt input) =>
-      (atan2(input.x, sqrt(input.y * input.y + input.z * input.z)) * 57.3)
+  static int pitch(Mpu input) =>
+      (atan2(input.aX, sqrt(input.aY * input.aY + input.aZ * input.aZ)) * 57.3)
           .toInt();
 
-  static int roll(ThreeDimensionalValueInt input) =>
-      (atan2(input.y, input.z) * 57.3).toInt();
+  static int roll(Mpu input) => (atan2(input.aY, input.aZ) * 57.3).toInt();
 }

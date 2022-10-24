@@ -1,11 +1,11 @@
 import '../const.dart';
 
-enum BLESystemCharacteristic { timestamp, battery, temperature, unknown }
+enum BLESystemCharacteristic { system, unknown }
 
 enum BLETelemetryCharacteristic {
-  accelerometer,
+  mpu,
   // speed,
-  gyroscope,
+  //gyroscope,
   gps,
   unknown
 }
@@ -17,12 +17,8 @@ class BLECharacteristicHelper {
     switch (input) {
 
       ///System Service
-      case kBLETimestampCharacteristic:
-        return BLESystemCharacteristic.timestamp;
-      case kBLEBatteryCharacteristic:
-        return BLESystemCharacteristic.battery;
-      case kBLETemperatureCharacteristic:
-        return BLESystemCharacteristic.temperature;
+      case kBLESystemCharacteristic:
+        return BLESystemCharacteristic.system;
     }
     return BLESystemCharacteristic.unknown;
   }
@@ -32,10 +28,8 @@ class BLECharacteristicHelper {
     switch (input) {
 
       ///Telemetry Service
-      case kBLEAccelerometerCharacteristic:
-        return BLETelemetryCharacteristic.accelerometer;
-      case kBLEGyroscopeCharacteristic:
-        return BLETelemetryCharacteristic.gyroscope;
+      case kBLEMpuCharacteristic:
+        return BLETelemetryCharacteristic.mpu;
       case kBLEGpsCharacteristic:
         return BLETelemetryCharacteristic.gps;
     }
@@ -54,12 +48,10 @@ class BLECharacteristicHelper {
         return 'Temperature';*/
 
       ///Telemetry Service
-      case BLETelemetryCharacteristic.accelerometer:
-        return 'Accelerometer';
+      case BLETelemetryCharacteristic.mpu:
+        return 'Mpu';
       /* case BLETelemetryCharacteristic.speed:
         return 'Speed';*/
-      case BLETelemetryCharacteristic.gyroscope:
-        return 'Gyroscope';
       case BLETelemetryCharacteristic.gps:
         return 'Gps';
       case BLETelemetryCharacteristic.unknown:

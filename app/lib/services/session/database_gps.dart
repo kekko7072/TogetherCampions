@@ -15,7 +15,7 @@ class DatabaseGps {
           .collection('gps');
 
   ///CRUD
-  Future add(GPS gps) async {
+  Future add(Gps gps) async {
     return telemetryCollection.doc('${gps.timestamp}').set({
       'available': gps.available,
       'latitude': gps.latLng.latitude,
@@ -28,9 +28,9 @@ class DatabaseGps {
   }
 
   ///SERIALIZATION
-  static GPS gpsFromSnapshot(DocumentSnapshot<Map<String, dynamic>?> snapshot) {
+  static Gps gpsFromSnapshot(DocumentSnapshot<Map<String, dynamic>?> snapshot) {
     bool available = snapshot.data()?['available'] ?? false;
-    return GPS(
+    return Gps(
       timestamp: int.parse(snapshot.id),
       available: available,
       latLng: MapLatLng(available ? snapshot.data()!['latitude'] : 0.0,
@@ -43,14 +43,14 @@ class DatabaseGps {
     );
   }
 
-  static List<GPS> telemetriesListFromSnapshot(
+  static List<Gps> telemetriesListFromSnapshot(
           QuerySnapshot<Map<String, dynamic>> snapshot) =>
       snapshot.docs.map((snapshot) => gpsFromSnapshot(snapshot)).toList();
 
   ///STREAMS
-  Stream<GPS> stream({required String telemetryID}) =>
+  Stream<Gps> stream({required String telemetryID}) =>
       telemetryCollection.doc(telemetryID).snapshots().map(gpsFromSnapshot);
 
-  Stream<List<GPS>> get streamList =>
+  Stream<List<Gps>> get streamList =>
       telemetryCollection.snapshots().map(telemetriesListFromSnapshot);
 }

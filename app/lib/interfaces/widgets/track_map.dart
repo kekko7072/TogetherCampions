@@ -3,15 +3,15 @@ import 'package:flutter/cupertino.dart';
 
 class TrackMap extends StatefulWidget {
   const TrackMap({Key? key, required this.gps}) : super(key: key);
-  final List<GPS> gps;
+  final List<Gps> gps;
 
   @override
   State<TrackMap> createState() => TrackMapState();
 }
 
 class TrackMapState extends State<TrackMap> {
-  late GPS start;
-  late GPS end;
+  late Gps start;
+  late Gps end;
   List<MapLatLng> polylinePoints = [];
   TelemetryViewLive telemetryViewRange = TelemetryViewLive.speed;
   TelemetryViewLive telemetryViewCharts = TelemetryViewLive.speed;
@@ -24,7 +24,7 @@ class TrackMapState extends State<TrackMap> {
     start = widget.gps.first;
     end = widget.gps.last;
 
-    for (GPS log in widget.gps) {
+    for (Gps log in widget.gps) {
       polylinePoints.add(log.latLng);
     }
 
@@ -348,7 +348,7 @@ class TrackMapState extends State<TrackMap> {
                                           data: widget.gps,
                                           variables: {
                                             'timestamp': Variable(
-                                              accessor: (GPS log) =>
+                                              accessor: (Gps log) =>
                                                   log.timestamp,
                                               scale: LinearScale(
                                                   formatter: (number) =>
@@ -357,7 +357,7 @@ class TrackMapState extends State<TrackMap> {
                                                               number.toInt())),
                                             ),
                                             'speed': Variable(
-                                                accessor: (GPS gps) =>
+                                                accessor: (Gps gps) =>
                                                     gps.speed,
                                                 scale: LinearScale(
                                                     title: 'Speed',
@@ -387,7 +387,7 @@ class TrackMapState extends State<TrackMap> {
                                           data: widget.gps,
                                           variables: {
                                             'timestamp': Variable(
-                                              accessor: (GPS log) =>
+                                              accessor: (Gps log) =>
                                                   log.timestamp,
                                               scale: LinearScale(
                                                   formatter: (number) =>
@@ -396,7 +396,7 @@ class TrackMapState extends State<TrackMap> {
                                                               number.toInt())),
                                             ),
                                             'altitude': Variable(
-                                                accessor: (GPS gps) =>
+                                                accessor: (Gps gps) =>
                                                     gps.altitude,
                                                 scale: LinearScale(
                                                     title: 'Altitude',
@@ -426,7 +426,7 @@ class TrackMapState extends State<TrackMap> {
                                           data: widget.gps,
                                           variables: {
                                             'timestamp': Variable(
-                                              accessor: (GPS log) =>
+                                              accessor: (Gps log) =>
                                                   log.timestamp,
                                               scale: LinearScale(
                                                   formatter: (number) =>
@@ -435,7 +435,7 @@ class TrackMapState extends State<TrackMap> {
                                                               number.toInt())),
                                             ),
                                             'course': Variable(
-                                                accessor: (GPS gps) =>
+                                                accessor: (Gps gps) =>
                                                     gps.course,
                                                 scale: LinearScale(
                                                     title: 'Course',

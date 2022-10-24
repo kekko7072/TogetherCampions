@@ -45,11 +45,10 @@ class DatabaseSession {
         start: snapshot.data()?['info']['start'].toDate(),
         end: snapshot.data()?['info']['end'].toDate(),
       ),
-      devicePosition: ThreeDimensionalValueInt(
+      devicePosition: DevicePosition(
         x: snapshot.data()?['devicePosition']?['x']?.toInt(),
         y: snapshot.data()?['devicePosition']?['y']?.toInt(),
         z: snapshot.data()?['devicePosition']?['z']?.toInt(),
-        timestamp: snapshot.data()?['devicePosition']?['timestamp']?.toInt(),
       ),
     );
   }

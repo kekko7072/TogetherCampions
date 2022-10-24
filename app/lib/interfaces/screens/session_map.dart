@@ -7,7 +7,7 @@ class SessionMap extends StatefulWidget {
       : super(key: key);
 
   final Session session;
-  final List<GPS> gps;
+  final List<Gps> gps;
 
   @override
   State<SessionMap> createState() => SessionMapState();
@@ -15,8 +15,8 @@ class SessionMap extends StatefulWidget {
 
 class SessionMapState extends State<SessionMap>
     with SingleTickerProviderStateMixin {
-  late GPS start;
-  late GPS end;
+  late Gps start;
+  late Gps end;
 
   late TelemetryAnalytics telemetry;
 
@@ -39,7 +39,7 @@ class SessionMapState extends State<SessionMap>
     start = widget.gps.first;
     end = widget.gps.last;
 
-    for (GPS log in widget.gps) {
+    for (Gps log in widget.gps) {
       polylinePoints.add(log.latLng);
     }
 

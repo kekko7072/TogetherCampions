@@ -6,7 +6,7 @@ void setupMPU() {
   Wire.endTransmission(true);
 }
 
-void updateAcceleration(BLECharacteristic characteristic, int timestamp) {
+void updateMpu(BLECharacteristic characteristic, int timestamp) {
   Wire.beginTransmission(MPU_ADDR);
   Wire.write(0x3B);  // starting with register 0x3B (ACCEL_XOUT_H)
   Wire.endTransmission(false);
@@ -14,6 +14,10 @@ void updateAcceleration(BLECharacteristic characteristic, int timestamp) {
   int16_t AcX = Wire.read() << 8 | Wire.read();  // 0x3B (ACCEL_XOUT_H) & 0x3C (ACCEL_XOUT_L)
   int16_t AcY = Wire.read() << 8 | Wire.read();  // 0x3D (ACCEL_YOUT_H) & 0x3E (ACCEL_YOUT_L)
   int16_t AcZ = Wire.read() << 8 | Wire.read();  // 0x3F (ACCEL_ZOUT_H) & 0x40 (ACCEL_ZOUT_L)
+  int16_t temperature = Wire.read() << 8 | Wire.read();
+  int16_t GyX = Wire.read() << 8 | Wire.read();  // 0x43 (GYRO_XOUT_H) & 0x44 (GYRO_XOUT_L)
+  int16_t GyY = Wire.read() << 8 | Wire.read();  // 0x45 (GYRO_YOUT_H) & 0x46 (GYRO_YOUT_L)
+  int16_t GyZ = Wire.read() << 8 | Wire.read();  // 0x47 (GYRO_ZOUT_H) & 0x48 (GYRO_ZOUT_L)
 
 
   Serial.print("Accelerometer: ");
@@ -22,17 +26,29 @@ void updateAcceleration(BLECharacteristic characteristic, int timestamp) {
   Serial.print(" | Y = ");
   Serial.print(AcY);
   Serial.print(" | Z = ");
-  Serial.println(AcZ - 16384.0);  //AcZ - 16384.0 to make it inertail from the device position
+  Serial.println(AcZ);  //AcZ - 16384.0 to make it inertail from the device position
+  Serial.print("Gyroscope: ");
+  Serial.print("X = ");
+  Serial.print(GyX);
+  Serial.print(" | Y = ");
+  Serial.print(GyY);
+  Serial.print(" | Z = ");
+  Serial.println(GyZ);
+  Serial.println(" ");
 
 
-  int eulers[4];
-  eulers[0] = AcX;
-  eulers[1] = AcY;
-  eulers[2] = AcZ;
-  eulers[3] = millis();
+
+  int eulers[7];
+  eulers[2] = timestamp;
+  eulers[1] = AcX;
+  eulers[2] = AcY;
+  eulers[3] = AcZ;
+  eulers[4] = GyX;
+  eulers[5] = GyY;
+  eulers[6] = GyZ;
 
   // Send 3x eulers over bluetooth as 1x byte array
-  characteristic.setValue((byte *)&eulers, 16);
+  characteristic.setValue((byte *)&eulers, 28);
 }
 
 /*

@@ -1,179 +1,141 @@
 import 'package:app/services/imports.dart';
 import 'package:flutter/cupertino.dart';
 
-class DataChartVisualizationBattery extends StatefulWidget {
-  const DataChartVisualizationBattery({Key? key, required this.service})
+enum SystemDataVisualization { battery, temperature }
+
+class DataChartVisualizationSystem extends StatefulWidget {
+  const DataChartVisualizationSystem(
+      {Key? key, required this.service, required this.systemDataVisualization})
       : super(key: key);
   final BluetoothService service;
+  final SystemDataVisualization systemDataVisualization;
 
   @override
-  State<DataChartVisualizationBattery> createState() =>
-      _DataChartVisualizationBatteryState();
+  State<DataChartVisualizationSystem> createState() =>
+      _DataChartVisualizationSystemState();
 }
 
-class _DataChartVisualizationBatteryState
-    extends State<DataChartVisualizationBattery> {
-  List<MonoDimensionalValueInt> batteryLevels = [];
-  @override
-  Widget build(BuildContext context) {
-    return StreamBuilder<List<int>>(
-        stream: BluetoothHelper.characteristic(
-                widget.service, kBLEBatteryCharacteristic)
-            ?.value,
-        initialData: BluetoothHelper.characteristic(
-                widget.service, kBLEBatteryCharacteristic)
-            ?.lastValue,
-        builder: (context, snapshot) {
-          final value = snapshot.data;
-          if (value != null) {
-            ByteBuffer buffer = Int8List.fromList(value).buffer;
-            ByteData byteData = ByteData.view(buffer);
-            try {
-              batteryLevels.add(MonoDimensionalValueInt(
-                value: byteData.getInt32(0, Endian.little),
-                timestamp: byteData.getInt32(4, Endian.little),
-              ));
-            } catch (e) {
-              debugPrint("\nERROR: $e\n");
-            }
-          }
-          return CupertinoAlertDialog(
-            title: Text(
-              'Battery Level  ${batteryLevels.last.value} %',
-            ),
-            content: SizedBox(
-              height: MediaQuery.of(context).size.height / 2,
-              //https://medium.com/analytics-vidhya/the-versatility-of-the-grammar-of-graphics-d1366760424d
-
-              child: Chart(
-                data: batteryLevels,
-                variables: {
-                  'timestamp': Variable(
-                    accessor: (MonoDimensionalValueInt log) => log.timestamp,
-                    scale: LinearScale(
-                        formatter: (number) =>
-                            CalculationService.timestamp(number.toInt())),
-                  ),
-                  'battery': Variable(
-                    accessor: (MonoDimensionalValueInt log) => log.value,
-                    scale: LinearScale(
-                        formatter: (number) => '${number.toInt()} %'),
-                  ),
-                },
-                coord: RectCoord(),
-                elements: [LineElement()],
-                rebuild: true,
-                axes: [
-                  Defaults.horizontalAxis,
-                  Defaults.verticalAxis,
-                ],
-              ),
-            ),
-            actions: [
-              CupertinoDialogAction(
-                isDestructiveAction: true,
-                onPressed: () => Navigator.of(context).pop(),
-                child: const Text('Chiudi'),
-              ),
-              CupertinoDialogAction(
-                isDefaultAction: true,
-                //TODO create exportation of data as csv
-                onPressed: () => Navigator.of(context).pop(),
-                child: const Text('Esporta'),
-              )
-            ],
-          );
-        });
-  }
-}
-
-class DataChartVisualizationTemperature extends StatefulWidget {
-  const DataChartVisualizationTemperature({Key? key, required this.service})
-      : super(key: key);
-  final BluetoothService service;
-
-  @override
-  State<DataChartVisualizationTemperature> createState() =>
-      _DataChartVisualizationTemperatureState();
-}
-
-class _DataChartVisualizationTemperatureState
-    extends State<DataChartVisualizationTemperature> {
-  List<MonoDimensionalValueDouble> temperatures = [];
+class _DataChartVisualizationSystemState
+    extends State<DataChartVisualizationSystem> {
+  List<System> system = [];
 
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<List<int>>(
         stream: BluetoothHelper.characteristic(
-                widget.service, kBLETemperatureCharacteristic)
+                widget.service, kBLESystemCharacteristic)
             ?.value,
         initialData: BluetoothHelper.characteristic(
-                widget.service, kBLETemperatureCharacteristic)
+                widget.service, kBLESystemCharacteristic)
             ?.lastValue,
         builder: (context, snapshot) {
           final value = snapshot.data;
-
           if (value != null) {
-            ByteBuffer buffer = Int8List.fromList(value).buffer;
-            ByteData byteData = ByteData.view(buffer);
-            try {
-              temperatures.add(MonoDimensionalValueDouble(
-                value: CalculationService.temperature(
-                    byteData.getInt32(0, Endian.little)),
-                timestamp: byteData.getInt32(4, Endian.little),
-              ));
-            } catch (e) {
-              debugPrint("\nERROR: $e\n");
+            System? sys = System.formListInt(value);
+            if (sys != null) {
+              system.add(sys);
+            } else {
+              debugPrint("ERROR: SYSTEM IS NULL");
             }
           }
-          return CupertinoAlertDialog(
-            title: Text(
-              'Temperature ${temperatures.last.value.toStringAsFixed(2)} °',
-            ),
-            content: SizedBox(
-              height: MediaQuery.of(context).size.height / 2,
-              //https://medium.com/analytics-vidhya/the-versatility-of-the-grammar-of-graphics-d1366760424d
+          switch (widget.systemDataVisualization) {
+            case SystemDataVisualization.battery:
+              return CupertinoAlertDialog(
+                title: Text(
+                  'Battery Level  ${system.last.battery} %',
+                ),
+                content: SizedBox(
+                  height: MediaQuery.of(context).size.height / 2,
+                  //https://medium.com/analytics-vidhya/the-versatility-of-the-grammar-of-graphics-d1366760424d
 
-              child: Chart(
-                data: temperatures,
-                variables: {
-                  'timestamp': Variable(
-                    accessor: (MonoDimensionalValueDouble log) => log.timestamp,
-                    scale: LinearScale(
-                        formatter: (number) =>
-                            CalculationService.timestamp(number.toInt())),
+                  child: Chart(
+                    data: system,
+                    variables: {
+                      'timestamp': Variable(
+                        accessor: (System log) => log.timestamp,
+                        scale: LinearScale(
+                            formatter: (number) =>
+                                CalculationService.timestamp(number.toInt())),
+                      ),
+                      'battery': Variable(
+                        accessor: (System log) => log.battery,
+                        scale: LinearScale(
+                            formatter: (number) => '${number.toInt()} %'),
+                      ),
+                    },
+                    coord: RectCoord(),
+                    elements: [LineElement()],
+                    rebuild: true,
+                    axes: [
+                      Defaults.horizontalAxis,
+                      Defaults.verticalAxis,
+                    ],
                   ),
-                  'temperature': Variable(
-                    accessor: (MonoDimensionalValueDouble log) =>
-                        log.value.roundToDouble(),
-                    scale: LinearScale(
-                        formatter: (number) =>
-                            '${number.toStringAsFixed(2)} °C'),
+                ),
+                actions: [
+                  CupertinoDialogAction(
+                    isDestructiveAction: true,
+                    onPressed: () => Navigator.of(context).pop(),
+                    child: const Text('Chiudi'),
                   ),
-                },
-                coord: RectCoord(),
-                elements: [LineElement()],
-                rebuild: true,
-                axes: [
-                  Defaults.horizontalAxis,
-                  Defaults.verticalAxis,
+                  CupertinoDialogAction(
+                    isDefaultAction: true,
+                    //TODO create exportation of data as csv
+                    onPressed: () => Navigator.of(context).pop(),
+                    child: const Text('Esporta'),
+                  )
                 ],
-              ),
-            ),
-            actions: [
-              CupertinoDialogAction(
-                isDestructiveAction: true,
-                onPressed: () => Navigator.of(context).pop(),
-                child: const Text('Chiudi'),
-              ),
-              CupertinoDialogAction(
-                isDefaultAction: true,
-                //TODO create exportation of data as csv
-                onPressed: () => Navigator.of(context).pop(),
-                child: const Text('Esporta'),
-              )
-            ],
-          );
+              );
+            case SystemDataVisualization.temperature:
+              return CupertinoAlertDialog(
+                title: Text(
+                  'Temperature ${system.last.temperature.toStringAsFixed(2)} °',
+                ),
+                content: SizedBox(
+                  height: MediaQuery.of(context).size.height / 2,
+                  //https://medium.com/analytics-vidhya/the-versatility-of-the-grammar-of-graphics-d1366760424d
+
+                  child: Chart(
+                    data: system,
+                    variables: {
+                      'timestamp': Variable(
+                        accessor: (System log) => log.timestamp,
+                        scale: LinearScale(
+                            formatter: (number) =>
+                                CalculationService.timestamp(number.toInt())),
+                      ),
+                      'temperature': Variable(
+                        accessor: (System log) =>
+                            log.temperature.roundToDouble(),
+                        scale: LinearScale(
+                            formatter: (number) =>
+                                '${number.toStringAsFixed(2)} °C'),
+                      ),
+                    },
+                    coord: RectCoord(),
+                    elements: [LineElement()],
+                    rebuild: true,
+                    axes: [
+                      Defaults.horizontalAxis,
+                      Defaults.verticalAxis,
+                    ],
+                  ),
+                ),
+                actions: [
+                  CupertinoDialogAction(
+                    isDestructiveAction: true,
+                    onPressed: () => Navigator.of(context).pop(),
+                    child: const Text('Chiudi'),
+                  ),
+                  CupertinoDialogAction(
+                    isDefaultAction: true,
+                    //TODO create exportation of data as csv
+                    onPressed: () => Navigator.of(context).pop(),
+                    child: const Text('Esporta'),
+                  )
+                ],
+              );
+          }
         });
   }
 }

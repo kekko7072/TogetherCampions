@@ -21,7 +21,7 @@ class MapService {
     return MapLatLng(latMidway, lngMidway);
   }
 
-  static int findFastestLogFromList(List<GPS> list) {
+  static int findFastestLogFromList(List<Gps> list) {
     int i = 0;
     double speed = 0;
     int index = 0;

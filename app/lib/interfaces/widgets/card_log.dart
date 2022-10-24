@@ -2,7 +2,7 @@ import 'package:app/services/imports.dart';
 
 class CardLog extends StatelessWidget {
   const CardLog({Key? key, required this.gps}) : super(key: key);
-  final GPS gps;
+  final Gps gps;
 
   @override
   Widget build(BuildContext context) {

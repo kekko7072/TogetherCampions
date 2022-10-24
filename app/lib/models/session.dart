@@ -8,7 +8,7 @@ class Session {
   });
   final String id;
   final SessionInfo info;
-  final ThreeDimensionalValueInt devicePosition;
+  final DevicePosition devicePosition;
 }
 
 class SessionInfo {
@@ -22,25 +22,13 @@ class SessionInfo {
   final DateTime end;
 }
 
-class Service {
-  Service({
-    required this.timestamp,
-    required this.battery,
-    required this.temperature,
+class DevicePosition {
+  DevicePosition({
+    required this.x,
+    required this.y,
+    required this.z,
   });
-  final int timestamp;
-  final MonoDimensionalValueInt battery;
-  final MonoDimensionalValueDouble temperature;
-}
-
-class Telemetry {
-  Telemetry({
-    required this.timestamp,
-    required this.acceleration,
-    required this.gyroscope,
-  });
-
-  final int timestamp;
-  final ThreeDimensionalValueInt acceleration;
-  final ThreeDimensionalValueInt gyroscope;
+  final int x;
+  final int y;
+  final int z;
 }

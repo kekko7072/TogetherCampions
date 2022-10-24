@@ -1,5 +1,6 @@
 import 'package:app/services/imports.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:intl/intl.dart';
 
 class BLEDeviceScreen extends StatefulWidget {
   const BLEDeviceScreen({Key? key, required this.device}) : super(key: key);
@@ -14,15 +15,11 @@ class _BLEDeviceScreenState extends State<BLEDeviceScreen> {
   bool recording = false;
 
   /// System
-  List<int> timestamps = [];
-  List<MonoDimensionalValueInt> batteryLevels = [];
-  List<MonoDimensionalValueDouble> temperatures = [];
+  List<System> system = [];
 
   /// Telemetry
-  List<ThreeDimensionalValueInt> accelerations = [];
-  List<ThreeDimensionalValueDouble> speeds = [];
-  List<ThreeDimensionalValueInt> gyroscopes = [];
-  List<GPS> gps = [];
+  List<Mpu> mpu = [];
+  List<Gps> gps = [];
 
   @override
   void initState() {
@@ -170,44 +167,47 @@ class _BLEDeviceScreenState extends State<BLEDeviceScreen> {
                                         session: Session(
                                             id: sessionID,
                                             info: SessionInfo(
-                                                name: 'name',
+                                                name: DateFormat.yMd()
+                                                    .add_Hms()
+                                                    .format(DateTime.now()),
                                                 start: DateTime.now().subtract(
                                                     Duration(
-                                                        milliseconds:
-                                                            timestamps.last)),
+                                                        milliseconds: system
+                                                            .last.timestamp)),
                                                 end: DateTime.now()),
-                                            devicePosition:
-                                                ThreeDimensionalValueInt(
-                                                    x: 0,
-                                                    y: 0,
-                                                    z: 0,
-                                                    timestamp: 0)));
+                                            devicePosition: DevicePosition(
+                                              x: 0,
+                                              y: 0,
+                                              z: 0,
+                                            )));
 
-                                ///1. Add Service
-                                int i = 0;
-                                for (i = 0; i < timestamps.length; i++) {
-                                  await DatabaseService(
+                                //TODO create json to save locally
+                                Directory appDocDir =
+                                    await getApplicationDocumentsDirectory();
+                                String appDocPath = appDocDir.path;
+
+                                ///1. Add System
+                                for (System sys in system) {
+                                  await DatabaseSystem(
                                           deviceID: widget.device.id.id,
                                           sessionID: sessionID)
-                                      .add(Service(
-                                          timestamp: timestamps[i],
-                                          battery: batteryLevels[i],
-                                          temperature: temperatures[i]));
-                                  await DatabaseTelemetry(
-                                          deviceID: widget.device.id.id,
-                                          sessionID: sessionID)
-                                      .add(Telemetry(
-                                          timestamp: timestamps[i],
-                                          acceleration: accelerations[i],
-                                          gyroscope: gyroscopes[i]));
+                                      .add(sys);
                                 }
 
-                                ///3. Add Gps
-                                for (GPS gps in gps) {
+                                ///2. Add Gps
+                                for (Gps gps in gps) {
                                   await DatabaseGps(
                                           deviceID: widget.device.id.id,
                                           sessionID: sessionID)
                                       .add(gps);
+                                }
+
+                                ///3. Add Mpu
+                                for (Mpu mpu in mpu) {
+                                  await DatabaseMpu(
+                                          deviceID: widget.device.id.id,
+                                          sessionID: sessionID)
+                                      .add(mpu);
                                 }
                               } catch (e) {
                                 print(
@@ -398,12 +398,8 @@ class _BLEDeviceScreenState extends State<BLEDeviceScreen> {
                 FilterChip(
                   onSelected: (value) => setState(() {
                     recording = true;
-                    timestamps = [];
-                    batteryLevels = [];
-                    temperatures = [];
-
-                    accelerations = [];
-                    gyroscopes = [];
+                    system = [];
+                    mpu = [];
                     gps = [];
                   }),
                   backgroundColor: AppStyle.primaryColor,
@@ -428,9 +424,13 @@ class _BLEDeviceScreenState extends State<BLEDeviceScreen> {
                   StreamBuilder<List<BluetoothService>>(
                     stream: widget.device.services,
                     builder: (c, snapshot) {
-                      return Column(
-                        children: _buildServiceTiles(snapshot.data!),
-                      );
+                      if (snapshot.data != null) {
+                        return Column(
+                          children: _buildServiceTiles(snapshot.data!),
+                        );
+                      } else {
+                        return const CircularProgressIndicator();
+                      }
                     },
                   ),
                 ],
@@ -464,196 +464,118 @@ class _BLEDeviceScreenState extends State<BLEDeviceScreen> {
     List<Widget> list = [];
     for (BluetoothService service in services) {
       if (BluetoothHelper.formatUUID(service.uuid) == kBLESystemService) {
-        BluetoothCharacteristic? temperatureCharacteristic =
+        /*BluetoothCharacteristic? temperatureCharacteristic =
             BluetoothHelper.characteristic(
                 service, kBLETemperatureCharacteristic);
 
-        enableNotification(temperatureCharacteristic);
+        enableNotification(temperatureCharacteristic);*/
 
-        BluetoothCharacteristic? timestampCharacteristic =
-            BluetoothHelper.characteristic(
-                service, kBLETimestampCharacteristic);
+        BluetoothCharacteristic? systemCharacteristic =
+            BluetoothHelper.characteristic(service, kBLESystemCharacteristic);
 
-        enableNotification(timestampCharacteristic);
+        enableNotification(systemCharacteristic);
 
-        BluetoothCharacteristic? batteryCharacteristic =
+        /*BluetoothCharacteristic? batteryCharacteristic =
             BluetoothHelper.characteristic(service, kBLEBatteryCharacteristic);
 
-        enableNotification(batteryCharacteristic);
+        enableNotification(batteryCharacteristic);*/
 
         list.add(Padding(
           padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 10),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Visibility(
-                visible: temperatureCharacteristic != null,
-                child: GestureDetector(
-                  onTap: () => showCupertinoDialog(
-                      context: context,
-                      builder: (_) =>
-                          DataChartVisualizationTemperature(service: service),
-                      barrierDismissible: true),
-                  child: StreamBuilder<List<int>>(
-                      stream: BluetoothHelper.characteristic(
-                              service, kBLETemperatureCharacteristic)
-                          ?.value,
-                      initialData: BluetoothHelper.characteristic(
-                              service, kBLETemperatureCharacteristic)
-                          ?.lastValue,
-                      builder: (c, snapshot) {
-                        final value = snapshot.data;
+          child: StreamBuilder<List<int>>(
+              stream: BluetoothHelper.characteristic(
+                      service, kBLESystemCharacteristic)
+                  ?.value,
+              initialData: BluetoothHelper.characteristic(
+                      service, kBLESystemCharacteristic)
+                  ?.lastValue,
+              builder: (c, snapshot) {
+                final value = snapshot.data;
 
-                        if (value != null) {
-                          ByteBuffer buffer = Int8List.fromList(value).buffer;
-                          ByteData byteData = ByteData.view(buffer);
-                          try {
-                            temperatures.add(MonoDimensionalValueDouble(
-                              value: CalculationService.temperature(
-                                  byteData.getInt32(0, Endian.little)),
-                              timestamp: byteData.getInt32(4, Endian.little),
-                            ));
-                          } catch (e) {
-                            debugPrint("\nERROR: $e\n");
-                          }
-                        }
-
-                        return temperatureCharacteristic != null &&
-                                temperatureCharacteristic.isNotifying
-                            ? Text(
-                                '${temperatures.isNotEmpty ? temperatures.last.value.toStringAsFixed(2) : 'Loading...'} °C',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .titleLarge!
-                                    .copyWith(fontWeight: FontWeight.bold),
-                              )
-                            : IconButton(
-                                icon: Icon(Icons.sync,
-                                    color: Theme.of(context)
-                                        .iconTheme
-                                        .color
-                                        ?.withOpacity(0.5)),
-                                onPressed: () async {
-                                  await temperatureCharacteristic
-                                      ?.setNotifyValue(
-                                          !temperatureCharacteristic
-                                              .isNotifying);
-                                  await temperatureCharacteristic?.read();
-                                },
-                              );
-                      }),
-                ),
-              ),
-              Visibility(
-                visible: timestampCharacteristic != null,
-                child: StreamBuilder<List<int>>(
-                    stream: timestampCharacteristic?.value,
-                    initialData: timestampCharacteristic?.lastValue,
-                    builder: (c, snapshot) {
-                      final value = snapshot.data;
-
-                      if (value != null) {
-                        ByteBuffer buffer = Int8List.fromList(value).buffer;
-                        ByteData byteData = ByteData.view(buffer);
-                        try {
-                          timestamps.add(byteData.getInt32(0, Endian.little));
-                        } catch (e) {
-                          debugPrint("\nERROR: $e\n");
-                        }
-                      }
-                      return timestampCharacteristic != null &&
-                              timestampCharacteristic.isNotifying
-                          ? Text(
-                              CalculationService.timestamp(timestamps.last),
+                if (value != null) {
+                  System? sys = System.formListInt(value);
+                  if (sys != null) {
+                    system.add(sys);
+                  } else {
+                    debugPrint("ERROR: SYSTEM IS NULL");
+                  }
+                }
+                return systemCharacteristic != null &&
+                        systemCharacteristic.isNotifying
+                    ? Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          GestureDetector(
+                            onTap: () => showCupertinoDialog(
+                                context: context,
+                                builder: (_) => DataChartVisualizationSystem(
+                                      service: service,
+                                      systemDataVisualization:
+                                          SystemDataVisualization.temperature,
+                                    ),
+                                barrierDismissible: true),
+                            child: Text(
+                              '${system.isNotEmpty ? system.last.temperature.toStringAsFixed(2) : 'Loading...'} °C',
                               style: Theme.of(context)
                                   .textTheme
                                   .titleLarge!
                                   .copyWith(fontWeight: FontWeight.bold),
-                            )
-                          : IconButton(
-                              icon: Icon(Icons.sync,
-                                  color: Theme.of(context)
-                                      .iconTheme
-                                      .color
-                                      ?.withOpacity(0.5)),
-                              onPressed: () async {
-                                await timestampCharacteristic?.setNotifyValue(
-                                    !timestampCharacteristic.isNotifying);
-                                await timestampCharacteristic?.read();
-                              },
-                            );
-                    }),
-              ),
-              Visibility(
-                visible: batteryCharacteristic != null,
-                child: GestureDetector(
-                  onTap: () => showCupertinoDialog(
-                      context: context,
-                      builder: (_) =>
-                          DataChartVisualizationBattery(service: service),
-                      barrierDismissible: true),
-                  child: StreamBuilder<List<int>>(
-                      stream: batteryCharacteristic?.value,
-                      initialData: batteryCharacteristic?.lastValue,
-                      builder: (context, snapshot) {
-                        final value = snapshot.data;
-                        if (value != null) {
-                          ByteBuffer buffer = Int8List.fromList(value).buffer;
-                          ByteData byteData = ByteData.view(buffer);
-                          try {
-                            batteryLevels.add(MonoDimensionalValueInt(
-                              value: byteData.getInt32(0, Endian.little),
-                              timestamp: byteData.getInt32(4, Endian.little),
-                            ));
-                          } catch (e) {
-                            debugPrint("\nERROR: $e\n");
-                          }
-                        }
-                        return batteryCharacteristic != null &&
-                                batteryCharacteristic.isNotifying
-                            ? batteryLevels.isNotEmpty
-                                ? Row(
-                                    children: [
-                                      BatteryIndicator(
-                                        batteryFromPhone: false,
-                                        batteryLevel: batteryLevels.last.value,
-                                        style:
-                                            BatteryIndicatorStyle.skeumorphism,
-                                        colorful: true,
-                                        showPercentNum: false,
-                                        size: 25,
-                                        ratio: 1.5,
-                                        showPercentSlide: true,
-                                      ),
-                                      const SizedBox(width: 10),
-                                      Text(
-                                        "${batteryLevels.last.value} %",
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .titleMedium!
-                                            .copyWith(
-                                                fontWeight: FontWeight.bold),
-                                      ),
-                                    ],
-                                  )
-                                : const CircularProgressIndicator()
-                            : IconButton(
-                                icon: Icon(Icons.sync,
-                                    color: Theme.of(context)
-                                        .iconTheme
-                                        .color
-                                        ?.withOpacity(0.5)),
-                                onPressed: () async {
-                                  await batteryCharacteristic?.setNotifyValue(
-                                      !batteryCharacteristic.isNotifying);
-                                  await batteryCharacteristic?.read();
-                                },
-                              );
-                      }),
-                ),
-              ),
-            ],
-          ),
+                            ),
+                          ),
+                          Text(
+                            CalculationService.timestamp(system.last.timestamp),
+                            style: Theme.of(context)
+                                .textTheme
+                                .titleLarge!
+                                .copyWith(fontWeight: FontWeight.bold),
+                          ),
+                          GestureDetector(
+                            onTap: () => showCupertinoDialog(
+                                context: context,
+                                builder: (_) => DataChartVisualizationSystem(
+                                      service: service,
+                                      systemDataVisualization:
+                                          SystemDataVisualization.battery,
+                                    ),
+                                barrierDismissible: true),
+                            child: Row(
+                              children: [
+                                BatteryIndicator(
+                                  batteryFromPhone: false,
+                                  batteryLevel: system.last.battery,
+                                  style: BatteryIndicatorStyle.skeumorphism,
+                                  colorful: true,
+                                  showPercentNum: false,
+                                  size: 25,
+                                  ratio: 1.5,
+                                  showPercentSlide: true,
+                                ),
+                                const SizedBox(width: 10),
+                                Text(
+                                  "${system.last.battery} %",
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .titleMedium!
+                                      .copyWith(fontWeight: FontWeight.bold),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      )
+                    : IconButton(
+                        icon: Icon(Icons.sync,
+                            color: Theme.of(context)
+                                .iconTheme
+                                .color
+                                ?.withOpacity(0.5)),
+                        onPressed: () async {
+                          await systemCharacteristic?.setNotifyValue(
+                              !systemCharacteristic.isNotifying);
+                          await systemCharacteristic?.read();
+                        },
+                      );
+              }),
         ));
       } else if (BluetoothHelper.formatUUID(service.uuid) ==
           kBLETelemetryService) {
@@ -677,17 +599,20 @@ class _BLEDeviceScreenState extends State<BLEDeviceScreen> {
 
                 ///PARSE
                 switch (bleCharacteristic) {
-                  case BLETelemetryCharacteristic.accelerometer:
+                  case BLETelemetryCharacteristic.mpu:
                     {
                       if (value != null) {
                         ByteBuffer buffer = Int8List.fromList(value).buffer;
                         ByteData byteData = ByteData.view(buffer);
                         try {
-                          accelerations.add(ThreeDimensionalValueInt(
-                            x: byteData.getInt32(0, Endian.little),
-                            y: byteData.getInt32(4, Endian.little),
-                            z: byteData.getInt32(8, Endian.little),
-                            timestamp: byteData.getInt32(12, Endian.little),
+                          mpu.add(Mpu(
+                            timestamp: byteData.getInt32(0, Endian.little),
+                            aX: byteData.getInt32(4, Endian.little),
+                            aY: byteData.getInt32(8, Endian.little),
+                            aZ: byteData.getInt32(12, Endian.little),
+                            gX: byteData.getInt32(16, Endian.little),
+                            gY: byteData.getInt32(20, Endian.little),
+                            gZ: byteData.getInt32(20, Endian.little),
                           ));
                         } catch (e) {
                           debugPrint("\nERROR: $e\n");
@@ -703,20 +628,20 @@ class _BLEDeviceScreenState extends State<BLEDeviceScreen> {
                               style: Theme.of(context).textTheme.subtitle1,
                             ),
                             if (c.isNotifying) ...[
-                              if (accelerations.isNotEmpty) ...[
+                              if (mpu.isNotEmpty) ...[
                                 Text(
-                                    '| A |: ${CalculationService.mediumAcceleration(accelerations.last).toStringAsFixed(2)} g'),
+                                    '| A |: ${CalculationService.mediumAcceleration(mpu.last).toStringAsFixed(2)} g'),
                                 Wrap(
                                   spacing: 10,
                                   children: [
                                     Text(
-                                      'Ax: ${(accelerations.last.x / 16384.0).toStringAsFixed(2)} g',
+                                      'Ax: ${(mpu.last.aX / 16384.0).toStringAsFixed(2)} g',
                                     ),
                                     Text(
-                                      'Ay: ${(accelerations.last.y / 16384.0).toStringAsFixed(2)} g',
+                                      'Ay: ${(mpu.last.aY / 16384.0).toStringAsFixed(2)} g',
                                     ),
                                     Text(
-                                      'Az: ${(accelerations.last.z / 16384.0).toStringAsFixed(2)} g',
+                                      'Az: ${(mpu.last.aZ / 16384.0).toStringAsFixed(2)} g',
                                     ),
                                     SizedBox(
                                       height:
@@ -726,11 +651,10 @@ class _BLEDeviceScreenState extends State<BLEDeviceScreen> {
                                       //https://medium.com/analytics-vidhya/the-versatility-of-the-grammar-of-graphics-d1366760424d
 
                                       child: Chart(
-                                        data: accelerations,
+                                        data: mpu,
                                         variables: {
                                           'timestamp': Variable(
-                                            accessor: (ThreeDimensionalValueInt
-                                                    log) =>
+                                            accessor: (Mpu log) =>
                                                 log.timestamp,
                                             scale: LinearScale(
                                                 formatter: (number) =>
@@ -739,11 +663,9 @@ class _BLEDeviceScreenState extends State<BLEDeviceScreen> {
                                                             number.toInt())),
                                           ),
                                           'acceleration': Variable(
-                                            accessor: (ThreeDimensionalValueInt
-                                                    log) =>
-                                                sqrt(pow(log.x / 16384.0, 2) +
-                                                    pow(log.y / 16384.0, 2) +
-                                                    pow(log.z / 16384.0, 2)),
+                                            accessor: (Mpu log) =>
+                                                CalculationService
+                                                    .mediumAcceleration(log),
                                             scale: LinearScale(
                                                 formatter: (number) =>
                                                     '$number g'),
@@ -768,7 +690,7 @@ class _BLEDeviceScreenState extends State<BLEDeviceScreen> {
                                       child: Column(
                                         children: [
                                           Text(
-                                            'Pitch: ${CalculationService.pitch(accelerations.last)}°',
+                                            'Pitch: ${CalculationService.pitch(mpu.last)}°',
                                           ),
                                           SizedBox(
                                             height: 100,
@@ -776,13 +698,11 @@ class _BLEDeviceScreenState extends State<BLEDeviceScreen> {
                                             //https://medium.com/analytics-vidhya/the-versatility-of-the-grammar-of-graphics-d1366760424d
 
                                             child: Chart(
-                                              data: accelerations,
+                                              data: mpu,
                                               variables: {
                                                 'timestamp': Variable(
-                                                  accessor:
-                                                      (ThreeDimensionalValueInt
-                                                              log) =>
-                                                          log.timestamp,
+                                                  accessor: (Mpu log) =>
+                                                      log.timestamp,
                                                   scale: LinearScale(
                                                       formatter: (number) =>
                                                           CalculationService
@@ -790,12 +710,10 @@ class _BLEDeviceScreenState extends State<BLEDeviceScreen> {
                                                                   .toInt())),
                                                 ),
                                                 'pitch': Variable(
-                                                  accessor:
-                                                      (ThreeDimensionalValueInt
-                                                              log) =>
-                                                          CalculationService
-                                                                  .pitch(log)
-                                                              .roundToDouble(),
+                                                  accessor: (Mpu log) =>
+                                                      CalculationService.pitch(
+                                                              log)
+                                                          .roundToDouble(),
                                                   scale: LinearScale(
                                                       formatter: (number) =>
                                                           '${number.roundToDouble()} °'),
@@ -817,19 +735,17 @@ class _BLEDeviceScreenState extends State<BLEDeviceScreen> {
                                       child: Column(
                                         children: [
                                           Text(
-                                            'Roll: ${CalculationService.roll(accelerations.last)}°',
+                                            'Roll: ${CalculationService.roll(mpu.last)}°',
                                           ),
                                           SizedBox(
                                             height: 100,
                                             //https://medium.com/analytics-vidhya/the-versatility-of-the-grammar-of-graphics-d1366760424d
                                             child: Chart(
-                                              data: accelerations,
+                                              data: mpu,
                                               variables: {
                                                 'timestamp': Variable(
-                                                  accessor:
-                                                      (ThreeDimensionalValueInt
-                                                              log) =>
-                                                          log.timestamp,
+                                                  accessor: (Mpu log) =>
+                                                      log.timestamp,
                                                   scale: LinearScale(
                                                       formatter: (number) =>
                                                           CalculationService
@@ -837,12 +753,10 @@ class _BLEDeviceScreenState extends State<BLEDeviceScreen> {
                                                                   .toInt())),
                                                 ),
                                                 'roll': Variable(
-                                                  accessor:
-                                                      (ThreeDimensionalValueInt
-                                                              log) =>
-                                                          CalculationService
-                                                                  .roll(log)
-                                                              .toInt(),
+                                                  accessor: (Mpu log) =>
+                                                      CalculationService.roll(
+                                                              log)
+                                                          .toInt(),
                                                   scale: LinearScale(
                                                       formatter: (number) =>
                                                           '${number.toInt()} °'),
@@ -859,6 +773,20 @@ class _BLEDeviceScreenState extends State<BLEDeviceScreen> {
                                           ),
                                         ],
                                       ),
+                                    ),
+                                  ],
+                                ),
+                                Wrap(
+                                  spacing: 10,
+                                  children: [
+                                    Text(
+                                      'Rx: ${(mpu.last.gX / 131.0).toStringAsFixed(2)} °',
+                                    ),
+                                    Text(
+                                      'Ry: ${(mpu.last.gY / 131.0).toStringAsFixed(2)} °',
+                                    ),
+                                    Text(
+                                      'Rz: ${(mpu.last.gZ / 131.0).toStringAsFixed(2)} °',
                                     ),
                                   ],
                                 ),
@@ -887,78 +815,13 @@ class _BLEDeviceScreenState extends State<BLEDeviceScreen> {
                       );
                     }
 
-                  case BLETelemetryCharacteristic.gyroscope:
-                    {
-                      if (value != null) {
-                        ByteBuffer buffer = Int8List.fromList(value).buffer;
-                        ByteData byteData = ByteData.view(buffer);
-                        try {
-                          gyroscopes.add(ThreeDimensionalValueInt(
-                            x: byteData.getInt32(0, Endian.little),
-                            y: byteData.getInt32(4, Endian.little),
-                            z: byteData.getInt32(8, Endian.little),
-                            timestamp: byteData.getInt32(12, Endian.little),
-                          ));
-                        } catch (e) {
-                          debugPrint("\nERROR: $e\n");
-                        }
-                      }
-                      return ListTile(
-                        title: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            Text(
-                              characteristic,
-                              style: Theme.of(context).textTheme.subtitle1,
-                            ),
-                            if (c.isNotifying) ...[
-                              if (gyroscopes.isNotEmpty) ...[
-                                Wrap(
-                                  spacing: 10,
-                                  children: [
-                                    Text(
-                                      'Rx: ${(gyroscopes.last.x / 131.0).toStringAsFixed(2)} °',
-                                    ),
-                                    Text(
-                                      'Ry: ${(gyroscopes.last.y / 131.0).toStringAsFixed(2)} °',
-                                    ),
-                                    Text(
-                                      'Rz: ${(gyroscopes.last.z / 131.0).toStringAsFixed(2)} °',
-                                    ),
-                                  ],
-                                ),
-                              ] else ...[
-                                Text('Waiting $characteristic data...')
-                              ]
-                            ] else ...[
-                              IconButton(
-                                icon: Icon(
-                                    c.isNotifying
-                                        ? Icons.sync_disabled
-                                        : Icons.sync,
-                                    color: Theme.of(context)
-                                        .iconTheme
-                                        .color
-                                        ?.withOpacity(0.5)),
-                                onPressed: () async {
-                                  await c.setNotifyValue(!c.isNotifying);
-                                  await c.read();
-                                },
-                              )
-                            ]
-                          ],
-                        ),
-                        contentPadding: const EdgeInsets.all(0.0),
-                      );
-                    }
                   case BLETelemetryCharacteristic.gps:
                     {
                       if (value != null) {
                         ByteBuffer buffer = Int8List.fromList(value).buffer;
                         ByteData byteData = ByteData.view(buffer);
                         try {
-                          gps.add(GPS(
+                          gps.add(Gps(
                             timestamp:
                                 byteData.getFloat32(16, Endian.little).toInt(),
                             available:

@@ -1,7 +1,7 @@
 import 'package:app/services/imports.dart';
 
-class GPS {
-  GPS({
+class Gps {
+  Gps({
     required this.timestamp,
     required this.available,
     required this.latLng,
