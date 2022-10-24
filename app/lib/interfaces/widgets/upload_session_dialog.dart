@@ -3,19 +3,23 @@ import 'package:flutter/cupertino.dart';
 import 'package:intl/intl.dart';
 
 class UploadSessionDialog extends StatefulWidget {
-  const UploadSessionDialog(
-      {Key? key,
-      required this.device,
-      required this.devicePosition,
-      required this.system,
-      required this.gps,
-      required this.mpu})
-      : super(key: key);
+  const UploadSessionDialog({
+    Key? key,
+    required this.device,
+    required this.devicePosition,
+    required this.system,
+    required this.gpsPosition,
+    required this.gpsNavigation,
+    required this.accelerometer,
+    required this.gyroscope,
+  }) : super(key: key);
   final BluetoothDevice device;
   final DevicePosition devicePosition;
   final List<System> system;
-  final List<Gps> gps;
-  final List<Mpu> mpu;
+  final List<GpsPosition> gpsPosition;
+  final List<GpsNavigation> gpsNavigation;
+  final List<Accelerometer> accelerometer;
+  final List<Gyroscope> gyroscope;
 
   @override
   State<UploadSessionDialog> createState() => _UploadSessionDialogState();
@@ -28,8 +32,11 @@ class _UploadSessionDialogState extends State<UploadSessionDialog> {
   @override
   void initState() {
     super.initState();
-    totalProgress =
-        widget.system.length + widget.gps.length + widget.mpu.length;
+    totalProgress = widget.system.length +
+        widget.gpsPosition.length +
+        widget.gpsNavigation.length +
+        widget.accelerometer.length +
+        widget.gyroscope.length;
   }
 
   @override
@@ -53,8 +60,10 @@ class _UploadSessionDialogState extends State<UploadSessionDialog> {
             )
           ] else ...[
             Text('System log: ${widget.system.length}'),
-            Text('Gps log: ${widget.gps.length}'),
-            Text('Mpu log: ${widget.mpu.length}'),
+            Text('Gps position log: ${widget.gpsPosition.length}'),
+            Text('Gps navigation log: ${widget.gpsPosition.length}'),
+            Text('Accelerometer log: ${widget.accelerometer.length}'),
+            Text('Gyroscope log: ${widget.gyroscope.length}'),
           ]
         ],
       ),
@@ -90,31 +99,34 @@ class _UploadSessionDialogState extends State<UploadSessionDialog> {
               List<Map> systemListJSON = [];
               for (System sys in widget.system) {
                 setState(() => ++progress);
-                print('\n\n${sys.toJson()}\n\n');
-                //TODO CONVERT JSON TO CORRECT STRING
                 systemListJSON.add(sys.toJson());
               }
 
               ///2. Add Gps
-              List<Map> gpsListJSON = [];
-              for (Gps gps in widget.gps) {
+              List<Map> gpsPositionListJSON = [];
+              for (GpsPosition gps in widget.gpsPosition) {
                 setState(() => ++progress);
-                print('\n\n${gps.toJson()}\n\n');
-                //TODO CONVERT JSON TO CORRECT STRING
-                gpsListJSON.add(gps.toJson());
+                gpsPositionListJSON.add(gps.toJson());
+              }
+              List<Map> gpsNavigationListJSON = [];
+              for (GpsNavigation gps in widget.gpsNavigation) {
+                setState(() => ++progress);
+                gpsNavigationListJSON.add(gps.toJson());
               }
 
               ///3. Add Mpu
-              List<Map> mpuListJSON = [];
-              for (Mpu mpu in widget.mpu) {
+              List<Map> accelerometerListJSON = [];
+              for (Accelerometer mpu in widget.accelerometer) {
                 setState(() => ++progress);
-                print('\n\n${mpu.toJson()}\n\n');
-                //TODO CONVERT JSON TO CORRECT STRING
-                gpsListJSON.add(mpu.toJson());
+                accelerometerListJSON.add(mpu.toJson());
               }
-              Map<String, dynamic> content = {};
+              List<Map> gyroscopeListJSON = [];
+              for (Gyroscope mpu in widget.gyroscope) {
+                setState(() => ++progress);
+                gyroscopeListJSON.add(mpu.toJson());
+              }
 
-              var content1 = {
+              Map<String, dynamic> content = {
                 "deviceID": widget.device.id.toString(),
                 "sessionID": sessionID,
                 "info": {
@@ -134,15 +146,17 @@ class _UploadSessionDialogState extends State<UploadSessionDialog> {
                   "z": widget.devicePosition.z
                 },
                 "system": systemListJSON,
-                "gps": gpsListJSON,
-                "mpu": mpuListJSON,
+                "gps_position": gpsPositionListJSON,
+                "gps_navigation": gpsNavigationListJSON,
+                "accelerometer": accelerometerListJSON,
+                "gyroscope": gyroscopeListJSON,
               };
-              content.addAll(content1);
+
               print(content);
               final Directory directory =
                   await getApplicationDocumentsDirectory();
               final File file = File('${directory.path}/$sessionID.json');
-              await file.writeAsString(content.toString());
+              await file.writeAsString(jsonEncode(content));
             } catch (e) {
               print(
                   "\n\n\n\n\n\n\n\n\n\n\n\nERRRORRR: $e\n\n\n\n\n\n\n\n\n\n\n\n");
@@ -192,23 +206,35 @@ class _UploadSessionDialogState extends State<UploadSessionDialog> {
               }
 
               ///2. Add Gps
-              for (Gps gps in widget.gps) {
+              for (GpsPosition gps in widget.gpsPosition) {
                 setState(() => ++progress);
-                await DatabaseGps(
+                await DatabaseGpsPosition(
                         deviceID: widget.device.id.toString(),
                         sessionID: sessionID)
                     .add(gps);
-                print('\n\n${gps.toJson()}\n\n');
+              }
+              for (GpsNavigation gps in widget.gpsNavigation) {
+                setState(() => ++progress);
+                await DatabaseGpsNavigation(
+                        deviceID: widget.device.id.toString(),
+                        sessionID: sessionID)
+                    .add(gps);
               }
 
               ///3. Add Mpu
-              for (Mpu mpu in widget.mpu) {
+              for (Accelerometer mpu in widget.accelerometer) {
                 setState(() => ++progress);
-                await DatabaseMpu(
+                await DatabaseAccelerometer(
                         deviceID: widget.device.id.toString(),
                         sessionID: sessionID)
                     .add(mpu);
-                print('\n\n${mpu.toJson()}\n\n');
+              }
+              for (Gyroscope mpu in widget.gyroscope) {
+                setState(() => ++progress);
+                await DatabaseGyroscope(
+                        deviceID: widget.device.id.toString(),
+                        sessionID: sessionID)
+                    .add(mpu);
               }
             } catch (e) {
               print(

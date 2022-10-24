@@ -6,15 +6,12 @@ String kDeviceModelTKR1B1 = "TKR1B1"; //Only for future support of other devices
 
 ///BLUETOOTH SERVICE
 const String kBLESystemService = "1000";
-const String kBLETelemetryService = "2000";
+const String kBLEGpsService = "2000";
+const String kBLEMpuService = "3000";
 
 ///BLUETOOTH CHARACTERISTIC
 const String kBLESystemCharacteristic = "1001";
-//const String kBLEBatteryCharacteristic = "1002";
-//const String kBLETemperatureCharacteristic = "1003";
-
-const String kBLEGpsCharacteristic = "2001";
-const String kBLEMpuCharacteristic = "2002";
-//const String kBLESpeedCharacteristic = "2002";
-//const String kBLEGyroscopeCharacteristic = "2003";
-//const String kBLECompassCharacteristic = "2004";
+const String kBLEPositionCharacteristic = "2001";
+const String kBLENavigationCharacteristic = "2002";
+const String kBLEAccelerometerCharacteristic = "3001";
+const String kBLEGyroscopeCharacteristic = "3002";

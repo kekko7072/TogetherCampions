@@ -1,8 +1,4 @@
-enum TelemetryViewLive {
-  speed,
-  altitude,
-  course,
-}
+enum TelemetryViewLive { speed, altitude, course, distance, variation }
 
 class TelemetryAnalytics {
   TelemetryAnalytics({
@@ -18,8 +14,32 @@ class TelemetryAnalytics {
   final RangeAnalytics altitude;
   final RangeAnalytics course;
   final double distance;
-  final int variation;
+  final RangeAnalytics variation;
   //final Battery battery;
+}
+
+class TelemetryPosition {
+  TelemetryPosition({
+    required this.speed,
+    required this.distance,
+  });
+
+  final RangeAnalytics speed;
+  final double distance;
+}
+
+class TelemetryNavigation {
+  TelemetryNavigation({
+    required this.altitude,
+    required this.course,
+    required this.variation,
+    //required this.battery,
+  });
+
+  final RangeAnalytics altitude;
+  final RangeAnalytics course;
+  final RangeAnalytics variation;
+//final Battery battery;
 }
 
 class RangeAnalytics {

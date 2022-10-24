@@ -6,7 +6,7 @@ void setupMPU() {
   Wire.endTransmission(true);
 }
 
-void updateMpu(BLECharacteristic characteristic, int timestamp) {
+void updateMpu(BLECharacteristic accelerometer, BLECharacteristic gyroscope, int timestamp) {
   Wire.beginTransmission(MPU_ADDR);
   Wire.write(0x3B);  // starting with register 0x3B (ACCEL_XOUT_H)
   Wire.endTransmission(false);
@@ -38,15 +38,19 @@ void updateMpu(BLECharacteristic characteristic, int timestamp) {
 
 
 
-  int eulers[7];
-  eulers[2] = timestamp;
-  eulers[1] = AcX;
-  eulers[2] = AcY;
-  eulers[3] = AcZ;
-  eulers[4] = GyX;
-  eulers[5] = GyY;
-  eulers[6] = GyZ;
+  int acc[4];
+  acc[0] = timestamp;
+  acc[1] = AcX;
+  acc[2] = AcY;
+  acc[3] = AcZ;
+  
+  int gyr[4];
+  acc[0] = timestamp;
+  gyr[1] = GyX;
+  gyr[2] = GyY;
+  gyr[3] = GyZ;
 
-  // Send 3x eulers over bluetooth as 1x byte array
-  characteristic.setValue((byte *)&eulers, 28);
+  // Send x eulers over bluetooth as 1x byte array
+  accelerometer.setValue((byte *)&acc, 16);
+  gyroscope.setValue((byte *)&gyr, 16);
 }

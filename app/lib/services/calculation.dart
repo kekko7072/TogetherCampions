@@ -16,7 +16,8 @@ class CalculationService {
   }
 
   static TelemetryAnalytics telemetry({
-    required List<Gps> gps,
+    required List<GpsPosition> gpsPosition,
+    required List<GpsNavigation> gpsNavigation,
     required List<MapLatLng> segment,
   }) {
     double speedMedium = 0;
@@ -31,12 +32,11 @@ class CalculationService {
     double courseMax = 0;
     double courseMin = 10000;
 
-    double variation = 0;
+    double variationMedium = 0;
+    double variationMax = 0;
+    double variationMin = 10000;
 
-    double batteryMax = 0;
-    double batteryMin = 10000;
-
-    for (Gps log in gps) {
+    for (GpsPosition log in gpsPosition) {
       ///Speed
       speedMedium = speedMedium + log.speed;
 
@@ -49,7 +49,8 @@ class CalculationService {
         speedMin =
             CalculationService.roundDouble(number: log.speed, decimal: 3);
       }
-
+    }
+    for (GpsNavigation log in gpsNavigation) {
       ///Altitude
       altitudeMedium = altitudeMedium + log.altitude;
 
@@ -76,46 +77,158 @@ class CalculationService {
             CalculationService.roundDouble(number: log.course, decimal: 3);
       }
 
-      ///Satellites
-      variation = variation + log.variation;
+      ///Variation
+      variationMedium = variationMedium + log.variation;
 
-      /*///Battery
-      if (batteryMax < log.) {
-        batteryMax = log.battery;
+      if (variationMax < log.variation) {
+        variationMax =
+            CalculationService.roundDouble(number: log.variation, decimal: 3);
       }
 
-      if (batteryMin > log.battery) {
-        batteryMin = log.battery;
-      }*/
+      if (variationMin > log.variation) {
+        variationMin =
+            CalculationService.roundDouble(number: log.variation, decimal: 3);
+      }
     }
 
     return TelemetryAnalytics(
       speed: RangeAnalytics(
         medium: CalculationService.roundDouble(
-            number: speedMedium / gps.length, decimal: 3),
+            number: speedMedium / gpsPosition.length, decimal: 3),
         max: speedMax,
         min: speedMin,
       ),
       altitude: RangeAnalytics(
         medium: CalculationService.roundDouble(
-            number: altitudeMedium / gps.length, decimal: 3),
+            number: altitudeMedium / gpsNavigation.length, decimal: 3),
         max: altitudeMax,
         min: altitudeMin,
       ),
       course: RangeAnalytics(
         medium: CalculationService.roundDouble(
-            number: courseMedium / gps.length, decimal: 3),
+            number: courseMedium / gpsNavigation.length, decimal: 3),
         max: courseMax,
         min: courseMin,
       ),
       distance: MapService.findDistanceFromList(segment).roundToDouble(),
-      variation: variation ~/ gps.length,
-      /* battery: Battery(
-        consumption: CalculationService.roundDouble(
-            number: batteryMax - batteryMin, decimal: 3),
-        start: batteryMax,
-        minVoltage: batteryMin,
-      ),*/
+      variation: RangeAnalytics(
+        medium: CalculationService.roundDouble(
+            number: variationMedium / gpsNavigation.length, decimal: 3),
+        max: variationMax,
+        min: variationMin,
+      ),
+    );
+  }
+
+  static TelemetryPosition telemetryPosition({
+    required List<GpsPosition> gpsPosition,
+    required List<MapLatLng> segment,
+  }) {
+    double speedMedium = 0;
+    double speedMax = 0;
+    double speedMin = 10000;
+
+    for (GpsPosition log in gpsPosition) {
+      ///Speed
+      speedMedium = speedMedium + log.speed;
+
+      if (speedMax < log.speed) {
+        speedMax =
+            CalculationService.roundDouble(number: log.speed, decimal: 3);
+      }
+
+      if (speedMin > log.speed) {
+        speedMin =
+            CalculationService.roundDouble(number: log.speed, decimal: 3);
+      }
+    }
+
+    return TelemetryPosition(
+      speed: RangeAnalytics(
+        medium: CalculationService.roundDouble(
+            number: speedMedium / gpsPosition.length, decimal: 3),
+        max: speedMax,
+        min: speedMin,
+      ),
+      distance: MapService.findDistanceFromList(segment).roundToDouble(),
+    );
+  }
+
+  static TelemetryNavigation telemetryNavigation({
+    required List<GpsNavigation> gpsNavigation,
+  }) {
+    double altitudeMedium = 0;
+    double altitudeMax = 0;
+    double altitudeMin = 10000;
+
+    double courseMedium = 0;
+    double courseMax = 0;
+    double courseMin = 10000;
+
+    double variationMedium = 0;
+    double variationMax = 0;
+    double variationMin = 10000;
+
+    for (GpsNavigation log in gpsNavigation) {
+      ///Altitude
+      altitudeMedium = altitudeMedium + log.altitude;
+
+      if (altitudeMax < log.altitude) {
+        altitudeMax =
+            CalculationService.roundDouble(number: log.altitude, decimal: 3);
+      }
+
+      if (altitudeMin > log.altitude) {
+        altitudeMin =
+            CalculationService.roundDouble(number: log.altitude, decimal: 3);
+      }
+
+      ///Course
+      courseMedium = courseMedium + log.course;
+
+      if (courseMax < log.course) {
+        courseMax =
+            CalculationService.roundDouble(number: log.course, decimal: 3);
+      }
+
+      if (courseMin > log.course) {
+        courseMin =
+            CalculationService.roundDouble(number: log.course, decimal: 3);
+      }
+
+      ///Variation
+      variationMedium = variationMedium + log.variation;
+
+      if (variationMax < log.variation) {
+        variationMax =
+            CalculationService.roundDouble(number: log.variation, decimal: 3);
+      }
+
+      if (variationMin > log.variation) {
+        variationMin =
+            CalculationService.roundDouble(number: log.variation, decimal: 3);
+      }
+    }
+
+    return TelemetryNavigation(
+      altitude: RangeAnalytics(
+        medium: CalculationService.roundDouble(
+            number: altitudeMedium / gpsNavigation.length, decimal: 3),
+        max: altitudeMax,
+        min: altitudeMin,
+      ),
+      course: RangeAnalytics(
+        medium: CalculationService.roundDouble(
+            number: courseMedium / gpsNavigation.length, decimal: 3),
+        max: courseMax,
+        min: courseMin,
+      ),
+      variation: RangeAnalytics(
+        medium: CalculationService.roundDouble(
+            number: variationMedium / gpsNavigation.length, decimal: 3),
+        max: variationMax,
+        min: variationMin,
+      ),
     );
   }
 
@@ -204,14 +317,15 @@ class CalculationService {
 
   static double temperature(int input) => (input / 340.00) + 36.53;
 
-  static double mediumAcceleration(Mpu input) =>
+  static double mediumAcceleration(Accelerometer input) =>
       sqrt(pow(input.aX / 16384.0, 2) +
           pow(input.aY / 16384.0, 2) +
           pow(input.aZ / 16384.0, 2));
 
-  static int pitch(Mpu input) =>
+  static int pitch(Accelerometer input) =>
       (atan2(input.aX, sqrt(input.aY * input.aY + input.aZ * input.aZ)) * 57.3)
           .toInt();
 
-  static int roll(Mpu input) => (atan2(input.aY, input.aZ) * 57.3).toInt();
+  static int roll(Accelerometer input) =>
+      (atan2(input.aY, input.aZ) * 57.3).toInt();
 }

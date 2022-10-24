@@ -8,12 +8,14 @@ class CardSession extends StatefulWidget {
       {Key? key,
       required this.userData,
       required this.session,
-      required this.gps})
+      required this.gpsPosition,
+      required this.gpsNavigation})
       : super(key: key);
   final UserData userData;
 
   final Session session;
-  final List<Gps> gps;
+  final List<GpsPosition> gpsPosition;
+  final List<GpsNavigation> gpsNavigation;
 
   @override
   State<CardSession> createState() => _CardSessionState();
@@ -25,7 +27,7 @@ class _CardSessionState extends State<CardSession> {
   @override
   void initState() {
     super.initState();
-    for (Gps log in widget.gps) {
+    for (GpsPosition log in widget.gpsPosition) {
       polylinePoints.add(log.latLng);
     }
   }
@@ -140,7 +142,11 @@ class _CardSessionState extends State<CardSession> {
                                 ),
                                 const SizedBox(width: 10),
                                 Text(
-                                  '${CalculationService.telemetry(gps: widget.gps, segment: polylinePoints).distance} km',
+                                  '${CalculationService.telemetry(
+                                    gpsPosition: widget.gpsPosition,
+                                    gpsNavigation: widget.gpsNavigation,
+                                    segment: polylinePoints,
+                                  ).distance} km',
                                   style: const TextStyle(
                                     color: Colors.white70,
                                   ),
@@ -151,13 +157,13 @@ class _CardSessionState extends State<CardSession> {
                         ),
                       ),
                     ),
-                    if (widget.gps.isEmpty) ...[
+                    if (widget.gpsPosition.isEmpty) ...[
                       const Text('No data from GPS found...')
                     ] else ...[
                       Expanded(
                         flex: 2,
                         child: TrackPreview(
-                          gps: widget.gps,
+                          gps: widget.gpsPosition,
                         ),
                       )
                     ]
@@ -165,13 +171,14 @@ class _CardSessionState extends State<CardSession> {
                 ),
               ),
               onTap: () {
-                if (widget.gps.isNotEmpty) {
+                if (widget.gpsPosition.isNotEmpty) {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
                         builder: (context) => SessionMap(
                               session: widget.session,
-                              gps: widget.gps,
+                              gpsPosition: widget.gpsPosition,
+                              gpsNavigation: widget.gpsNavigation,
                             )),
                   );
                 }
@@ -184,15 +191,15 @@ class _CardSessionState extends State<CardSession> {
 
 class TrackPreview extends StatefulWidget {
   const TrackPreview({Key? key, required this.gps}) : super(key: key);
-  final List<Gps> gps;
+  final List<GpsPosition> gps;
 
   @override
   State<TrackPreview> createState() => TrackPreviewState();
 }
 
 class TrackPreviewState extends State<TrackPreview> {
-  late Gps start;
-  late Gps end;
+  late GpsPosition start;
+  late GpsPosition end;
 
   List<MapLatLng> segment = [];
 
@@ -206,7 +213,7 @@ class TrackPreviewState extends State<TrackPreview> {
     start = widget.gps.first;
     end = widget.gps.last;
 
-    for (Gps log in widget.gps) {
+    for (GpsPosition log in widget.gps) {
       segment.add(log.latLng);
     }
 

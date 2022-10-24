@@ -1,28 +1,28 @@
 #include <ArduinoBLE.h>
 #include <Arduino_MKRGPS.h>
 #include <Wire.h>
-#include <QMC5883LCompass.h>
 #include "configuration.h"
 #include "system.h"
 #include "mpu.h"
-#include "compass.h"
 #include "gps.h"
-#include "tca.h"
 
 
 //ORIGINAL POST FOR ARDUINO BLE: https://create.arduino.cc/editor/dpajak/e7af8e95-0aff-4ce1-b2f7-4e7b446c2577/preview
 
-
+//THE MAXIMUM SIZE IS 20 BYTES AS SAID HERE https://stackoverflow.com/questions/24135682/android-sending-data-20-bytes-by-ble
 // Bluetooth® Low Energy Battery Service
 BLEService systemService("00001000-0000-1000-8000-00805F9B34FB");
 
-BLECharacteristic systemCharacteristic("00001001-0000-1000-8000-00805F9B34FB", BLERead | BLENotify, 12);  //SYSTEM 1001 12 bit
+BLECharacteristic systemCharacteristic("00001001-0000-1000-8000-00805F9B34FB", BLERead | BLENotify, 12);  //SYSTEM 1001
 
-// Telemetry
-BLEService telemetryService("00002000-0000-1000-8000-00805F9B34FB");
+// GPS
+BLEService gpsService("00002000-0000-1000-8000-00805F9B34FB");
+BLECharacteristic poitionCharacteristic("00002001-0000-1000-8000-00805F9B34FB", BLERead | BLENotify, 20);     //GPS 2001 
+BLECharacteristic navigationCharacteristic("00002002-0000-1000-8000-00805F9B34FB", BLERead | BLENotify, 20);  //GPS 2001 
 
-BLECharacteristic gpsCharacteristic("00002001-0000-1000-8000-00805F9B34FB", BLERead | BLENotify, 32);  //GPS 2001 32 bit
-BLECharacteristic mpuCharacteristic("00002002-0000-1000-8000-00805F9B34FB", BLERead | BLENotify, 28);  //MPU 2002 28 bit
+BLEService mpuService("00003000-0000-1000-8000-00805F9B34FB");
+BLECharacteristic accelerometerCharacteristic("00003001-0000-1000-8000-00805F9B34FB", BLERead | BLENotify, 16);  //MPU 2002 
+BLECharacteristic gyroscopeCharacteristic("00003002-0000-1000-8000-00805F9B34FB", BLERead | BLENotify, 16);      //MPU 2002 
 
 
 //SERVICES
@@ -53,20 +53,24 @@ void setup() {
 
   // set advertised local name and service UUID:
   BLE.setDeviceName("TKR1A1");  //Setting a name that will appear when scanning for Bluetooth® devices
+  BLE.setLocalName("TKR1A1");
   byte data[19] = { 0x00, 0x00, 0x46, 0x72, 0x61, 0x6e, 0x63, 0x65, 0x73, 0x63, 0x6f, 0x20, 0x56, 0x65, 0x7a, 0x7a, 0x61, 0x6e, 0x69 };
   BLE.setManufacturerData(data, 19);
 
   BLE.setAdvertisedService(systemService);
-  BLE.setAdvertisedService(telemetryService);
+  BLE.setAdvertisedService(gpsService);
+  BLE.setAdvertisedService(mpuService);
 
   systemService.addCharacteristic(systemCharacteristic);  // Timestamp characteristic
+  gpsService.addCharacteristic(poitionCharacteristic);        // Gps characteristic
+  gpsService.addCharacteristic(navigationCharacteristic);        // Acceleration characteristic
+  mpuService.addCharacteristic(accelerometerCharacteristic);        // Acceleration characteristic
+  mpuService.addCharacteristic(gyroscopeCharacteristic);        // Acceleration characteristic
 
-  telemetryService.addCharacteristic(gpsCharacteristic);  // Gps characteristic
-  telemetryService.addCharacteristic(mpuCharacteristic);  // Acceleration characteristic
 
-
-  BLE.addService(systemService);     // System service
-  BLE.addService(telemetryService);  // Telemetry service
+  BLE.addService(systemService);  // System service
+  BLE.addService(gpsService);     // Telemetry service
+  BLE.addService(mpuService);     // Telemetry service
 
 
 
@@ -106,20 +110,24 @@ void setup() {
   Serial.println(" Bluetooth® device active, waiting for connections...");
 }
 
-float GPSData[8];
+float GPSPositionData[5];
+float GPSNavigationData[5];
 
 void loop() {
 
   BLEDevice central = BLE.central();  // wait for a Bluetooth® Low Energy central
 
-  GPSData[0] = millis();
-  GPSData[1] = GPS.available() ? 0 : 1.1;  //Passing custom values to make sure system works as espected
-  GPSData[2] = GPS.available() ? isnan(GPS.latitude()) ? 0.0 : GPS.latitude() : 0.0;
-  GPSData[3] = GPS.available() ? isnan(GPS.longitude()) ? 0.0 : GPS.longitude() : 0.0;
-  GPSData[4] = GPS.available() ? isnan(GPS.speed()) ? 0.0 : GPS.speed() : 0.0;
-  GPSData[5] = GPS.available() ? isnan(GPS.speed()) ? 0.0 : GPS.speed() : 0.0;
-  GPSData[6] = GPS.available() ? isnan(GPS.course()) ? 0.0 : GPS.course() : 0.0;        // Track angle in degrees
-  GPSData[7] = GPS.available() ? isnan(GPS.variation()) ? 0.0 : GPS.variation() : 0.0;  // Magnetic Variation
+  GPSPositionData[0] = millis();
+  GPSPositionData[1] = GPS.available() ? 0 : 1.1;  //Passing custom values to make sure system works as espected
+  GPSPositionData[2] = GPS.available() ? isnan(GPS.latitude()) ? 0.0 : GPS.latitude() : 0.0;
+  GPSPositionData[3] = GPS.available() ? isnan(GPS.longitude()) ? 0.0 : GPS.longitude() : 0.0;
+  GPSPositionData[4] = GPS.available() ? isnan(GPS.altitude()) ? 0.0 : GPS.altitude() : 0.0;
+
+  GPSNavigationData[0] = millis();
+  GPSNavigationData[1] = GPS.available() ? 0 : 1.1;  //Passing custom values to make sure system works as espected
+  GPSNavigationData[2] = GPS.available() ? isnan(GPS.speed()) ? 0.0 : GPS.speed() : 0.0;
+  GPSNavigationData[3] = GPS.available() ? isnan(GPS.course()) ? 0.0 : GPS.course() : 0;          // Track angle in degrees
+  GPSNavigationData[4] = GPS.available() ? isnan(GPS.variation()) ? 0.0 : GPS.variation() : 0.0;  // Magnetic Variation
 
 
   if (central.connected()) {
@@ -129,13 +137,16 @@ void loop() {
       //System
       updateSystem(systemCharacteristic, currentMillis);
 
-      //Telemetry
-      updateMpu(mpuCharacteristic, currentMillis);
-      gpsCharacteristic.setValue((byte *)&GPSData, 32);
+      //GPS
+      poitionCharacteristic.setValue((byte *)&GPSPositionData, 20);
+      navigationCharacteristic.setValue((byte *)&GPSNavigationData, 20);
 
-      Serial.println(GPSData[1]); 
-      Serial.println(GPSData[2], 7);
-      Serial.println(GPSData[3], 7);
+      updateMpu(accelerometerCharacteristic, gyroscopeCharacteristic, currentMillis);
+
+
+      Serial.println(GPSPositionData[1]);
+      Serial.println(GPSPositionData[2], 7);
+      Serial.println(GPSPositionData[3], 7);
 
       previousMillis = currentMillis;  //Clean to re-run cicle
     }

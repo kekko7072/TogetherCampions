@@ -1,7 +1,14 @@
 import '../../services/imports.dart';
 
-class BLEFindDevices extends StatelessWidget {
+class BLEFindDevices extends StatefulWidget {
   const BLEFindDevices({Key? key}) : super(key: key);
+
+  @override
+  State<BLEFindDevices> createState() => _BLEFindDevicesState();
+}
+
+class _BLEFindDevicesState extends State<BLEFindDevices> {
+  TextEditingController model = TextEditingController(text: kDeviceModelTKR1A1);
 
   @override
   Widget build(BuildContext context) {
@@ -12,13 +19,60 @@ class BLEFindDevices extends StatelessWidget {
         child: SingleChildScrollView(
           child: Column(
             children: <Widget>[
+              Center(
+                child: Wrap(
+                  spacing: 10,
+                  children: [
+                    FilterChip(
+                        backgroundColor: model.text == kDeviceModelTKR1A1
+                            ? AppStyle.primaryColor
+                            : Colors.white,
+                        label: Text(
+                          kDeviceModelTKR1A1,
+                          style: TextStyle(
+                              fontWeight: model.text == kDeviceModelTKR1A1
+                                  ? FontWeight.bold
+                                  : FontWeight.normal,
+                              color: model.text == kDeviceModelTKR1A1
+                                  ? Colors.white
+                                  : AppStyle.primaryColor),
+                        ),
+                        onSelected: (value) =>
+                            setState(() => model.text = kDeviceModelTKR1A1)),
+                    FilterChip(
+                        backgroundColor: model.text == kDeviceModelTKR1B1
+                            ? AppStyle.primaryColor
+                            : Colors.white,
+                        label: Text(
+                          kDeviceModelTKR1B1,
+                          style: TextStyle(
+                              fontWeight: model.text == kDeviceModelTKR1B1
+                                  ? FontWeight.bold
+                                  : FontWeight.normal,
+                              color: model.text == kDeviceModelTKR1B1
+                                  ? Colors.white
+                                  : AppStyle.primaryColor),
+                        ),
+                        onSelected: (value) =>
+                            setState(() => model.text = kDeviceModelTKR1B1)),
+                  ],
+                ),
+              ),
               StreamBuilder<List<BluetoothDevice>>(
                 stream: Stream.periodic(const Duration(seconds: 2))
                     .asyncMap((_) => FlutterBluePlus.instance.connectedDevices),
                 initialData: const [],
                 builder: (c, snapshot) => Column(
                   children: snapshot.data!
+                      .where((element) => element.name == model.text)
                       .map((d) => ListTile(
+                            leading: Image(
+                              image: AssetImage(
+                                'assets/${d.name}.png',
+                              ),
+                              fit: BoxFit.cover,
+                              height: 150,
+                            ),
                             title: Text(d.name),
                             subtitle: Text(d.id.toString()),
                             trailing: StreamBuilder<BluetoothDeviceState>(
@@ -47,8 +101,7 @@ class BLEFindDevices extends StatelessWidget {
                 initialData: const [],
                 builder: (c, snapshot) => Column(
                   children: snapshot.data!
-                      .where((element) =>
-                          element.device.name == kDeviceModelTKR1A1)
+                      .where((element) => element.device.name == model.text)
                       .map(
                         (r) => ScanResultTile(
                           result: r,

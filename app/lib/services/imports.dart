@@ -36,6 +36,7 @@ export 'package:libserialport/libserialport.dart'
     if (dart.library.io) 'package:libserialport/libserialport.dart';
 export 'package:geolocator/geolocator.dart';
 export 'package:flutter_blue_plus/flutter_blue_plus.dart';
+export 'package:multiple_stream_builder/multiple_stream_builder.dart';
 
 ///Design
 export 'package:font_awesome_flutter/font_awesome_flutter.dart';

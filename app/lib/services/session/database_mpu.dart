@@ -1,25 +1,71 @@
 import '../imports.dart';
 
-class DatabaseMpu {
-  DatabaseMpu({required this.deviceID, required this.sessionID});
+class DatabaseAccelerometer {
+  DatabaseAccelerometer({required this.deviceID, required this.sessionID});
   final String deviceID;
   final String sessionID;
 
   ///COLLECTIONS & DOCS
-  late CollectionReference<Map<String, dynamic>> telemetryCollection =
+  late CollectionReference<Map<String, dynamic>> accelerometerCollection =
       FirebaseFirestore.instance
           .collection('devices')
           .doc(deviceID)
           .collection('sessions')
           .doc(sessionID)
-          .collection('telemetries');
+          .collection('accelerometer');
 
   ///CRUD
-  Future add(Mpu mpu) async {
-    return telemetryCollection.doc('${mpu.timestamp}').set({
+  Future add(Accelerometer mpu) async {
+    return accelerometerCollection.doc('${mpu.timestamp}').set({
       'aX': mpu.aX,
       'aY': mpu.aY,
       'aZ': mpu.aZ,
+    });
+  }
+
+  ///SERIALIZATION
+  static Accelerometer telemetryFromSnapshot(
+      DocumentSnapshot<Map<String, dynamic>?> snapshot) {
+    return Accelerometer(
+      timestamp: int.parse(snapshot.id),
+      aX: snapshot.data()?['aX'] ?? 0,
+      aY: snapshot.data()?['aY'] ?? 0,
+      aZ: snapshot.data()?['aZ'] ?? 0,
+    );
+  }
+
+  static List<Accelerometer> telemetriesListFromSnapshot(
+          QuerySnapshot<Map<String, dynamic>> snapshot) =>
+      snapshot.docs.map((snapshot) => telemetryFromSnapshot(snapshot)).toList();
+
+  ///STREAMS
+  Stream<Accelerometer> stream({required String telemetryID}) =>
+      accelerometerCollection
+          .doc(telemetryID)
+          .snapshots()
+          .map(telemetryFromSnapshot);
+
+  Stream<List<Accelerometer>> get streamList =>
+      accelerometerCollection.snapshots().map(telemetriesListFromSnapshot);
+}
+
+class DatabaseGyroscope {
+  DatabaseGyroscope({required this.deviceID, required this.sessionID});
+  final String deviceID;
+  final String sessionID;
+
+  ///COLLECTIONS & DOCS
+  late CollectionReference<Map<String, dynamic>> gyroscopeCollection =
+      FirebaseFirestore.instance
+          .collection('devices')
+          .doc(deviceID)
+          .collection('sessions')
+          .doc(sessionID)
+          .collection('gyroscope');
+
+  ///CRUD
+  Future add(Gyroscope mpu) async {
+    return gyroscopeCollection.doc('${mpu.timestamp}').set({
       'gX': mpu.gX,
       'gY': mpu.gY,
       'gZ': mpu.gZ,
@@ -27,29 +73,26 @@ class DatabaseMpu {
   }
 
   ///SERIALIZATION
-  static Mpu telemetryFromSnapshot(
+  static Gyroscope telemetryFromSnapshot(
       DocumentSnapshot<Map<String, dynamic>?> snapshot) {
-    return Mpu(
+    return Gyroscope(
       timestamp: int.parse(snapshot.id),
-      aX: snapshot.data()?['aX'] ?? 0,
-      aY: snapshot.data()?['aY'] ?? 0,
-      aZ: snapshot.data()?['aZ'] ?? 0,
       gX: snapshot.data()?['gX'] ?? 0,
       gY: snapshot.data()?['gY'] ?? 0,
       gZ: snapshot.data()?['gZ'] ?? 0,
     );
   }
 
-  static List<Mpu> telemetriesListFromSnapshot(
+  static List<Gyroscope> telemetriesListFromSnapshot(
           QuerySnapshot<Map<String, dynamic>> snapshot) =>
       snapshot.docs.map((snapshot) => telemetryFromSnapshot(snapshot)).toList();
 
   ///STREAMS
-  Stream<Mpu> stream({required String telemetryID}) => telemetryCollection
+  Stream<Gyroscope> stream({required String telemetryID}) => gyroscopeCollection
       .doc(telemetryID)
       .snapshots()
       .map(telemetryFromSnapshot);
 
-  Stream<List<Mpu>> get streamList =>
-      telemetryCollection.snapshots().map(telemetriesListFromSnapshot);
+  Stream<List<Gyroscope>> get streamList =>
+      gyroscopeCollection.snapshots().map(telemetriesListFromSnapshot);
 }

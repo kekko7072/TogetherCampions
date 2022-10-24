@@ -1,55 +1,84 @@
 import 'package:app/services/imports.dart';
 
-class Gps {
-  Gps({
+class GpsPosition {
+  GpsPosition({
     required this.timestamp,
     required this.available,
     required this.latLng,
-    required this.altitude,
     required this.speed,
-    required this.course,
-    required this.variation,
   });
 
   final int timestamp;
   final bool available;
   final MapLatLng latLng;
-  final double altitude;
   final double speed;
-  final double course;
-  final double variation;
 
-  factory Gps.formListInt(List<int> bit) {
+  factory GpsPosition.formListInt(List<int> bit) {
     ByteBuffer buffer = Int8List.fromList(bit).buffer;
     ByteData byteData = ByteData.view(buffer);
-    return Gps(
+    return GpsPosition(
       timestamp: byteData.getFloat32(0, Endian.little).toInt(),
       available: byteData.getFloat32(4, Endian.little) == 0.0,
       latLng: MapLatLng(byteData.getFloat32(8, Endian.little),
           byteData.getFloat32(12, Endian.little)),
-      altitude: byteData.getFloat32(16, Endian.little),
-      speed: byteData.getFloat32(20, Endian.little),
-      course: byteData.getFloat32(24, Endian.little),
-      variation: byteData.getFloat32(28, Endian.little),
+      speed: byteData.getFloat32(16, Endian.little),
     );
   }
 
-  factory Gps.fromJson(Map<String, dynamic> json) => Gps(
+  factory GpsPosition.fromJson(Map<String, dynamic> json) => GpsPosition(
         timestamp: json["timestamp"],
         available: json["available"],
         latLng: MapLatLng(json["latitude"], json["longitude"]),
-        altitude: json["altitude"],
         speed: json["speed"],
-        course: json["course"],
-        variation: json["variation"],
       );
   Map<String, dynamic> toJson() => {
         "timestamp": timestamp,
         "available": available,
         "latitude": latLng.latitude,
         "longitude": latLng.longitude,
-        "altitude": altitude,
         "speed": speed,
+      };
+}
+
+class GpsNavigation {
+  GpsNavigation({
+    required this.timestamp,
+    required this.available,
+    required this.altitude,
+    required this.course,
+    required this.variation,
+  });
+
+  final int timestamp;
+  final bool available;
+  final double altitude;
+
+  final double course;
+  final double variation;
+
+  factory GpsNavigation.formListInt(List<int> bit) {
+    ByteBuffer buffer = Int8List.fromList(bit).buffer;
+    ByteData byteData = ByteData.view(buffer);
+    return GpsNavigation(
+      timestamp: byteData.getFloat32(0, Endian.little).toInt(),
+      available: byteData.getFloat32(4, Endian.little) == 0.0,
+      altitude: byteData.getFloat32(8, Endian.little),
+      course: byteData.getFloat32(12, Endian.little),
+      variation: byteData.getFloat32(16, Endian.little),
+    );
+  }
+
+  factory GpsNavigation.fromJson(Map<String, dynamic> json) => GpsNavigation(
+        timestamp: json["timestamp"],
+        available: json["available"],
+        altitude: json["altitude"],
+        course: json["course"],
+        variation: json["variation"],
+      );
+  Map<String, dynamic> toJson() => {
+        "timestamp": timestamp,
+        "available": available,
+        "altitude": altitude,
         "course": course,
         "variation": variation,
       };

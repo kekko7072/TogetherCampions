@@ -2,59 +2,63 @@ import '../const.dart';
 
 enum BLESystemCharacteristic { system, unknown }
 
-enum BLETelemetryCharacteristic {
-  mpu,
-  // speed,
-  //gyroscope,
-  gps,
-  unknown
-}
+enum BLEGpsCharacteristic { position, navigation, unknown }
+
+enum BLEMpuCharacteristic { accelerometer, gyroscope, unknown }
 
 class BLECharacteristicHelper {
   ///CHARACTERISTIC
 
   static BLESystemCharacteristic systemCharacteristicPicker(String input) {
     switch (input) {
-
-      ///System Service
       case kBLESystemCharacteristic:
         return BLESystemCharacteristic.system;
     }
     return BLESystemCharacteristic.unknown;
   }
 
-  static BLETelemetryCharacteristic telemetryCharacteristicPicker(
-      String input) {
+  static BLEGpsCharacteristic gpsCharacteristicPicker(String input) {
     switch (input) {
-
-      ///Telemetry Service
-      case kBLEMpuCharacteristic:
-        return BLETelemetryCharacteristic.mpu;
-      case kBLEGpsCharacteristic:
-        return BLETelemetryCharacteristic.gps;
+      case kBLEPositionCharacteristic:
+        return BLEGpsCharacteristic.position;
+      case kBLENavigationCharacteristic:
+        return BLEGpsCharacteristic.navigation;
     }
-    return BLETelemetryCharacteristic.unknown;
+    return BLEGpsCharacteristic.unknown;
   }
 
-  static String characteristicPickerName(BLETelemetryCharacteristic input) {
+  static BLEMpuCharacteristic mpuCharacteristicPicker(String input) {
     switch (input) {
+      case kBLEAccelerometerCharacteristic:
+        return BLEMpuCharacteristic.accelerometer;
+      case kBLEGyroscopeCharacteristic:
+        return BLEMpuCharacteristic.gyroscope;
+    }
+    return BLEMpuCharacteristic.unknown;
+  }
 
-      /*///System Service
-      case BLECharacteristic.timestamp:
-        return 'Timestamp';
-      case BLECharacteristic.batteryLevel:
-        return 'Battery Level';
-      case BLECharacteristic.temperature:
-        return 'Temperature';*/
+  static String gpsCharacteristicPickerName(BLEGpsCharacteristic input) {
+    switch (input) {
+      case BLEGpsCharacteristic.position:
+        return 'Position';
 
-      ///Telemetry Service
-      case BLETelemetryCharacteristic.mpu:
-        return 'Mpu';
-      /* case BLETelemetryCharacteristic.speed:
-        return 'Speed';*/
-      case BLETelemetryCharacteristic.gps:
-        return 'Gps';
-      case BLETelemetryCharacteristic.unknown:
+      case BLEGpsCharacteristic.navigation:
+        return 'Navigation';
+
+      case BLEGpsCharacteristic.unknown:
+        return 'Unknown';
+    }
+  }
+
+  static String mpuCharacteristicPickerName(BLEMpuCharacteristic input) {
+    switch (input) {
+      case BLEMpuCharacteristic.accelerometer:
+        return 'Accelerometer';
+
+      case BLEMpuCharacteristic.gyroscope:
+        return 'Gyroscope';
+
+      case BLEMpuCharacteristic.unknown:
         return 'Unknown';
     }
   }

@@ -2,7 +2,7 @@ import 'package:app/services/imports.dart';
 
 class CardLog extends StatelessWidget {
   const CardLog({Key? key, required this.gps}) : super(key: key);
-  final Gps gps;
+  final GpsPosition gps;
 
   @override
   Widget build(BuildContext context) {
@@ -25,10 +25,10 @@ class CardLog extends StatelessWidget {
       subtitle: Wrap(
         spacing: 10,
         children: [
-          Text('Speed: ${gps.speed} km/h'),
-          Text('Course: ${gps.course} deg'),
-          Text('Altitude: ${gps.altitude} m'),
-          Text('Satellites: ${gps.variation}'),
+          //Text('Speed: ${gps.speed} km/h'),
+          //Text('Course: ${gps.course} deg'),
+          //Text('Altitude: ${gps.altitude} m'),
+          //Text('Satellites: ${gps.variation}'),
           //Text('Battery: ${gps.battery} V'),
         ],
       ),
