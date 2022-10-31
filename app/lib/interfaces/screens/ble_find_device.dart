@@ -12,6 +12,8 @@ class _BLEFindDevicesState extends State<BLEFindDevices> {
 
   @override
   Widget build(BuildContext context) {
+    final unitSystem = Provider.of<UnitsSystem>(context);
+
     return Scaffold(
       body: RefreshIndicator(
         onRefresh: () => FlutterBluePlus.instance
@@ -58,63 +60,101 @@ class _BLEFindDevicesState extends State<BLEFindDevices> {
                   ],
                 ),
               ),
-              StreamBuilder<List<BluetoothDevice>>(
-                stream: Stream.periodic(const Duration(seconds: 2))
-                    .asyncMap((_) => FlutterBluePlus.instance.connectedDevices),
-                initialData: const [],
-                builder: (c, snapshot) => Column(
-                  children: snapshot.data!
-                      .where((element) => element.name == model.text)
-                      .map((d) => ListTile(
-                            leading: Image(
-                              image: AssetImage(
-                                'assets/${d.name}.png',
-                              ),
-                              fit: BoxFit.cover,
-                              height: 150,
-                            ),
-                            title: Text(d.name),
-                            subtitle: Text(d.id.toString()),
-                            trailing: StreamBuilder<BluetoothDeviceState>(
-                              stream: d.state,
-                              initialData: BluetoothDeviceState.disconnected,
-                              builder: (c, snapshot) {
-                                if (snapshot.data ==
-                                    BluetoothDeviceState.connected) {
-                                  return ElevatedButton(
-                                    child: const Text('OPEN'),
-                                    onPressed: () => Navigator.of(context).push(
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                BLEDeviceScreen(device: d))),
-                                  );
+              if (model.text == kDeviceModelTKR1A1) ...[
+                StreamBuilder<List<BluetoothDevice>>(
+                  stream: Stream.periodic(const Duration(seconds: 2)).asyncMap(
+                      (_) => FlutterBluePlus.instance.connectedDevices),
+                  initialData: const [],
+                  builder: (c, snapshot) => Column(
+                    children: snapshot.data!
+                        .where((element) => element.name == model.text)
+                        .map((d) => StreamBuilder<Device>(
+                            stream:
+                                DatabaseDevice().device(id: d.id.toString()),
+                            builder: (context, snapshot) {
+                              if (snapshot.hasError) {
+                                return Text('Error: ${snapshot.error}');
+                              }
+                              if (!snapshot.hasData) {
+                                return const Text("Device not found");
+                              }
+                              final device = snapshot.data!;
+                              return ListTile(
+                                leading: Image(
+                                  image: AssetImage(
+                                    'assets/${d.name}.png',
+                                  ),
+                                  fit: BoxFit.cover,
+                                  height: 150,
+                                ),
+                                title: Text(d.name),
+                                subtitle: Text(d.id.toString()),
+                                trailing: StreamBuilder<BluetoothDeviceState>(
+                                  stream: d.state,
+                                  initialData:
+                                      BluetoothDeviceState.disconnected,
+                                  builder: (c, snapshot) {
+                                    if (snapshot.data ==
+                                        BluetoothDeviceState.connected) {
+                                      return ElevatedButton(
+                                        child: const Text('OPEN'),
+                                        onPressed: () => Navigator.of(context)
+                                            .push(MaterialPageRoute(
+                                                builder: (context) =>
+                                                    BLEDeviceScreen(
+                                                      deviceBLE: d,
+                                                      device: device,
+                                                      unitsSystem: unitSystem,
+                                                    ))),
+                                      );
+                                    }
+                                    return Text(snapshot.data.toString());
+                                  },
+                                ),
+                              );
+                            }))
+                        .toList(),
+                  ),
+                ),
+                StreamBuilder<List<ScanResult>>(
+                  stream: FlutterBluePlus.instance.scanResults,
+                  initialData: const [],
+                  builder: (c, snapshot) => Column(
+                    children: snapshot.data!
+                        .where((element) => element.device.name == model.text)
+                        .map(
+                          (r) => StreamBuilder<Device>(
+                              stream: DatabaseDevice()
+                                  .device(id: r.device.id.toString()),
+                              builder: (context, snapshot) {
+                                if (snapshot.hasError) {
+                                  return Text('Error: ${snapshot.error}');
                                 }
-                                return Text(snapshot.data.toString());
-                              },
-                            ),
-                          ))
-                      .toList(),
+                                if (!snapshot.hasData) {
+                                  return const Text("Device not found");
+                                }
+                                final device = snapshot.data!;
+                                return ScanResultTile(
+                                  result: r,
+                                  onTap: () async => await r.device
+                                      .connect()
+                                      .then((value) => Navigator.of(context)
+                                              .push(MaterialPageRoute(
+                                                  builder: (context) {
+                                            return BLEDeviceScreen(
+                                                deviceBLE: r.device,
+                                                unitsSystem: unitSystem,
+                                                device: device);
+                                          }))),
+                                );
+                              }),
+                        )
+                        .toList(),
+                  ),
                 ),
-              ),
-              StreamBuilder<List<ScanResult>>(
-                stream: FlutterBluePlus.instance.scanResults,
-                initialData: const [],
-                builder: (c, snapshot) => Column(
-                  children: snapshot.data!
-                      .where((element) => element.device.name == model.text)
-                      .map(
-                        (r) => ScanResultTile(
-                          result: r,
-                          onTap: () async => await r.device.connect().then(
-                              (value) => Navigator.of(context).push(
-                                      MaterialPageRoute(builder: (context) {
-                                    return BLEDeviceScreen(device: r.device);
-                                  }))),
-                        ),
-                      )
-                      .toList(),
-                ),
-              ),
+              ] else if (model.text == kDeviceModelTKR1B1) ...[
+                ///STREAM FROM SERVER
+              ]
             ],
           ),
         ),

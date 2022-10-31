@@ -1,5 +1,3 @@
-import 'package:app/services/imports.dart';
-
 class Session {
   Session({
     required this.id,

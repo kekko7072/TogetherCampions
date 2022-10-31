@@ -35,8 +35,11 @@ export 'package:libserialport/libserialport.dart'
     if (dart.library.html) 'package:app/services/web_serialport.dart'
     if (dart.library.io) 'package:libserialport/libserialport.dart';
 export 'package:geolocator/geolocator.dart';
+export 'package:battery_plus/battery_plus.dart';
 export 'package:flutter_blue_plus/flutter_blue_plus.dart';
+export 'package:sensors_plus/sensors_plus.dart';
 export 'package:multiple_stream_builder/multiple_stream_builder.dart';
+export 'package:shared_preferences/shared_preferences.dart';
 
 ///Design
 export 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -44,6 +47,7 @@ export 'package:battery_indicator/battery_indicator.dart';
 export 'package:flutter_easyloading/flutter_easyloading.dart';
 export 'package:graphic/graphic.dart';
 export 'package:badges/badges.dart';
+export 'package:cupertino_onboarding/cupertino_onboarding.dart';
 
 ///INTERFACE
 ///##Pages
@@ -61,13 +65,16 @@ export 'package:app/interfaces/widgets/card_telemetry.dart';
 export 'package:app/interfaces/widgets/add_edit_session.dart';
 export 'package:app/interfaces/widgets/card_info.dart';
 export 'package:app/interfaces/widgets/card_session.dart';
-export 'package:app/interfaces/widgets/add_edit_profile.dart';
+export 'package:app/interfaces/widgets/profile.dart';
 export 'package:app/interfaces/widgets/list_logs.dart';
 export 'package:app/interfaces/widgets/card_log.dart';
 export 'package:app/interfaces/widgets/card_device.dart';
 export 'package:app/interfaces/widgets/add_edit_device.dart';
 export 'package:app/interfaces/widgets/data_visualization.dart';
 export 'package:app/interfaces/widgets/track_map.dart';
+export 'package:app/interfaces/widgets/position_device_configurator.dart';
+export 'package:app/interfaces/widgets/track_telemetries.dart';
+export 'package:app/interfaces/widgets/upload_session_dialog.dart';
 
 ///MODELS
 export 'package:app/models/device.dart';
@@ -93,3 +100,4 @@ export 'package:app/services/calculation.dart';
 export 'package:app/services/style.dart';
 export 'package:app/services/map.dart';
 export 'package:app/services/bluetooth_helper.dart';
+export 'package:app/services/units.dart';

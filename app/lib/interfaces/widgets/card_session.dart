@@ -49,7 +49,7 @@ class _CardSessionState extends State<CardSession> {
             children: [
               SlidableAction(
                 onPressed: (con) async {
-                  //TODO REMOVE
+                  //TODO DELETE
                 },
                 backgroundColor: CupertinoColors.destructiveRed,
                 foregroundColor: Colors.black,

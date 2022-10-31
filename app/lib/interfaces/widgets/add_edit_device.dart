@@ -27,12 +27,19 @@ class _AddEditDeviceState extends State<AddEditDevice> {
 
   List<ScanResult> devices = [];
 
+  int x = 0;
+  int y = 0;
+  int z = 0;
+
   @override
   void initState() {
     super.initState();
     if (widget.isEdit && widget.device != null) {
       id.text = widget.device!.serialNumber;
       name.text = widget.device!.name;
+      x = widget.device!.devicePosition.x;
+      y = widget.device!.devicePosition.y;
+      z = widget.device!.devicePosition.z;
     } else {
       FlutterBluePlus.instance.startScan(timeout: const Duration(seconds: 4));
     }
@@ -181,6 +188,15 @@ class _AddEditDeviceState extends State<AddEditDevice> {
                           icon: Icons.edit, hintText: 'Enter device name'),
                     ),
                   ),
+                  PositionDeviceConfigurator(
+                    onChangePosition: (newX, newY, newZ) => setState(() {
+                      x = newX;
+                      y = newY;
+                      z = newZ;
+                    }),
+                    initialPosition:
+                        widget.isEdit ? DevicePosition(x: x, y: y, z: z) : null,
+                  ),
                   const SizedBox(height: 10),
                   CupertinoButton.filled(
                     onPressed: id.text.isEmpty
@@ -190,12 +206,12 @@ class _AddEditDeviceState extends State<AddEditDevice> {
 
                             await DatabaseDevice()
                                 .register(
-                              serialNumber: id.text,
-                              modelNumber: model.text,
-                              modelName: modelName.text,
-                              uid: widget.uid,
-                              name: name.text,
-                            )
+                                    serialNumber: id.text,
+                                    modelNumber: model.text,
+                                    uid: widget.uid,
+                                    name: name.text,
+                                    devicePosition:
+                                        DevicePosition(x: x, y: y, z: z))
                                 .then((value) {
                               setState(() => showLoading = false);
                               Navigator.of(context).pop();

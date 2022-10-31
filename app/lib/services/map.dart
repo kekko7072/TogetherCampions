@@ -142,4 +142,20 @@ class MapService {
           iconColor: Colors.black),
     );
   }
+
+  liveCameraPosition({required MapLatLng last}) {
+    return MapZoomPanBehavior(
+      zoomLevel: 12,
+      minZoomLevel: 1,
+      maxZoomLevel: 30,
+      enableMouseWheelZooming: true,
+      enableDoubleTapZooming: true,
+      focalLatLng: last,
+      showToolbar: true,
+      toolbarSettings: const MapToolbarSettings(
+          direction: Axis.horizontal,
+          position: MapToolbarPosition.topRight,
+          iconColor: Colors.black),
+    );
+  }
 }

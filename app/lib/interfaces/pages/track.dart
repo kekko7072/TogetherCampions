@@ -1,6 +1,5 @@
 import 'package:app/services/imports.dart';
 import 'package:flutter/cupertino.dart';
-import '../screens/ble_find_device.dart';
 
 class Track extends StatefulWidget {
   const Track({Key? key}) : super(key: key);

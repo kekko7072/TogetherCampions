@@ -119,19 +119,19 @@ class CardTelemetry extends StatelessWidget {
                                               CrossAxisAlignment.end,
                                           children: [
                                             Text(
-                                              '${telemetry.speed.medium}   km/h',
+                                              '${telemetry.speed.medium}   kts',
                                               style: Theme.of(context)
                                                   .textTheme
                                                   .titleMedium,
                                             ),
                                             Text(
-                                              '${telemetry.speed.max}   km/h',
+                                              '${telemetry.speed.max}   kts',
                                               style: Theme.of(context)
                                                   .textTheme
                                                   .titleMedium,
                                             ),
                                             Text(
-                                              '${telemetry.speed.min}   km/h',
+                                              '${telemetry.speed.min}   kts',
                                               style: Theme.of(context)
                                                   .textTheme
                                                   .titleMedium,
@@ -153,7 +153,7 @@ class CardTelemetry extends StatelessWidget {
                           ),
                           const SizedBox(height: 5),
                           Text(
-                            '${telemetry.speed.medium.toInt()} km/h',
+                            '${telemetry.speed.medium.toInt()} kts',
                             style: Theme.of(context)
                                 .textTheme
                                 .titleLarge!

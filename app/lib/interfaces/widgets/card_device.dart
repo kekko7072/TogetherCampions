@@ -25,46 +25,46 @@ class _CardDeviceState extends State<CardDevice> {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(5.0),
-      child: Container(
-        margin: EdgeInsets.zero,
-        width: AppStyle.resizeAutomaticallyWidth(context),
-        decoration: BoxDecoration(
-            borderRadius: const BorderRadius.all(Radius.circular(20)),
-            color: AppStyle.primaryColor),
-        child: Padding(
-          padding: const EdgeInsets.all(5.0),
-          child: Slidable(
-            key: const ValueKey(0),
-            startActionPane: ActionPane(
-              motion: const ScrollMotion(),
-              children: [
-                SlidableAction(
-                  onPressed: (con) async => await DatabaseDevice()
-                      .delete(id: widget.device.serialNumber, uid: widget.uid),
-                  backgroundColor: const Color(0xFFFE4A49),
-                  foregroundColor: Colors.black,
-                  icon: Icons.delete,
-                  label: 'Delete',
-                ),
-                SlidableAction(
-                  onPressed: (cons) async => showModalBottomSheet(
-                    context: context,
-                    shape: AppStyle.kModalBottomStyle,
-                    isScrollControlled: true,
-                    isDismissible: true,
-                    builder: (context) => AddEditDevice(
-                      isEdit: true,
-                      uid: widget.uid,
-                      device: widget.device,
-                    ),
-                  ),
-                  backgroundColor: AppStyle.primaryColor,
-                  foregroundColor: Colors.black,
-                  icon: Icons.edit,
-                  label: 'Edit',
-                ),
-              ],
+      child: Slidable(
+        key: const ValueKey(0),
+        startActionPane: ActionPane(
+          motion: const ScrollMotion(),
+          children: [
+            SlidableAction(
+              onPressed: (con) async => await DatabaseDevice()
+                  .delete(id: widget.device.serialNumber, uid: widget.uid),
+              backgroundColor: const Color(0xFFFE4A49),
+              foregroundColor: Colors.black,
+              icon: Icons.delete,
+              label: 'Delete',
             ),
+            SlidableAction(
+              onPressed: (cons) async => showModalBottomSheet(
+                context: context,
+                shape: AppStyle.kModalBottomStyle,
+                isScrollControlled: true,
+                isDismissible: true,
+                builder: (context) => AddEditDevice(
+                  isEdit: true,
+                  uid: widget.uid,
+                  device: widget.device,
+                ),
+              ),
+              backgroundColor: AppStyle.primaryColor,
+              foregroundColor: Colors.black,
+              icon: Icons.edit,
+              label: 'Edit',
+            ),
+          ],
+        ),
+        child: Container(
+          margin: EdgeInsets.zero,
+          width: AppStyle.resizeAutomaticallyWidth(context),
+          decoration: BoxDecoration(
+              borderRadius: const BorderRadius.all(Radius.circular(20)),
+              color: AppStyle.primaryColor),
+          child: Padding(
+            padding: const EdgeInsets.all(5.0),
             child: Padding(
               padding: const EdgeInsets.all(10.0),
               child: SizedBox(
@@ -192,27 +192,7 @@ class _CardDeviceState extends State<CardDevice> {
                                                       mainAxisAlignment:
                                                           MainAxisAlignment
                                                               .spaceBetween,
-                                                      children: [
-                                                        Text(
-                                                          'Nome modello:',
-                                                          style: Theme.of(
-                                                                  context)
-                                                              .textTheme
-                                                              .titleMedium!
-                                                              .copyWith(
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .w500),
-                                                        ),
-                                                        Text(
-                                                          widget
-                                                              .device.modelName,
-                                                          style:
-                                                              Theme.of(context)
-                                                                  .textTheme
-                                                                  .titleMedium,
-                                                        ),
-                                                      ],
+                                                      children: [],
                                                     ),
                                                   ),
                                                   Padding(

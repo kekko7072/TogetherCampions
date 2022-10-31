@@ -1,3 +1,6 @@
+#ifndef MPU_H
+#define MPU_H
+
 void setupMPU() {
   Wire.begin();
   Wire.beginTransmission(MPU_ADDR);
@@ -6,7 +9,7 @@ void setupMPU() {
   Wire.endTransmission(true);
 }
 
-void updateMpu(BLECharacteristic accelerometer, BLECharacteristic gyroscope, int timestamp) {
+void updateMPU(BLECharacteristic accelerometer, BLECharacteristic gyroscope) {
   Wire.beginTransmission(MPU_ADDR);
   Wire.write(0x3B);  // starting with register 0x3B (ACCEL_XOUT_H)
   Wire.endTransmission(false);
@@ -20,32 +23,30 @@ void updateMpu(BLECharacteristic accelerometer, BLECharacteristic gyroscope, int
   int16_t GyZ = Wire.read() << 8 | Wire.read();  // 0x47 (GYRO_ZOUT_H) & 0x48 (GYRO_ZOUT_L)
 
 
-  Serial.print("Accelerometer: ");
-  Serial.print("X = ");
+  Serial.print(F("Accelerometer: X = "));
   Serial.print(AcX);
-  Serial.print(" | Y = ");
+  Serial.print(F(" | Y = "));
   Serial.print(AcY);
-  Serial.print(" | Z = ");
+  Serial.print(F(" | Z = "));
   Serial.println(AcZ);  //AcZ - 16384.0 to make it inertail from the device position
-  Serial.print("Gyroscope: ");
-  Serial.print("X = ");
+  Serial.print(F("Gyroscope: X = "));
   Serial.print(GyX);
-  Serial.print(" | Y = ");
+  Serial.print(F(" | Y = "));
   Serial.print(GyY);
   Serial.print(" | Z = ");
   Serial.println(GyZ);
-  Serial.println(" ");
+  Serial.println(F(" "));
 
 
 
   int acc[4];
-  acc[0] = timestamp;
+  acc[0] = millis();
   acc[1] = AcX;
   acc[2] = AcY;
   acc[3] = AcZ;
-  
+
   int gyr[4];
-  acc[0] = timestamp;
+  acc[0] = millis();
   gyr[1] = GyX;
   gyr[2] = GyY;
   gyr[3] = GyZ;
@@ -54,3 +55,5 @@ void updateMpu(BLECharacteristic accelerometer, BLECharacteristic gyroscope, int
   accelerometer.setValue((byte *)&acc, 16);
   gyroscope.setValue((byte *)&gyr, 16);
 }
+
+#endif

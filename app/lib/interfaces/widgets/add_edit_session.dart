@@ -27,8 +27,9 @@ class _AddEditSessionState extends State<AddEditSession> {
   DateTime start = DateTime.now();
   DateTime end = DateTime.now();
 
-  DevicePosition devicePosition = DevicePosition(x: 0, y: 0, z: 0);
-
+  int x = 0;
+  int y = 0;
+  int z = 0;
   FilePickerResult? result;
   PlatformFile? file;
   List<String> value = [];
@@ -44,6 +45,9 @@ class _AddEditSessionState extends State<AddEditSession> {
       name.text = widget.session!.info.name;
       start = widget.session!.info.start;
       end = widget.session!.info.end;
+      x = widget.session!.devicePosition.x;
+      y = widget.session!.devicePosition.y;
+      z = widget.session!.devicePosition.z;
     }
   }
 
@@ -129,7 +133,6 @@ class _AddEditSessionState extends State<AddEditSession> {
                       ],
                     ),
                   ],
-
                   Wrap(
                     alignment: WrapAlignment.start,
                     direction: Axis.horizontal,
@@ -140,22 +143,36 @@ class _AddEditSessionState extends State<AddEditSession> {
                             backgroundColor: deviceID == deviceID
                                 ? AppStyle.primaryColor
                                 : Colors.black12,
-                            label: Text(
-                              deviceID,
-                              style: TextStyle(
-                                  fontWeight: deviceID == deviceID
-                                      ? FontWeight.bold
-                                      : FontWeight.normal,
-                                  color: Colors.white),
-                            ),
+                            label: StreamBuilder<Device>(
+                                stream: DatabaseDevice().device(id: deviceID),
+                                builder: (context, snapshot) {
+                                  return Text(
+                                    snapshot.data?.name ?? '',
+                                    style: TextStyle(
+                                        fontWeight: deviceID == deviceID
+                                            ? FontWeight.bold
+                                            : FontWeight.normal,
+                                        color: Colors.white),
+                                  );
+                                }),
                             onSelected: (value) =>
                                 setState(() => deviceID = deviceID)),
                       ],
                     ],
                   ),
-
-                  ///TODO add configuration for device position
-
+                  const SizedBox(height: 20),
+                  const Text(
+                    'Posizione: ',
+                  ),
+                  PositionDeviceConfigurator(
+                    onChangePosition: (newX, newY, newZ) => setState(() {
+                      x = newX;
+                      y = newY;
+                      z = newZ;
+                    }),
+                    initialPosition:
+                        widget.isEdit ? DevicePosition(x: x, y: y, z: z) : null,
+                  ),
                   Padding(
                     padding: const EdgeInsets.only(left: 20.0),
                     child: Row(
@@ -205,7 +222,23 @@ class _AddEditSessionState extends State<AddEditSession> {
                       onPressed: () async {
                         setState(() => showLoading = true);
                         if (widget.isEdit) {
-                          //TODO edit
+                          await DatabaseSession(deviceID: deviceID)
+                              .edit(
+                                  session: Session(
+                                      id: const Uuid().v4(),
+                                      info: SessionInfo(
+                                          name: name.text,
+                                          start: start,
+                                          end: end),
+                                      devicePosition: DevicePosition(
+                                        x: x,
+                                        y: y,
+                                        z: z,
+                                      )))
+                              .then((value) {
+                            setState(() => showLoading = false);
+                            Navigator.of(context).pop();
+                          });
                         } else {
                           await DatabaseSession(deviceID: deviceID)
                               .add(
@@ -216,9 +249,9 @@ class _AddEditSessionState extends State<AddEditSession> {
                                           start: start,
                                           end: end),
                                       devicePosition: DevicePosition(
-                                        x: devicePosition.x,
-                                        y: devicePosition.y,
-                                        z: devicePosition.z,
+                                        x: x,
+                                        y: y,
+                                        z: z,
                                       )))
                               .then((value) {
                             setState(() => showLoading = false);

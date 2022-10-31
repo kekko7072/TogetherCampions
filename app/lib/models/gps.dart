@@ -13,6 +13,12 @@ class GpsPosition {
   final MapLatLng latLng;
   final double speed;
 
+  static bool isAvailable(List<int> bit) {
+    ByteBuffer buffer = Int8List.fromList(bit).buffer;
+    ByteData byteData = ByteData.view(buffer);
+    return byteData.getFloat32(4, Endian.little).toInt() == 0;
+  }
+
   factory GpsPosition.formListInt(List<int> bit) {
     ByteBuffer buffer = Int8List.fromList(bit).buffer;
     ByteData byteData = ByteData.view(buffer);
@@ -55,6 +61,12 @@ class GpsNavigation {
 
   final double course;
   final double variation;
+
+  static bool isAvailable(List<int> bit) {
+    ByteBuffer buffer = Int8List.fromList(bit).buffer;
+    ByteData byteData = ByteData.view(buffer);
+    return byteData.getFloat32(4, Endian.little).toInt() == 0;
+  }
 
   factory GpsNavigation.formListInt(List<int> bit) {
     ByteBuffer buffer = Int8List.fromList(bit).buffer;

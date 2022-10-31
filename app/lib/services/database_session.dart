@@ -23,16 +23,23 @@ class DatabaseSession {
         'x': session.devicePosition.x,
         'y': session.devicePosition.y,
         'z': session.devicePosition.z,
-        'timestamp': 0,
       }
     });
   }
 
-  static Future edit(
-      {required String uid,
-      required Session oldSession,
-      required Session newSession}) async {
-    //TODO edit session
+  Future edit({required Session session}) async {
+    return await sessionCollection.doc(session.id).set({
+      'info': {
+        'name': session.info.name,
+        'start': session.info.start,
+        'end': session.info.end,
+      },
+      'devicePosition': {
+        'x': session.devicePosition.x,
+        'y': session.devicePosition.y,
+        'z': session.devicePosition.z,
+      }
+    });
   }
 
   ///SERIALIZATION

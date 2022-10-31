@@ -6,7 +6,7 @@ class DatabaseGpsPosition {
   final String sessionID;
 
   ///COLLECTIONS & DOCS
-  late CollectionReference<Map<String, dynamic>> telemetryCollection =
+  late CollectionReference<Map<String, dynamic>> gpsPositionCollection =
       FirebaseFirestore.instance
           .collection('devices')
           .doc(deviceID)
@@ -16,7 +16,7 @@ class DatabaseGpsPosition {
 
   ///CRUD
   Future add(GpsPosition gps) async {
-    return telemetryCollection.doc('${gps.timestamp}').set({
+    return gpsPositionCollection.doc('${gps.timestamp}').set({
       'available': gps.available,
       'latitude': gps.latLng.latitude,
       'longitude': gps.latLng.longitude,
@@ -25,7 +25,7 @@ class DatabaseGpsPosition {
   }
 
   ///SERIALIZATION
-  static GpsPosition gpsFromSnapshot(
+  static GpsPosition gpsPositionFromSnapshot(
       DocumentSnapshot<Map<String, dynamic>?> snapshot) {
     bool available = snapshot.data()?['available'] ?? false;
     return GpsPosition(
@@ -37,16 +37,21 @@ class DatabaseGpsPosition {
     );
   }
 
-  static List<GpsPosition> telemetriesListFromSnapshot(
+  static List<GpsPosition> gpsPositionListFromSnapshot(
           QuerySnapshot<Map<String, dynamic>> snapshot) =>
-      snapshot.docs.map((snapshot) => gpsFromSnapshot(snapshot)).toList();
+      snapshot.docs
+          .map((snapshot) => gpsPositionFromSnapshot(snapshot))
+          .toList();
 
   ///STREAMS
   Stream<GpsPosition> stream({required String telemetryID}) =>
-      telemetryCollection.doc(telemetryID).snapshots().map(gpsFromSnapshot);
+      gpsPositionCollection
+          .doc(telemetryID)
+          .snapshots()
+          .map(gpsPositionFromSnapshot);
 
   Stream<List<GpsPosition>> get streamList =>
-      telemetryCollection.snapshots().map(telemetriesListFromSnapshot);
+      gpsPositionCollection.snapshots().map(gpsPositionListFromSnapshot);
 }
 
 class DatabaseGpsNavigation {
@@ -55,7 +60,7 @@ class DatabaseGpsNavigation {
   final String sessionID;
 
   ///COLLECTIONS & DOCS
-  late CollectionReference<Map<String, dynamic>> telemetryCollection =
+  late CollectionReference<Map<String, dynamic>> gpsNavigationCollection =
       FirebaseFirestore.instance
           .collection('devices')
           .doc(deviceID)
@@ -65,16 +70,16 @@ class DatabaseGpsNavigation {
 
   ///CRUD
   Future add(GpsNavigation gps) async {
-    return telemetryCollection.doc('${gps.timestamp}').set({
+    return gpsNavigationCollection.doc('${gps.timestamp}').set({
       'available': gps.available,
       'altitude': gps.altitude,
       'course': gps.course,
-      'satellites': gps.variation,
+      'variation': gps.variation,
     });
   }
 
   ///SERIALIZATION
-  static GpsNavigation gpsFromSnapshot(
+  static GpsNavigation gpsNavigationFromSnapshot(
       DocumentSnapshot<Map<String, dynamic>?> snapshot) {
     bool available = snapshot.data()?['available'] ?? false;
     return GpsNavigation(
@@ -83,18 +88,24 @@ class DatabaseGpsNavigation {
       altitude:
           available ? snapshot.data()!['altitude']?.toDouble() ?? 0.0 : 0.0,
       course: available ? snapshot.data()!['course']?.toDouble() ?? 0.0 : 0.0,
-      variation: available ? snapshot.data()!['satellites']?.toInt() ?? 0 : 0,
+      variation:
+          available ? snapshot.data()!['satellites']?.toDouble() ?? 0 : 0,
     );
   }
 
-  static List<GpsNavigation> telemetriesListFromSnapshot(
+  static List<GpsNavigation> gpsNavigationListFromSnapshot(
           QuerySnapshot<Map<String, dynamic>> snapshot) =>
-      snapshot.docs.map((snapshot) => gpsFromSnapshot(snapshot)).toList();
+      snapshot.docs
+          .map((snapshot) => gpsNavigationFromSnapshot(snapshot))
+          .toList();
 
   ///STREAMS
   Stream<GpsNavigation> stream({required String telemetryID}) =>
-      telemetryCollection.doc(telemetryID).snapshots().map(gpsFromSnapshot);
+      gpsNavigationCollection
+          .doc(telemetryID)
+          .snapshots()
+          .map(gpsNavigationFromSnapshot);
 
   Stream<List<GpsNavigation>> get streamList =>
-      telemetryCollection.snapshots().map(telemetriesListFromSnapshot);
+      gpsNavigationCollection.snapshots().map(gpsNavigationListFromSnapshot);
 }

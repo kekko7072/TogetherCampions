@@ -10,34 +10,60 @@ class TrackMap extends StatefulWidget {
 }
 
 class TrackMapState extends State<TrackMap> {
-  late GpsPosition start;
-  late GpsPosition end;
   List<MapLatLng> polylinePoints = [];
   TelemetryViewLive telemetryViewRange = TelemetryViewLive.speed;
-  TelemetryViewLive telemetryViewCharts = TelemetryViewLive.speed;
+  bool showSpeedChart = false;
   late MapTileLayerController _mapController;
   late MapZoomPanBehavior _zoomPanBehavior;
+  late Timer movePosition;
 
   @override
   void initState() {
-    super.initState();
-    start = widget.gpsPosition.first;
-    end = widget.gpsPosition.last;
-
-    for (GpsPosition log in widget.gpsPosition) {
-      polylinePoints.add(log.latLng);
-    }
-
     _mapController = MapTileLayerController();
+    _zoomPanBehavior = MapZoomPanBehavior(
+      zoomLevel: 12,
+      minZoomLevel: 1,
+      maxZoomLevel: 30,
+      enableMouseWheelZooming: true,
+      enableDoubleTapZooming: true,
+      focalLatLng: widget.gpsPosition.last.latLng,
+      showToolbar: true,
+      toolbarSettings: const MapToolbarSettings(
+          direction: Axis.horizontal,
+          position: MapToolbarPosition.topRight,
+          iconColor: Colors.black),
+    );
+    movePosition = Timer.periodic(const Duration(seconds: 3), (timer) {
+      _zoomPanBehavior
+        ..focalLatLng = widget.gpsPosition.last.latLng
+        ..zoomLevel = 18;
+    });
+    super.initState();
+  }
 
-    _zoomPanBehavior = MapService.initialCameraPosition(
-        list: polylinePoints, isPreview: false);
+  void updateLines() {
+    polylinePoints.add(widget.gpsPosition.last.latLng);
+  }
+
+  Timer timer() =>
+      movePosition = Timer.periodic(const Duration(seconds: 5), (timer) {
+        _zoomPanBehavior
+          ..focalLatLng = widget.gpsPosition.last.latLng
+          ..zoomLevel = 17;
+      });
+
+  @override
+  void dispose() {
+    movePosition.cancel();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    updateLines();
     TelemetryPosition telemetry = CalculationService.telemetryPosition(
         gpsPosition: widget.gpsPosition, segment: polylinePoints);
+
     return Column(
       children: [
         SfMaps(
@@ -53,6 +79,7 @@ class TrackMapState extends State<TrackMap> {
               urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
               zoomPanBehavior: _zoomPanBehavior,
               controller: _mapController,
+              initialFocalLatLng: widget.gpsPosition.last.latLng,
               initialMarkersCount: widget.gpsPosition.length,
               tooltipSettings: const MapTooltipSettings(
                 color: Colors.white,
@@ -128,20 +155,12 @@ class TrackMapState extends State<TrackMap> {
             ),
           ],
         ),
-        /*   GoogleMap(
-          polylines: _polyline,
-          markers: _markers,
-          onMapCreated: _onMapCreated,
-          zoomControlsEnabled: false,
-          mapType: MapType.satellite,
-          initialCameraPosition: CalculationService.initialCameraPosition(
-              list: segment, isPreview: false),
-        ),*/
-        Row(
+        const SizedBox(height: 10),
+        Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Column(
-              mainAxisSize: MainAxisSize.min,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 FilterChip(
                     backgroundColor:
@@ -183,119 +202,73 @@ class TrackMapState extends State<TrackMap> {
               ],
             ),
             if (telemetryViewRange == TelemetryViewLive.speed) ...[
-              SizedBox(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text('Medium: ${telemetry.speed.medium} m'),
-                    Text('Max: ${telemetry.speed.max} m'),
-                    Text('Min: ${telemetry.speed.min} m'),
-                  ],
+              if (showSpeedChart) ...[
+                Padding(
+                  padding: const EdgeInsets.only(left: 15.0),
+                  child: SizedBox(
+                    height: MediaQuery.of(context).size.height / 4,
+                    width: MediaQuery.of(context).size.width,
+                    //https://medium.com/analytics-vidhya/the-versatility-of-the-grammar-of-graphics-d1366760424d
+
+                    child: Chart(
+                      data: widget.gpsPosition,
+                      variables: {
+                        'timestamp': Variable(
+                          accessor: (GpsPosition gps) => gps.timestamp,
+                          scale: LinearScale(
+                              formatter: (number) =>
+                                  CalculationService.timestamp(number.toInt())),
+                        ),
+                        'speed': Variable(
+                            accessor: (GpsPosition gps) => gps.speed,
+                            scale: LinearScale(
+                                title: 'Speed',
+                                formatter: (number) =>
+                                    '${(number * 0.539957).toStringAsFixed(2)} kts')),
+                      },
+                      coord: RectCoord(),
+                      elements: [LineElement()],
+                      rebuild: true,
+                      axes: [
+                        Defaults.horizontalAxis,
+                        Defaults.verticalAxis,
+                      ],
+                    ),
+                  ),
                 ),
-              ),
+              ] else ...[
+                SizedBox(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Medium: ${telemetry.speed.medium} kts'),
+                      Text('Max: ${telemetry.speed.max} kts'),
+                      Text('Min: ${telemetry.speed.min} kts'),
+                    ],
+                  ),
+                ),
+              ],
+              CupertinoButton(
+                  child: Icon(
+                    showSpeedChart
+                        ? CupertinoIcons.chart_bar_square_fill
+                        : CupertinoIcons.chart_bar_square,
+                    size: 40,
+                  ),
+                  onPressed: () => setState(() {
+                        showSpeedChart = !showSpeedChart;
+                      }))
             ] else if (telemetryViewRange == TelemetryViewLive.distance) ...[
               SizedBox(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text('Medium: ${telemetry.distance} m'),
+                    Text('Total: ${telemetry.distance} m'),
                   ],
                 ),
               ),
             ],
-            CupertinoButton(
-              child: const Icon(CupertinoIcons.chart_bar_square),
-              onPressed: () => showCupertinoDialog(
-                  barrierDismissible: true,
-                  context: context,
-                  builder: (_) => CupertinoAlertDialog(
-                        content: SafeArea(
-                          child: Align(
-                            alignment: Alignment.bottomCenter,
-                            child: Container(
-                              decoration: const BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.only(
-                                      topLeft: Radius.circular(30),
-                                      topRight: Radius.circular(30))),
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 20.0, vertical: 5),
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Wrap(
-                                      spacing: 10,
-                                      children: [
-                                        FilterChip(
-                                            backgroundColor:
-                                                telemetryViewCharts ==
-                                                        TelemetryViewLive.speed
-                                                    ? AppStyle.primaryColor
-                                                    : Colors.black12,
-                                            label: Text(
-                                              'Speed',
-                                              style: TextStyle(
-                                                  fontWeight:
-                                                      telemetryViewCharts ==
-                                                              TelemetryViewLive
-                                                                  .speed
-                                                          ? FontWeight.bold
-                                                          : FontWeight.normal),
-                                            ),
-                                            onSelected: (value) => setState(
-                                                () => telemetryViewCharts =
-                                                    TelemetryViewLive.speed)),
-                                      ],
-                                    ),
-                                    if (telemetryViewCharts ==
-                                        TelemetryViewLive.speed) ...[
-                                      SizedBox(
-                                        height:
-                                            MediaQuery.of(context).size.height /
-                                                4,
-                                        width:
-                                            MediaQuery.of(context).size.width,
-                                        //https://medium.com/analytics-vidhya/the-versatility-of-the-grammar-of-graphics-d1366760424d
-
-                                        child: Chart(
-                                          data: widget.gpsPosition,
-                                          variables: {
-                                            'timestamp': Variable(
-                                              accessor: (GpsPosition log) =>
-                                                  log.timestamp,
-                                              scale: LinearScale(
-                                                  formatter: (number) =>
-                                                      CalculationService
-                                                          .timestamp(
-                                                              number.toInt())),
-                                            ),
-                                            'speed': Variable(
-                                                accessor: (GpsPosition gps) =>
-                                                    gps.speed,
-                                                scale: LinearScale(
-                                                    title: 'Speed',
-                                                    formatter: (number) =>
-                                                        '$number km/h')),
-                                          },
-                                          coord: RectCoord(),
-                                          elements: [LineElement()],
-                                          rebuild: true,
-                                          axes: [
-                                            Defaults.horizontalAxis,
-                                            Defaults.verticalAxis,
-                                          ],
-                                        ),
-                                      ),
-                                    ]
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      )),
-            )
           ],
         ),
       ],

@@ -102,16 +102,6 @@ class _SessionsState extends State<Sessions> {
                                               child:
                                                   CircularProgressIndicator(),
                                             ));
-                                          } else if (snapshot
-                                              .snapshot1.data!.isEmpty) {
-                                            return const Center(
-                                                child:
-                                                    Text('No data available'));
-                                          } else if (snapshot
-                                              .snapshot2.data!.isEmpty) {
-                                            return const Center(
-                                                child:
-                                                    Text('No data available'));
                                           }
 
                                           return CardSession(
@@ -128,24 +118,6 @@ class _SessionsState extends State<Sessions> {
                               ),
                             );
                           }),
-                      /* CupertinoButton(
-                        child: const Text(
-                          'Load more',
-                        ),
-                        onPressed: () => setState(() =>
-                            sessions.addAll(userData.sessions.sublist(
-                              widget.userData.sessions.length -
-                                          sessions.length >
-                                      5
-                                  ? widget.userData.sessions.length -
-                                      sessions.length -
-                                      5
-                                  : widget.userData.sessions.length -
-                                      sessions.length,
-                              widget.userData.sessions.length - sessions.length,
-                            ))),
-                      ),*/
-                      const SizedBox(height: 60),
                     ],
                   ),
                 ),

@@ -53,3 +53,26 @@
   SD CARD chip protocol
 */
 #define chip_select 4
+
+
+void ConnectHandler(BLEDevice central) {
+  // central connected event handler
+
+  Serial.print("Connected event, central: ");
+  Serial.println(central.address());
+
+  BLE.advertise();
+}
+
+void DisconnectHandler(BLEDevice central) {
+  // central disconnected event handlerù
+
+  Serial.print("Disconnected event, central: ");
+  Serial.println(central.address());
+
+  BLE.advertise();
+}
+
+double randomDouble(double minf, double maxf) {
+  return minf + random(1UL << 31) * (maxf - minf) / (1UL << 31);  // use 1ULL<<63 for max double values)
+}

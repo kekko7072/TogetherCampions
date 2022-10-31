@@ -1,5 +1,4 @@
 import 'package:app/services/imports.dart';
-import 'package:app/services/session/database_gps.dart';
 
 class ListLogs extends StatefulWidget {
   const ListLogs(

@@ -1,5 +1,7 @@
 import 'dart:typed_data';
 
+import 'package:app/models/session.dart';
+
 class Accelerometer {
   Accelerometer({
     required this.timestamp,
@@ -13,14 +15,14 @@ class Accelerometer {
   final int aY;
   final int aZ;
 
-  factory Accelerometer.formListInt(List<int> bit) {
+  factory Accelerometer.formListInt(List<int> bit, DevicePosition position) {
     ByteBuffer buffer = Int8List.fromList(bit).buffer;
     ByteData byteData = ByteData.view(buffer);
     return Accelerometer(
       timestamp: byteData.getInt32(0, Endian.little),
-      aX: byteData.getInt32(4, Endian.little),
-      aY: byteData.getInt32(8, Endian.little),
-      aZ: byteData.getInt32(12, Endian.little),
+      aX: byteData.getInt32(4, Endian.little) - position.x,
+      aY: byteData.getInt32(8, Endian.little) - position.y,
+      aZ: byteData.getInt32(12, Endian.little) - position.z,
     );
   }
 
