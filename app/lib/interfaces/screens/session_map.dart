@@ -6,11 +6,13 @@ class SessionMap extends StatefulWidget {
   const SessionMap(
       {Key? key,
       required this.session,
+      required this.unitsSystem,
       required this.gpsPosition,
       required this.gpsNavigation})
       : super(key: key);
 
   final Session session;
+  final UnitsSystem unitsSystem;
   final List<GpsPosition> gpsPosition;
   final List<GpsNavigation> gpsNavigation;
 
@@ -247,7 +249,7 @@ class SessionMapState extends State<SessionMap>
                                                                       .length -
                                                                   1
                                                           ? 'End'
-                                                          : 'Speed: ${widget.gpsPosition[index].speed.roundToDouble()} km/h',
+                                                          : 'Speed: ${UnitsService.speedUnitsConvertFromKTS(widget.unitsSystem.speedUnits, widget.gpsPosition[index].speed).roundToDouble()} ${UnitsService.speedUnitsToString(widget.unitsSystem.speedUnits)}',
                                                   style: const TextStyle(
                                                       fontSize: 14,
                                                       color: Colors.black,

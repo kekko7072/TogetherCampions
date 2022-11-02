@@ -110,7 +110,8 @@ class CalculationService {
         max: courseMax,
         min: courseMin,
       ),
-      distance: MapService.findDistanceFromList(segment).roundToDouble(),
+      distance:
+          (MapService.findDistanceFromList(segment) * 1000).roundToDouble(),
       variation: RangeAnalytics(
         medium: CalculationService.roundDouble(
             number: variationMedium / gpsNavigation.length, decimal: 3),

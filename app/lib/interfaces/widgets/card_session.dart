@@ -34,6 +34,8 @@ class _CardSessionState extends State<CardSession> {
 
   @override
   Widget build(BuildContext context) {
+    final unitSystem = Provider.of<UnitsSystem>(context);
+
     return Padding(
       padding: const EdgeInsets.all(5.0),
       child: Container(
@@ -142,11 +144,11 @@ class _CardSessionState extends State<CardSession> {
                                 ),
                                 const SizedBox(width: 10),
                                 Text(
-                                  '${CalculationService.telemetry(
-                                    gpsPosition: widget.gpsPosition,
-                                    gpsNavigation: widget.gpsNavigation,
-                                    segment: polylinePoints,
-                                  ).distance} km',
+                                  '${UnitsService.distanceUnitsConvertFromMETER(unitSystem.distanceUnits, CalculationService.telemetry(
+                                        gpsPosition: widget.gpsPosition,
+                                        gpsNavigation: widget.gpsNavigation,
+                                        segment: polylinePoints,
+                                      ).distance).toStringAsFixed(2)} ${UnitsService.distanceUnitsToString(unitSystem.distanceUnits)}',
                                   style: const TextStyle(
                                     color: Colors.white70,
                                   ),
@@ -177,6 +179,7 @@ class _CardSessionState extends State<CardSession> {
                     MaterialPageRoute(
                         builder: (context) => SessionMap(
                               session: widget.session,
+                              unitsSystem: unitSystem,
                               gpsPosition: widget.gpsPosition,
                               gpsNavigation: widget.gpsNavigation,
                             )),

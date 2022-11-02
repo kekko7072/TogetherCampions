@@ -29,8 +29,6 @@ class _BLEDeviceScreenState extends State<BLEDeviceScreen> {
   List<Accelerometer> accelerometer = [];
   List<Gyroscope> gyroscope = [];
 
-  //TODO USE unitsSystem
-
   @override
   void initState() {
     super.initState();
@@ -516,8 +514,7 @@ class _BLEDeviceScreenState extends State<BLEDeviceScreen> {
                                     ),
                                 barrierDismissible: true),
                             child: Text(
-                              ///TODO temp in different uinits
-                              '${system.isNotEmpty ? system.last.temperature.toStringAsFixed(2) : 'Loading...'} °C',
+                              '${system.isNotEmpty ? UnitsService.temperatureUnitsFromCELSIUS(widget.unitsSystem.temperatureUnits, system.last.temperature).toStringAsFixed(2) : 'Loading...'} ${UnitsService.temperatureUnitsToString(widget.unitsSystem.temperatureUnits)}',
                               style: Theme.of(context)
                                   .textTheme
                                   .titleLarge!
@@ -637,6 +634,7 @@ class _BLEDeviceScreenState extends State<BLEDeviceScreen> {
                                   ),
                                 ],
                                 TrackMap(
+                                  unitsSystem: widget.unitsSystem,
                                   gpsPosition: gpsPosition,
                                 ),
                               ] else ...[

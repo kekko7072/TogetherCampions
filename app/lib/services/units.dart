@@ -10,7 +10,7 @@ enum SpeedUnits {
 enum DistanceUnits {
   km,
   mi,
-  nm,
+  M,
 }
 
 enum TemperatureUnits {
@@ -49,11 +49,6 @@ class UnitsSystem {
 }
 
 class UnitsService {
-  ///TODO CREATE CONVERSION OF EACH UNITS
-  ///
-  ///
-  ///
-
   ///SPEED
   static String speedUnitsToString(SpeedUnits input) {
     switch (input) {
@@ -83,6 +78,19 @@ class UnitsService {
     }
   }
 
+  static double speedUnitsConvertFromKTS(SpeedUnits unit, double knot) {
+    switch (unit) {
+      case SpeedUnits.mS:
+        return knot * 0.51444444; // _GPS_MPS_PER_KNOT 0.51444444
+      case SpeedUnits.kts:
+        return knot;
+      case SpeedUnits.kmH:
+        return knot * 1.852; // _GPS_KMPH_PER_KNOT 1.852
+      case SpeedUnits.mpH:
+        return knot * 1.15077945; //_GPS_MPH_PER_KNOT 1.15077945
+    }
+  }
+
   ///TEMPERATURE
   static String temperatureUnitsToString(TemperatureUnits input) {
     switch (input) {
@@ -104,6 +112,16 @@ class UnitsService {
     }
   }
 
+  static double temperatureUnitsFromCELSIUS(
+      TemperatureUnits input, double value) {
+    switch (input) {
+      case TemperatureUnits.C:
+        return value;
+      case TemperatureUnits.F:
+        return (value * 9 / 5) + 32;
+    }
+  }
+
   ///DISTANCE
   static String distanceUnitsToString(DistanceUnits input) {
     switch (input) {
@@ -111,8 +129,8 @@ class UnitsService {
         return 'km';
       case DistanceUnits.mi:
         return 'mi';
-      case DistanceUnits.nm:
-        return 'NM';
+      case DistanceUnits.M:
+        return 'M';
     }
   }
 
@@ -122,10 +140,23 @@ class UnitsService {
         return DistanceUnits.km;
       case 'mi':
         return DistanceUnits.mi;
-      case 'NM':
-        return DistanceUnits.nm;
+      case 'M':
+        return DistanceUnits.M;
       default:
         return DistanceUnits.km;
+    }
+  }
+
+  static double distanceUnitsConvertFromMETER(
+      DistanceUnits unit, double meter) {
+    switch (unit) {
+      case DistanceUnits.km:
+        return meter * 0.001; // _GPS_KM_PER_METER 0.001
+      case DistanceUnits.mi:
+        return meter * 0.00062137112; // _GPS_MILES_PER_METER 0.00062137112
+      case DistanceUnits.M:
+        return meter * 0.0002; // #define _GPS_NAUTICAL_MILES_PER_METER 0.0002
+
     }
   }
 }

@@ -2,7 +2,10 @@ import 'package:app/services/imports.dart';
 import 'package:flutter/cupertino.dart';
 
 class TrackMap extends StatefulWidget {
-  const TrackMap({Key? key, required this.gpsPosition}) : super(key: key);
+  const TrackMap(
+      {Key? key, required this.unitsSystem, required this.gpsPosition})
+      : super(key: key);
+  final UnitsSystem unitsSystem;
   final List<GpsPosition> gpsPosition;
 
   @override
@@ -102,7 +105,7 @@ class TrackMapState extends State<TrackMap> {
                                   ? 'Start'
                                   : index == widget.gpsPosition.length - 1
                                       ? 'End'
-                                      : 'Speed: ${widget.gpsPosition[index].speed.roundToDouble()} km/h',
+                                      : 'Speed: ${UnitsService.speedUnitsConvertFromKTS(widget.unitsSystem.speedUnits, widget.gpsPosition[index].speed).roundToDouble()} ${UnitsService.speedUnitsToString(widget.unitsSystem.speedUnits)}',
                               style: const TextStyle(
                                   fontSize: 14,
                                   color: Colors.black,
@@ -224,7 +227,7 @@ class TrackMapState extends State<TrackMap> {
                             scale: LinearScale(
                                 title: 'Speed',
                                 formatter: (number) =>
-                                    '${(number * 0.539957).toStringAsFixed(2)} kts')),
+                                    '${UnitsService.speedUnitsConvertFromKTS(widget.unitsSystem.speedUnits, double.parse('$number')).roundToDouble()} ${UnitsService.speedUnitsToString(widget.unitsSystem.speedUnits)}')),
                       },
                       coord: RectCoord(),
                       elements: [LineElement()],
@@ -242,9 +245,12 @@ class TrackMapState extends State<TrackMap> {
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Medium: ${telemetry.speed.medium} kts'),
-                      Text('Max: ${telemetry.speed.max} kts'),
-                      Text('Min: ${telemetry.speed.min} kts'),
+                      Text(
+                          'Medium: ${UnitsService.speedUnitsConvertFromKTS(widget.unitsSystem.speedUnits, telemetry.speed.medium).roundToDouble()} ${UnitsService.speedUnitsToString(widget.unitsSystem.speedUnits)}'),
+                      Text(
+                          'Max: ${UnitsService.speedUnitsConvertFromKTS(widget.unitsSystem.speedUnits, telemetry.speed.max).roundToDouble()} ${UnitsService.speedUnitsToString(widget.unitsSystem.speedUnits)}'),
+                      Text(
+                          'Min: ${UnitsService.speedUnitsConvertFromKTS(widget.unitsSystem.speedUnits, telemetry.speed.min).roundToDouble()} ${UnitsService.speedUnitsToString(widget.unitsSystem.speedUnits)}'),
                     ],
                   ),
                 ),
@@ -264,7 +270,8 @@ class TrackMapState extends State<TrackMap> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text('Total: ${telemetry.distance} m'),
+                    Text(
+                        'Total: ${UnitsService.distanceUnitsConvertFromMETER(widget.unitsSystem.distanceUnits, telemetry.distance)} ${UnitsService.distanceUnitsToString(widget.unitsSystem.distanceUnits)}'),
                   ],
                 ),
               ),
