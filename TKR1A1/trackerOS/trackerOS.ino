@@ -1,5 +1,7 @@
 #include <ArduinoBLE.h>
 #include <TinyGPSPlus.h>
+#include <Adafruit_MPU6050.h>
+#include <Adafruit_Sensor.h>
 #include <Wire.h>
 #include "configuration.h"
 #include "system.h"
@@ -23,19 +25,16 @@ BLECharacteristic accelerometerCharacteristic("00003001-0000-1000-8000-00805F9B3
 BLECharacteristic gyroscopeCharacteristic("00003002-0000-1000-8000-00805F9B34FB", BLERead | BLENotify, 16);      //MPU 2002
 
 
-//CUSTOM
-SystemStatus systemStatus = SystemStatus(systemCharacteristic);
-
-
 //SERVICES
 long previousMillis = 0;
 
-
-
+//GPS
 TinyGPSPlus gps;
 TinyGPSCustom magneticVariation(gps, "GPRMC", 10);
 
-
+//MPU
+Adafruit_MPU6050 mpu;
+sensors_event_t a, g, temp;
 
 void setup() {
 
@@ -77,10 +76,13 @@ void setup() {
   BLE.setEventHandler(BLEDisconnected, DisconnectHandler);
 
   //MPU-6050
-  setupMPU();
+  setupMPU(mpu);
 
   //GPS
   setupGPS();
+
+  //READY
+  digitalWrite(LED_BUILTIN, HIGH);
 }
 
 void loop() {
@@ -88,29 +90,33 @@ void loop() {
   BLEDevice central = BLE.central();  // Wait for a Bluetooth® Low Energy central
 
   //if (central) {
-  digitalWrite(LED_BUILTIN, HIGH);
+  //digitalWrite(LED_BUILTIN, HIGH);
 
-  while (central.connected()) {
+  //BLE.poll();
 
-    if (Serial1.available() > 0) {
-      if (gps.encode(Serial1.read())) {}
-    }
+  //while (central.connected()) {
 
-    long currentMillis = millis();
+  long currentMillis = millis();
 
-    if (currentMillis - previousMillis >= measurements_milliseconds) {
-      //System
-      systemStatus.update();
-
-      //GPS
-      updateGPS(poitionCharacteristic, navigationCharacteristic, gps, magneticVariation);
-
-      //MPU
-      updateMPU(accelerometerCharacteristic, gyroscopeCharacteristic);
-
-      previousMillis = currentMillis;  //Clean to re-run cicle
-    }
+  if (Serial1.available() > 0) {
+    if (gps.encode(Serial1.read())) {}
   }
-  digitalWrite(LED_BUILTIN, LOW);
+  //mpu.getEvent(&a, &g, &temp);
+
+  if (currentMillis - previousMillis >= measurements_milliseconds) {
+    //System
+    updateSystem(systemCharacteristic);
+
+    //GPS
+    updateGPS(poitionCharacteristic, navigationCharacteristic, gps, magneticVariation);
+
+    //MPU
+    updateMPU(accelerometerCharacteristic, gyroscopeCharacteristic);
+
+    previousMillis = currentMillis;  //Clean to re-run cicle
+  }
+  
+  //}
+  //digitalWrite(LED_BUILTIN, LOW);
   //}
 }

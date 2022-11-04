@@ -53,8 +53,21 @@ class _DevicesState extends State<Devices> {
                             return const Text('No data');
                           }
                           List<Device> devices = snapshot.data ?? [];
-
-                          return StreamBuilder<List<String>>(
+                          return Wrap(
+                            direction: Axis.horizontal,
+                            spacing: 5,
+                            runSpacing: 5,
+                            children: [
+                              for (Device device in devices) ...[
+                                CardDevice(
+                                  device: device,
+                                  uid: userData.uid,
+                                  serialConnected: false,
+                                )
+                              ]
+                            ],
+                          );
+                          /*   return StreamBuilder<List<String>>(
                               stream: streamPorts(),
                               initialData: const [],
                               builder: (context, snapshot) {
@@ -82,7 +95,7 @@ class _DevicesState extends State<Devices> {
                                     ]
                                   ],
                                 );
-                              });
+                              });*/
                         }),
                   ),
                 ),

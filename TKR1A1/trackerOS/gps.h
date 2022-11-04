@@ -1,7 +1,6 @@
 #ifndef GPS_CLASSES
 #define GPS_CLASSES
 
-
 void setupGPS() {
   Serial.print("Intializing  GPS:  ");  // Start the software serial port at the GPS's default baud
   Serial1.begin(9600);
@@ -21,7 +20,7 @@ void updateGPS(BLECharacteristic position, BLECharacteristic navigation, TinyGPS
   GPSPositionData[1] = gps.location.isValid() ? 0 : 1;
   GPSPositionData[2] = gps.location.isValid() ? gps.location.lat() : 0.0;
   GPSPositionData[3] = gps.location.isValid() ? gps.location.lng() : 0.0;
-  GPSPositionData[4] = gps.speed.isValid() ? gps.speed.kmph() : 0.0;  // Speed over the ground in kph
+  GPSPositionData[4] = gps.speed.isValid() ? gps.speed.knots() : 0.0;  
 
   GPSNavigationData[0] = millis();
   GPSNavigationData[1] = gps.altitude.isValid() ? 0 : 1;

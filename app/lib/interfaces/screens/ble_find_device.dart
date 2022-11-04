@@ -9,7 +9,7 @@ class BLEFindDevices extends StatefulWidget {
 
 class _BLEFindDevicesState extends State<BLEFindDevices> {
   TextEditingController model = TextEditingController(text: kDeviceModelTKR1A1);
-
+  bool connecting = false;
   @override
   Widget build(BuildContext context) {
     final unitSystem = Provider.of<UnitsSystem>(context);
@@ -75,6 +75,7 @@ class _BLEFindDevicesState extends State<BLEFindDevices> {
                               if (snapshot.hasError) {
                                 return Text('Error: ${snapshot.error}');
                               }
+
                               if (!snapshot.hasData) {
                                 return const Text("Device not found");
                               }
@@ -103,7 +104,7 @@ class _BLEFindDevicesState extends State<BLEFindDevices> {
                                                 builder: (context) =>
                                                     BLEDeviceScreen(
                                                       deviceBLE: d,
-                                                      device: device,
+                                                      //device: device,
                                                       unitsSystem: unitSystem,
                                                     ))),
                                       );
@@ -122,14 +123,40 @@ class _BLEFindDevicesState extends State<BLEFindDevices> {
                   builder: (c, snapshot) => Column(
                     children: snapshot.data!
                         .where((element) => element.device.name == model.text)
-                        .map(
-                          (r) => StreamBuilder<Device>(
+                        .map((r) => ScanResultTile(
+                                  result: r,
+                                  onTap: () async {
+                                    try {
+                                      if (!connecting) {
+                                        setState(() => connecting = true);
+                                        EasyLoading.show();
+                                        await r.device.connect();
+                                        setState(() => connecting = false);
+                                        EasyLoading.dismiss().then((value) =>
+                                            Navigator.of(context).push(
+                                                MaterialPageRoute(
+                                                    builder: (context) {
+                                              return BLEDeviceScreen(
+                                                deviceBLE: r.device,
+                                                unitsSystem: unitSystem,
+                                              );
+                                            })));
+                                      }
+                                    } catch (e) {
+                                      EasyLoading.showError(e.toString());
+                                    }
+                                  },
+                                ) /*
+
+                          ///STREAM NOT WORKING ON ANDOIRD
+                          StreamBuilder<Device>(
                               stream: DatabaseDevice()
                                   .device(id: r.device.id.toString()),
                               builder: (context, snapshot) {
                                 if (snapshot.hasError) {
                                   return Text('Error: ${snapshot.error}');
                                 }
+                                print('DEVICE:\n\n\n\n\n\n${r}');
                                 if (!snapshot.hasData) {
                                   return const Text("Device not found");
                                 }
@@ -147,8 +174,8 @@ class _BLEFindDevicesState extends State<BLEFindDevices> {
                                                 device: device);
                                           }))),
                                 );
-                              }),
-                        )
+                              }),*/
+                            )
                         .toList(),
                   ),
                 ),
@@ -173,7 +200,7 @@ class _BLEFindDevicesState extends State<BLEFindDevices> {
             return FloatingActionButton(
                 child: const Icon(Icons.search),
                 onPressed: () => FlutterBluePlus.instance
-                    .startScan(timeout: const Duration(seconds: 4)));
+                    .startScan(timeout: const Duration(seconds: 20)));
           }
         },
       ),

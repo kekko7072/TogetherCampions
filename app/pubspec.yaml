@@ -32,7 +32,7 @@ dependencies:
   http: ^0.13.5
   flutter_libserialport: ^0.3.0
   geolocator: ^9.0.2
-  geolocator_apple: ^2.2.2
+  geolocator_apple: ^2.2.3
   battery_plus: ^3.0.2
   sensors_plus: ^2.0.1
   flutter_blue_plus: ^1.3.1
@@ -47,7 +47,7 @@ dependencies:
   font_awesome_flutter: ^10.2.1
   battery_indicator: ^0.1.2
   flutter_easyloading: ^3.0.5
-  graphic: ^0.10.7
+  graphic: ^1.0.0
   badges: ^2.0.3
   cupertino_onboarding: ^1.1.1
   #rename_app: ^1.1.0

@@ -1,12 +1,23 @@
 #ifndef MPU_H
 #define MPU_H
 
-void setupMPU() {
+void setupMPU(Adafruit_MPU6050 mpu) {
   Wire.begin();
   Wire.beginTransmission(MPU_ADDR);
   Wire.write(0x6B);  // PWR_MGMT_1 register
   Wire.write(0);     // set to zero (wakes up the MPU-6050)
   Wire.endTransmission(true);
+  // Try to initialize!
+  /*if (!mpu.begin()) {
+    Serial.println("Failed to find MPU6050 chip");
+    while (1) {
+      delay(10);
+    }
+  }
+  Serial.println("MPU6050 Found!");
+  mpu.setAccelerometerRange(MPU6050_RANGE_8_G);
+  mpu.setGyroRange(MPU6050_RANGE_500_DEG);
+  mpu.setFilterBandwidth(MPU6050_BAND_21_HZ);*/
 }
 
 void updateMPU(BLECharacteristic accelerometer, BLECharacteristic gyroscope) {
@@ -23,7 +34,7 @@ void updateMPU(BLECharacteristic accelerometer, BLECharacteristic gyroscope) {
   int16_t GyZ = Wire.read() << 8 | Wire.read();  // 0x47 (GYRO_ZOUT_H) & 0x48 (GYRO_ZOUT_L)
 
 
-  Serial.print(F("Accelerometer: X = "));
+  /*Serial.print(F("Accelerometer: X = "));
   Serial.print(AcX);
   Serial.print(F(" | Y = "));
   Serial.print(AcY);
@@ -35,8 +46,7 @@ void updateMPU(BLECharacteristic accelerometer, BLECharacteristic gyroscope) {
   Serial.print(GyY);
   Serial.print(" | Z = ");
   Serial.println(GyZ);
-  Serial.println(F(" "));
-
+  Serial.println(F(" "));*/
 
 
   int acc[4];

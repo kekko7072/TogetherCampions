@@ -5,12 +5,14 @@ class BLEDeviceScreen extends StatefulWidget {
   const BLEDeviceScreen(
       {Key? key,
       required this.deviceBLE,
-      required this.device,
+      //required this.device,
       required this.unitsSystem})
       : super(key: key);
 
   final BluetoothDevice deviceBLE;
-  final Device device;
+
+  ///Not working on ANDROID
+  // final Device device;
   final UnitsSystem unitsSystem;
 
   @override
@@ -212,8 +214,9 @@ class _BLEDeviceScreenState extends State<BLEDeviceScreen> {
                                             context: context,
                                             builder: (_) => UploadSessionDialog(
                                                   device: widget.deviceBLE,
-                                                  devicePosition: widget
-                                                      .device.devicePosition,
+                                                  devicePosition:
+                                                      DevicePosition(
+                                                          x: 0, y: 0, z: 0),
                                                   system: system,
                                                   gpsPosition: gpsPosition,
                                                   gpsNavigation: gpsNavigation,
@@ -753,7 +756,7 @@ class _BLEDeviceScreenState extends State<BLEDeviceScreen> {
                       if (value != null) {
                         try {
                           accelerometer.add(Accelerometer.formListInt(
-                              value, widget.device.devicePosition));
+                              value, DevicePosition(x: 0, y: 0, z: 0)));
                         } catch (e) {
                           debugPrint("\nERROR ADDING ACCELEROMETER: $e\n");
                         }
