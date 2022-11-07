@@ -79,7 +79,7 @@ class _AddEditSessionState extends State<AddEditSession> {
             )
           ] else ...[
             Text(
-              '${widget.isEdit ? 'Modifica' : 'Avvia'} sessione',
+              '${widget.isEdit ? 'Edit' : 'Upload'} session',
               style: Theme.of(context).textTheme.titleLarge,
             ),
             const SizedBox(height: 10),
@@ -90,16 +90,6 @@ class _AddEditSessionState extends State<AddEditSession> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 5.0, horizontal: 20),
-                    child: TextFormField(
-                      controller: name,
-                      textAlign: TextAlign.center,
-                      decoration: AppStyle().kTextFieldDecoration(
-                          icon: Icons.label, hintText: 'Enter title'),
-                    ),
-                  ),
                   const SizedBox(height: 10),
                   if (!widget.isEdit) ...[
                     Row(
@@ -110,7 +100,7 @@ class _AddEditSessionState extends State<AddEditSession> {
                                 ? AppStyle.primaryColor
                                 : Colors.black12,
                             label: Text(
-                              'LOCAL',
+                              'LOCAL FILE',
                               style: TextStyle(
                                   fontWeight: isLocal
                                       ? FontWeight.bold
@@ -165,176 +155,123 @@ class _AddEditSessionState extends State<AddEditSession> {
                     ],
                   ),
                   const SizedBox(height: 20),
-                  const Text(
-                    'Posizione: ',
-                  ),
-                  PositionDeviceConfigurator(
-                    onChangePosition: (newX, newY, newZ) => setState(() {
-                      x = newX;
-                      y = newY;
-                      z = newZ;
-                    }),
-                    initialPosition:
-                        widget.isEdit ? DevicePosition(x: x, y: y, z: z) : null,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 20.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  if (isLocal) ...[
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Text(
-                          'Inizio sessione: ',
-                        ),
                         CupertinoButton(
-                          child: Text(
-                              '${start.hour}:${start.minute}   ${start.day}/${start.month}/${start.year}'),
                           onPressed: () async {
-                            DateTime value = await _selectDateTime(
-                                context: context, input: start);
-                            setState(() {
-                              start = value;
-                            });
+                            EasyLoading.show();
+
+                            try {
+                              result = await FilePicker.platform.pickFiles(
+                                dialogTitle: 'Seleziona il file sessionId.json',
+                                type: FileType.custom,
+                                allowedExtensions: ["json"], //tkrlg
+                              );
+
+                              if (result != null) {
+                                setState(() {
+                                  file = result!.files.first;
+                                  debugPrint(
+                                      "PATH: ${file!.path}\nNAME: ${file!.name}\nEXTENSION: ${file!.extension}\nSIZE: ${file!.size}\nBYTES AVAILABLE: ${file!.bytes != null}");
+                                });
+                              } else {
+                                debugPrint("User cancelled");
+                              }
+                            } catch (e) {
+                              debugPrint(
+                                  "\n\n\n\n\n\n\n\n\n\n\n\nERRRORRR: $e\n\n\n\n\n\n\n\n\n\n\n\n");
+                            }
+                            EasyLoading.dismiss();
                           },
+                          child: const Text(
+                            'Select file',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
                         ),
+                        if (file != null) ...[
+                          const SizedBox(width: 20),
+                          const Icon(
+                            CupertinoIcons.check_mark_circled_solid,
+                            color: CupertinoColors.activeGreen,
+                            size: 30,
+                          )
+                        ]
                       ],
                     ),
-                  ),
-                  if (isLocal) ...[
                     const SizedBox(height: 10),
-                    /* Padding(
+                    CupertinoButton.filled(
+                      onPressed: file == null
+                          ? null
+                          : () async {
+                              try {
+                                EasyLoading.show();
+                                var body = json.decode(String.fromCharCodes(
+                                    await File(file!.path!).readAsBytes()));
+                                var url = Uri.http(
+                                    "together-champions.ew.r.appspot.com",
+                                    '/upload');
+                                var response = await post(url,
+                                    headers: {
+                                      "Content-Type": "application/json",
+                                      // "Authorization": "Bearer iasUSnalspwoid@asw",
+                                      "Access-Control-Allow-Origin": "*",
+                                    },
+                                    body: json.encode(json.decode(
+                                        String.fromCharCodes(
+                                            await File(file!.path!)
+                                                .readAsBytes()))));
+                                EasyLoading.dismiss();
+                                debugPrint("RESPONSE: ${response.body}");
+                                if (response.statusCode == 200) {
+                                  EasyLoading.showSuccess(
+                                      "Session uploaded to server!It will take some time processing...");
+                                  Navigator.of(context).pop();
+                                }
+                              } catch (e) {
+                                EasyLoading.showError("ERROR: $e");
+                                print(e);
+                              }
+                            },
+                      child: const Text(
+                        'Upload',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ] else ...[
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 5.0, horizontal: 20),
+                      child: TextFormField(
+                        controller: name,
+                        textAlign: TextAlign.center,
+                        decoration: AppStyle().kTextFieldDecoration(
+                            icon: Icons.label, hintText: 'Enter title'),
+                      ),
+                    ),
+                    Padding(
                       padding: const EdgeInsets.only(left: 20.0),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           const Text(
-                            'Fine sessione: ',
+                            'Inizio sessione: ',
                           ),
                           CupertinoButton(
                             child: Text(
-                                '${end.hour}:${end.minute}   ${end.day}/${end.month}/${end.year}'),
+                                '${start.hour}:${start.minute}   ${start.day}/${start.month}/${start.year}'),
                             onPressed: () async {
                               DateTime value = await _selectDateTime(
-                                  context: context, input: end);
+                                  context: context, input: start);
                               setState(() {
-                                end = value;
+                                start = value;
                               });
                             },
                           ),
                         ],
                       ),
-                    ),*/
-                    if (showUploading) ...[
-                      Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          const Padding(
-                            padding: EdgeInsets.symmetric(vertical: 15.0),
-                            child: CircularProgressIndicator(),
-                          ),
-                          Text("Progress: $progress/$totalProgress"),
-                          Text(
-                              "Missing time:  ${CalculationService.formatTime(seconds: ((totalProgress - progress) * 0.25).toInt())}"),
-                        ],
-                      )
-                    ],
-                    const SizedBox(height: 10),
-                    CupertinoButton.filled(
-                      onPressed: () async {
-                        setState(() => showUploading = true);
-
-                        try {
-                          result = await FilePicker.platform.pickFiles(
-                            dialogTitle: 'Seleziona il file sessionId.json',
-                            type: FileType.custom,
-                            allowedExtensions: ["json"], //tkrlg
-                          );
-
-                          if (result != null) {
-                            file = result!.files.first;
-                            debugPrint(
-                                "PATH: ${file!.path}\nNAME: ${file!.name}\nEXTENSION: ${file!.extension}\nSIZE: ${file!.size}\nBYTES AVAILABLE: ${file!.bytes != null}");
-
-                            final input = SessionUpload.fromJson(json.decode(
-                                String.fromCharCodes(
-                                    await File(file!.path!).readAsBytes())));
-
-                            ///TODO upload JSON to an endpoint and then receve notification when upload is done.
-                            setState(() {
-                              totalProgress = input.system.length +
-                                  input.gpsNavigation.length +
-                                  input.gpsPosition.length +
-                                  input.accelerometer.length +
-                                  input.gyroscope.length;
-                            });
-
-                            ///1. Create Session
-                            await DatabaseSession(deviceID: deviceID).add(
-                                session: Session(
-                                    id: input.sessionId,
-                                    info: input.info,
-                                    devicePosition: input.devicePosition));
-
-                            ///1. Add System
-                            for (System sys in input.system) {
-                              setState(() => ++progress);
-                              await DatabaseSystem(
-                                      deviceID: input.deviceId,
-                                      sessionID: input.sessionId)
-                                  .add(sys);
-                            }
-
-                            ///2. Add Gps
-                            for (GpsPosition gps in input.gpsPosition) {
-                              setState(() => ++progress);
-                              await DatabaseGpsPosition(
-                                      deviceID: input.deviceId,
-                                      sessionID: input.sessionId)
-                                  .add(gps);
-                            }
-                            for (GpsNavigation gps in input.gpsNavigation) {
-                              setState(() => ++progress);
-                              await DatabaseGpsNavigation(
-                                      deviceID: input.deviceId,
-                                      sessionID: input.sessionId)
-                                  .add(gps);
-                            }
-
-                            ///3. Add Mpu
-                            for (Accelerometer mpu in input.accelerometer) {
-                              setState(() => ++progress);
-                              await DatabaseAccelerometer(
-                                      deviceID: input.deviceId,
-                                      sessionID: input.sessionId)
-                                  .add(mpu);
-                            }
-                            for (Gyroscope mpu in input.gyroscope) {
-                              setState(() => ++progress);
-                              await DatabaseGyroscope(
-                                      deviceID: input.deviceId,
-                                      sessionID: input.sessionId)
-                                  .add(mpu);
-                            }
-
-                            /*   } else {
-                              String convertedValue = String.fromCharCodes(
-                                  await File(file!.path!).readAsBytes());
-                              setState(() => value = convertedValue.split(","));
-                            }*/
-
-                          } else {
-                            debugPrint("User cancelled");
-                          }
-                        } catch (e) {
-                          debugPrint(
-                              "\n\n\n\n\n\n\n\n\n\n\n\nERRRORRR: $e\n\n\n\n\n\n\n\n\n\n\n\n");
-                        }
-                      },
-                      child: Text(
-                        widget.isEdit ? 'Modifica' : 'Crea',
-                        style: const TextStyle(fontWeight: FontWeight.bold),
-                      ),
                     ),
-                  ] else ...[
                     const SizedBox(height: 10),
                     CupertinoButton.filled(
                       onPressed: () async {

@@ -263,13 +263,16 @@ class _BLEDeviceScreenState extends State<BLEDeviceScreen> {
                                   CupertinoDialogAction(
                                     isDestructiveAction: true,
                                     child: const Text('Disconnect'),
-                                    onPressed: () async => await widget
-                                        .deviceBLE
-                                        .disconnect()
-                                        .then((value) {
-                                      Navigator.of(context).pop();
-                                      Navigator.of(context).pop();
-                                    }),
+                                    onPressed: () async {
+                                      setState(
+                                          () => reconnectAutomatically = false);
+                                      await widget.deviceBLE
+                                          .disconnect()
+                                          .then((value) {
+                                        Navigator.of(context).pop();
+                                        Navigator.of(context).pop();
+                                      });
+                                    },
                                   ),
                                   CupertinoDialogAction(
                                     isDefaultAction: true,
