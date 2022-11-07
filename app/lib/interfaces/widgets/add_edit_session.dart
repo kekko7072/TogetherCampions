@@ -232,6 +232,8 @@ class _AddEditSessionState extends State<AddEditSession> {
                             child: CircularProgressIndicator(),
                           ),
                           Text("Progress: $progress/$totalProgress"),
+                          Text(
+                              "Missing time:  ${CalculationService.formatTime(seconds: ((totalProgress - progress) * 0.25).toInt())}"),
                         ],
                       )
                     ],
