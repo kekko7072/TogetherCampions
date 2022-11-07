@@ -9,7 +9,11 @@ const axios = require("axios");
 
 app.use(cors());
 app.use(express.urlencoded({ extended: false }));
-app.use(express.json());
+// fixing "413 Request Entity Too Large" errors
+app.use(express.json({ limit: "10mb", extended: true }));
+app.use(
+  express.urlencoded({ limit: "10mb", extended: true, parameterLimit: 50000 })
+);
 
 const serviceAccount = {
   type: "service_account",
@@ -139,6 +143,111 @@ app.post("/post", async (req, res) => {
         });
     }
     res.sendStatus(200);
+  } catch (e) {
+    console.log(e);
+    res.sendStatus(400);
+  }
+});
+
+app.post("/upload", async (req, res) => {
+  try {
+    const value = req.body; //JSON.parse(JSON.stringify(req.body));
+    console.log("DEVICE ID: " + value.deviceID);
+    console.log("SESSION ID: " + value.sessionID);
+    const DEVICE_ID = value.deviceID;
+    const SESSION_ID = value.sessionID;
+
+    const docSession = admin
+      .firestore()
+      .collection("devices")
+      .doc(DEVICE_ID)
+      .collection("sessions")
+      .doc(SESSION_ID);
+
+    res.sendStatus(200);
+
+    //console.log(req.body);
+
+    ///1. Create Session
+    await docSession.set({
+      info: {
+        name: value.info.name,
+        start: admin.firestore.Timestamp.fromDate(new Date(value.info.start)),
+        end: admin.firestore.Timestamp.fromDate(new Date(value.info.end)),
+      },
+      devicePosition: {
+        x: value.devicePosition.x,
+        y: value.devicePosition.y,
+        z: value.devicePosition.z,
+      },
+    });
+
+    ///1. Add System
+    console.log("Uploading services STARTED");
+    for (var i = 0; i < value.system.length ?? 0; i++) {
+      await docSession
+        .collection("services")
+        .doc(`${value.system[i].timestamp}`)
+        .set({
+          battery: value.system[i].battery,
+          temperature: value.system[i].temperature,
+        });
+    }
+    console.log("Uploading services COMPLETED");
+
+    ///2. Add Gps
+    console.log("Uploading gps STARTED");
+    for (var k = 0; k < value.gps_position.length ?? 0; k++) {
+      await docSession
+        .collection("gps_position")
+        .doc(`${value.gps_position[k].timestamp}`)
+        .set({
+          available: value.gps_position[k].available,
+          latitude: value.gps_position[k].latitude,
+          longitude: value.gps_position[k].longitude,
+          speed: value.gps_position[k].speed,
+        });
+    }
+    for (var j = 0; j < value.gps_navigation.length ?? 0; j++) {
+      await docSession
+        .collection("gps_navigation")
+        .doc(`${value.gps_navigation[j].timestamp}`)
+        .set({
+          available: value.gps_navigation[j].available,
+          altitude: value.gps_navigation[j].altitude,
+          course: value.gps_navigation[j].course,
+          variation: value.gps_navigation[j].variation,
+        });
+    }
+
+    console.log("Uploading gps COMPLETED");
+
+    ///3. Add Mpu
+    console.log("Uploading mpu STARTED");
+
+    for (var l = 0; l < value.accelerometer.length ?? 0; l++) {
+      await docSession
+        .collection("accelerometer")
+        .doc(`${value.accelerometer[l].timestamp}`)
+        .set({
+          aX: value.accelerometer[l].aX,
+          aY: value.accelerometer[l].aY,
+          aZ: value.accelerometer[l].aZ,
+        });
+    }
+    for (var m = 0; m < value.gyroscope.length ?? 0; m++) {
+      await docSession
+        .collection("gyroscope")
+        .doc(`${value.gyroscope[m].timestamp}`)
+        .set({
+          gX: value.gyroscope[m].aX,
+          gY: value.gyroscope[m].aY,
+          gZ: value.gyroscope[m].aZ,
+        });
+    }
+    console.log("Uploading mpu COMPLETED");
+
+    ///TODO send notification to user process is finished....
   } catch (e) {
     console.log(e);
     res.sendStatus(400);
