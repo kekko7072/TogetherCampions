@@ -68,6 +68,8 @@ class DatabaseSession {
   Stream<Session> stream({required String id}) =>
       sessionCollection.doc(id).snapshots().map(sessionFromSnapshot);
 
-  Stream<List<Session>> get streamList =>
-      sessionCollection.snapshots().map(sessionsListFromSnapshot);
+  Stream<List<Session>> get streamList => sessionCollection
+      .orderBy('info.start', descending: true)
+      .snapshots()
+      .map(sessionsListFromSnapshot);
 }

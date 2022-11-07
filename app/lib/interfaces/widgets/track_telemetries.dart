@@ -90,6 +90,7 @@ class TrackTelemetriesState extends State<TrackTelemetries> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
+                    Text('Now: ${widget.gpsNavigation.last.altitude} m'),
                     Text('Medium: ${telemetry.altitude.medium} m'),
                     Text('Max: ${telemetry.altitude.max} m'),
                     Text('Min: ${telemetry.altitude.min} m'),
@@ -101,6 +102,7 @@ class TrackTelemetriesState extends State<TrackTelemetries> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
+                    Text('Now: ${widget.gpsNavigation.last.course} deg'),
                     Text('Medium: ${telemetry.course.medium} deg'),
                     Text('Max: ${telemetry.course.max} deg'),
                     Text('Min: ${telemetry.course.min} deg'),
@@ -112,6 +114,7 @@ class TrackTelemetriesState extends State<TrackTelemetries> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
+                    Text('Now: ${widget.gpsNavigation.last.variation} deg'),
                     Text('Medium: ${telemetry.variation.medium} deg'),
                     Text('Max: ${telemetry.variation.max} deg'),
                     Text('Min: ${telemetry.variation.min} deg'),

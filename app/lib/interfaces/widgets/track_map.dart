@@ -3,10 +3,10 @@ import 'package:flutter/cupertino.dart';
 
 class TrackMap extends StatefulWidget {
   const TrackMap(
-      {Key? key, required this.unitsSystem, required this.gpsPosition})
+      {Key? key, required this.unitsSystem, required this.gpsPositions})
       : super(key: key);
   final UnitsSystem unitsSystem;
-  final List<GpsPosition> gpsPosition;
+  final List<GpsPosition> gpsPositions;
 
   @override
   State<TrackMap> createState() => TrackMapState();
@@ -29,7 +29,7 @@ class TrackMapState extends State<TrackMap> {
       maxZoomLevel: 30,
       enableMouseWheelZooming: true,
       enableDoubleTapZooming: true,
-      focalLatLng: widget.gpsPosition.last.latLng,
+      focalLatLng: widget.gpsPositions.last.latLng,
       showToolbar: true,
       toolbarSettings: const MapToolbarSettings(
           direction: Axis.horizontal,
@@ -38,20 +38,20 @@ class TrackMapState extends State<TrackMap> {
     );
     movePosition = Timer.periodic(const Duration(seconds: 3), (timer) {
       _zoomPanBehavior
-        ..focalLatLng = widget.gpsPosition.last.latLng
+        ..focalLatLng = widget.gpsPositions.last.latLng
         ..zoomLevel = 18;
     });
     super.initState();
   }
 
   void updateLines() {
-    polylinePoints.add(widget.gpsPosition.last.latLng);
+    polylinePoints.add(widget.gpsPositions.last.latLng);
   }
 
   Timer timer() =>
       movePosition = Timer.periodic(const Duration(seconds: 5), (timer) {
         _zoomPanBehavior
-          ..focalLatLng = widget.gpsPosition.last.latLng
+          ..focalLatLng = widget.gpsPositions.last.latLng
           ..zoomLevel = 17;
       });
 
@@ -65,7 +65,7 @@ class TrackMapState extends State<TrackMap> {
   Widget build(BuildContext context) {
     updateLines();
     TelemetryPosition telemetry = CalculationService.telemetryPosition(
-        gpsPosition: widget.gpsPosition, segment: polylinePoints);
+        gpsPosition: widget.gpsPositions, segment: polylinePoints);
 
     return Column(
       children: [
@@ -82,8 +82,8 @@ class TrackMapState extends State<TrackMap> {
               urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
               zoomPanBehavior: _zoomPanBehavior,
               controller: _mapController,
-              initialFocalLatLng: widget.gpsPosition.last.latLng,
-              initialMarkersCount: widget.gpsPosition.length,
+              initialFocalLatLng: widget.gpsPositions.last.latLng,
+              initialMarkersCount: widget.gpsPositions.length,
               tooltipSettings: const MapTooltipSettings(
                 color: Colors.white,
               ),
@@ -103,9 +103,9 @@ class TrackMapState extends State<TrackMap> {
                             Text(
                               index == 0
                                   ? 'Start'
-                                  : index == widget.gpsPosition.length - 1
+                                  : index == widget.gpsPositions.length - 1
                                       ? 'End'
-                                      : 'Speed: ${UnitsService.speedUnitsConvertFromKTS(widget.unitsSystem.speedUnits, widget.gpsPosition[index].speed).roundToDouble()} ${UnitsService.speedUnitsToString(widget.unitsSystem.speedUnits)}',
+                                      : 'Speed: ${UnitsService.speedUnitsConvertFromKTS(widget.unitsSystem.speedUnits, widget.gpsPositions[index].speed).roundToDouble()} ${UnitsService.speedUnitsToString(widget.unitsSystem.speedUnits)}',
                               style: const TextStyle(
                                   fontSize: 14,
                                   color: Colors.black,
@@ -118,19 +118,19 @@ class TrackMapState extends State<TrackMap> {
               },
               markerBuilder: (BuildContext context, int index) {
                 return MapMarker(
-                  latitude: widget.gpsPosition[index].latLng.latitude,
-                  longitude: widget.gpsPosition[index].latLng.longitude,
+                  latitude: widget.gpsPositions[index].latLng.latitude,
+                  longitude: widget.gpsPositions[index].latLng.longitude,
                   alignment: Alignment.bottomCenter,
                   child: FittedBox(
                     child: Icon(Icons.location_on,
-                        color:
-                            index == 0 || index == widget.gpsPosition.length - 1
-                                ? Colors.blue
-                                : AppStyle.primaryColor,
-                        size:
-                            index == 0 || index == widget.gpsPosition.length - 1
-                                ? 50
-                                : 20),
+                        color: index == 0 ||
+                                index == widget.gpsPositions.length - 1
+                            ? Colors.blue
+                            : AppStyle.primaryColor,
+                        size: index == 0 ||
+                                index == widget.gpsPositions.length - 1
+                            ? 50
+                            : 20),
                   ),
                 );
               },
@@ -214,7 +214,7 @@ class TrackMapState extends State<TrackMap> {
                     //https://medium.com/analytics-vidhya/the-versatility-of-the-grammar-of-graphics-d1366760424d
 
                     child: Chart(
-                      data: widget.gpsPosition,
+                      data: widget.gpsPositions,
                       variables: {
                         'timestamp': Variable(
                           accessor: (GpsPosition gps) => gps.timestamp,
@@ -245,6 +245,8 @@ class TrackMapState extends State<TrackMap> {
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      Text(
+                          'Now: ${UnitsService.speedUnitsConvertFromKTS(widget.unitsSystem.speedUnits, widget.gpsPositions.last.speed).roundToDouble()} ${UnitsService.speedUnitsToString(widget.unitsSystem.speedUnits)}'),
                       Text(
                           'Medium: ${UnitsService.speedUnitsConvertFromKTS(widget.unitsSystem.speedUnits, telemetry.speed.medium).roundToDouble()} ${UnitsService.speedUnitsToString(widget.unitsSystem.speedUnits)}'),
                       Text(

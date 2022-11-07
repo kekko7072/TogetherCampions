@@ -20,7 +20,7 @@ class _AddEditSessionState extends State<AddEditSession> {
   final formKey = GlobalKey<FormState>();
 
   bool showLoading = false;
-  bool isOnline = true;
+  bool isLocal = true;
 
   TextEditingController name = TextEditingController(text: 'Nuova sessione');
 
@@ -35,6 +35,10 @@ class _AddEditSessionState extends State<AddEditSession> {
   List<String> value = [];
   int progress = 0;
   String deviceID = '';
+
+  int totalProgress = 0;
+
+  bool showUploading = false;
 
   @override
   void initState() {
@@ -70,7 +74,7 @@ class _AddEditSessionState extends State<AddEditSession> {
                   padding: EdgeInsets.symmetric(vertical: 15.0),
                   child: CircularProgressIndicator(),
                 ),
-                if (!isOnline) Text("Progress: $progress/${value.length}"),
+                if (!isLocal) Text("Progress: $progress/${value.length}"),
               ],
             )
           ] else ...[
@@ -102,34 +106,34 @@ class _AddEditSessionState extends State<AddEditSession> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         FilterChip(
-                            backgroundColor: isOnline
+                            backgroundColor: isLocal
                                 ? AppStyle.primaryColor
                                 : Colors.black12,
                             label: Text(
-                              'CLOUD',
+                              'LOCAL',
                               style: TextStyle(
-                                  fontWeight: isOnline
+                                  fontWeight: isLocal
                                       ? FontWeight.bold
                                       : FontWeight.normal,
                                   color: Colors.white),
                             ),
                             onSelected: (value) =>
-                                setState(() => isOnline = true)),
+                                setState(() => isLocal = true)),
                         const SizedBox(width: 20),
                         FilterChip(
-                            backgroundColor: !isOnline
+                            backgroundColor: !isLocal
                                 ? AppStyle.primaryColor
                                 : Colors.black12,
                             label: Text(
                               'SD CARD',
                               style: TextStyle(
-                                  fontWeight: !isOnline
+                                  fontWeight: !isLocal
                                       ? FontWeight.bold
                                       : FontWeight.normal,
                                   color: Colors.white),
                             ),
                             onSelected: (value) =>
-                                setState(() => isOnline = false)),
+                                setState(() => isLocal = false)),
                       ],
                     ),
                   ],
@@ -195,8 +199,9 @@ class _AddEditSessionState extends State<AddEditSession> {
                       ],
                     ),
                   ),
-                  if (isOnline) ...[
-                    Padding(
+                  if (isLocal) ...[
+                    const SizedBox(height: 10),
+                    /* Padding(
                       padding: const EdgeInsets.only(left: 20.0),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -217,50 +222,113 @@ class _AddEditSessionState extends State<AddEditSession> {
                           ),
                         ],
                       ),
-                    ),
+                    ),*/
+                    if (showUploading) ...[
+                      Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Padding(
+                            padding: EdgeInsets.symmetric(vertical: 15.0),
+                            child: CircularProgressIndicator(),
+                          ),
+                          Text("Progress: $progress/$totalProgress"),
+                        ],
+                      )
+                    ],
+                    const SizedBox(height: 10),
                     CupertinoButton.filled(
                       onPressed: () async {
-                        setState(() => showLoading = true);
-                        if (widget.isEdit) {
-                          await DatabaseSession(deviceID: deviceID)
-                              .edit(
-                                  session: Session(
-                                      id: const Uuid().v4(),
-                                      info: SessionInfo(
-                                          name: name.text,
-                                          start: start,
-                                          end: end),
-                                      devicePosition: DevicePosition(
-                                        x: x,
-                                        y: y,
-                                        z: z,
-                                      )))
-                              .then((value) {
-                            setState(() => showLoading = false);
-                            Navigator.of(context).pop();
-                          });
-                        } else {
-                          await DatabaseSession(deviceID: deviceID)
-                              .add(
-                                  session: Session(
-                                      id: const Uuid().v4(),
-                                      info: SessionInfo(
-                                          name: name.text,
-                                          start: start,
-                                          end: end),
-                                      devicePosition: DevicePosition(
-                                        x: x,
-                                        y: y,
-                                        z: z,
-                                      )))
-                              .then((value) {
-                            setState(() => showLoading = false);
-                            Navigator.of(context).pop();
-                          });
+                        setState(() => showUploading = true);
+
+                        try {
+                          result = await FilePicker.platform.pickFiles(
+                            dialogTitle: 'Seleziona il file sessionId.json',
+                            type: FileType.custom,
+                            allowedExtensions: ["json"], //tkrlg
+                          );
+
+                          if (result != null) {
+                            file = result!.files.first;
+                            debugPrint(
+                                "PATH: ${file!.path}\nNAME: ${file!.name}\nEXTENSION: ${file!.extension}\nSIZE: ${file!.size}\nBYTES AVAILABLE: ${file!.bytes != null}");
+
+                            final input = SessionUpload.fromJson(json.decode(
+                                String.fromCharCodes(
+                                    await File(file!.path!).readAsBytes())));
+
+                            ///TODO upload JSON to an endpoint and then receve notification when upload is done.
+                            setState(() {
+                              totalProgress = input.system.length +
+                                  input.gpsNavigation.length +
+                                  input.gpsPosition.length +
+                                  input.accelerometer.length +
+                                  input.gyroscope.length;
+                            });
+
+                            ///1. Create Session
+                            await DatabaseSession(deviceID: deviceID).add(
+                                session: Session(
+                                    id: input.sessionId,
+                                    info: input.info,
+                                    devicePosition: input.devicePosition));
+
+                            ///1. Add System
+                            for (System sys in input.system) {
+                              setState(() => ++progress);
+                              await DatabaseSystem(
+                                      deviceID: input.deviceId,
+                                      sessionID: input.sessionId)
+                                  .add(sys);
+                            }
+
+                            ///2. Add Gps
+                            for (GpsPosition gps in input.gpsPosition) {
+                              setState(() => ++progress);
+                              await DatabaseGpsPosition(
+                                      deviceID: input.deviceId,
+                                      sessionID: input.sessionId)
+                                  .add(gps);
+                            }
+                            for (GpsNavigation gps in input.gpsNavigation) {
+                              setState(() => ++progress);
+                              await DatabaseGpsNavigation(
+                                      deviceID: input.deviceId,
+                                      sessionID: input.sessionId)
+                                  .add(gps);
+                            }
+
+                            ///3. Add Mpu
+                            for (Accelerometer mpu in input.accelerometer) {
+                              setState(() => ++progress);
+                              await DatabaseAccelerometer(
+                                      deviceID: input.deviceId,
+                                      sessionID: input.sessionId)
+                                  .add(mpu);
+                            }
+                            for (Gyroscope mpu in input.gyroscope) {
+                              setState(() => ++progress);
+                              await DatabaseGyroscope(
+                                      deviceID: input.deviceId,
+                                      sessionID: input.sessionId)
+                                  .add(mpu);
+                            }
+
+                            /*   } else {
+                              String convertedValue = String.fromCharCodes(
+                                  await File(file!.path!).readAsBytes());
+                              setState(() => value = convertedValue.split(","));
+                            }*/
+
+                          } else {
+                            debugPrint("User cancelled");
+                          }
+                        } catch (e) {
+                          debugPrint(
+                              "\n\n\n\n\n\n\n\n\n\n\n\nERRRORRR: $e\n\n\n\n\n\n\n\n\n\n\n\n");
                         }
                       },
                       child: Text(
-                        widget.isEdit ? 'Modifica' : 'Avvia',
+                        widget.isEdit ? 'Modifica' : 'Crea',
                         style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
                     ),
@@ -268,7 +336,6 @@ class _AddEditSessionState extends State<AddEditSession> {
                     const SizedBox(height: 10),
                     CupertinoButton.filled(
                       onPressed: () async {
-                        //TODO macos not working permission requied
                         result = await FilePicker.platform.pickFiles(
                           dialogTitle:
                               'Seleziona il file datalog.txt dalla sd card',

@@ -638,7 +638,7 @@ class _BLEDeviceScreenState extends State<BLEDeviceScreen> {
                                 ],
                                 TrackMap(
                                   unitsSystem: widget.unitsSystem,
-                                  gpsPosition: gpsPosition,
+                                  gpsPositions: gpsPosition,
                                 ),
                               ] else ...[
                                 Text('Waiting $characteristic data...')

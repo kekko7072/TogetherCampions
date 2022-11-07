@@ -1,23 +1,27 @@
 #ifndef MPU_H
 #define MPU_H
 
-void setupMPU(Adafruit_MPU6050 mpu) {
+void setupMPU() {
   Wire.begin();
   Wire.beginTransmission(MPU_ADDR);
   Wire.write(0x6B);  // PWR_MGMT_1 register
-  Wire.write(0);     // set to zero (wakes up the MPU-6050)
+  Wire.write(0x5);     // set to zero (wakes up the MPU-6050)
   Wire.endTransmission(true);
   // Try to initialize!
-  /*if (!mpu.begin()) {
-    Serial.println("Failed to find MPU6050 chip");
-    while (1) {
-      delay(10);
-    }
-  }
-  Serial.println("MPU6050 Found!");
-  mpu.setAccelerometerRange(MPU6050_RANGE_8_G);
-  mpu.setGyroRange(MPU6050_RANGE_500_DEG);
-  mpu.setFilterBandwidth(MPU6050_BAND_21_HZ);*/
+  /* * <pre>
+ *          |   ACCELEROMETER    |           GYROSCOPE
+ * DLPF_CFG | Bandwidth | Delay  | Bandwidth | Delay  | Sample Rate
+ * ---------+-----------+--------+-----------+--------+-------------
+ * 0        | 260Hz     | 0ms    | 256Hz     | 0.98ms | 8kHz
+ * 1        | 184Hz     | 2.0ms  | 188Hz     | 1.9ms  | 1kHz
+ * 2        | 94Hz      | 3.0ms  | 98Hz      | 2.8ms  | 1kHz
+ * 3        | 44Hz      | 4.9ms  | 42Hz      | 4.8ms  | 1kHz
+ * 4        | 21Hz      | 8.5ms  | 20Hz      | 8.3ms  | 1kHz
+ * 5        | 10Hz      | 13.8ms | 10Hz      | 13.4ms | 1kHz
+ * 6        | 5Hz       | 19.0ms | 5Hz       | 18.6ms | 1kHz
+ * 7        |   -- Reserved --   |   -- Reserved --   | Reserved
+ * </pre>
+ */
 }
 
 void updateMPU(BLECharacteristic accelerometer, BLECharacteristic gyroscope) {

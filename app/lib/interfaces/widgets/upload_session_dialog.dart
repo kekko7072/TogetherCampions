@@ -165,7 +165,7 @@ class _UploadSessionDialogState extends State<UploadSessionDialog> {
                   session: Session(
                       id: sessionID,
                       info: SessionInfo(
-                          name: DateFormat.yMd()
+                          name: DateFormat('dd/MM/yyyy')
                               .add_Hms()
                               .format(DateTime.now())
                               .toString(),

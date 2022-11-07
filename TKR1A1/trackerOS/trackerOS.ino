@@ -1,7 +1,7 @@
 #include <ArduinoBLE.h>
 #include <TinyGPSPlus.h>
-#include <Adafruit_MPU6050.h>
-#include <Adafruit_Sensor.h>
+//#include <Adafruit_MPU6050.h>
+//#include <Adafruit_Sensor.h>
 #include <Wire.h>
 #include "configuration.h"
 #include "system.h"
@@ -33,8 +33,8 @@ TinyGPSPlus gps;
 TinyGPSCustom magneticVariation(gps, "GPRMC", 10);
 
 //MPU
-Adafruit_MPU6050 mpu;
-sensors_event_t a, g, temp;
+//Adafruit_MPU6050 mpu;
+//sensors_event_t a, g, temp;
 
 void setup() {
 
@@ -76,7 +76,8 @@ void setup() {
   BLE.setEventHandler(BLEDisconnected, DisconnectHandler);
 
   //MPU-6050
-  setupMPU(mpu);
+  setupMPU();
+  
 
   //GPS
   setupGPS();

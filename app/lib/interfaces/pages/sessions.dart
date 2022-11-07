@@ -123,7 +123,7 @@ class _SessionsState extends State<Sessions> {
                 ),
               ),
             ),
-            /* floatingActionButton: TextButton(
+            floatingActionButton: TextButton(
               onPressed: () async => showModalBottomSheet(
                 context: context,
                 shape: AppStyle.kModalBottomStyle,
@@ -140,11 +140,11 @@ class _SessionsState extends State<Sessions> {
                     padding: EdgeInsets.all(10.0),
                     child: Icon(
                       Icons.add,
-                      color: Colors.white,
                       size: 30,
+                      color: Colors.white,
                     ),
                   )),
-            ),*/
+            ),
           )
         : const Center(
             child: CircularProgressIndicator(),

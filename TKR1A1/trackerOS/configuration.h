@@ -48,7 +48,7 @@
 /*
   Define time between each measurements in ms
 */
-#define measurements_milliseconds 333
+#define measurements_milliseconds 500
 /*
   SD CARD chip protocol
 */
