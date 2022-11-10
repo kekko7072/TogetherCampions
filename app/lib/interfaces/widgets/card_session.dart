@@ -7,12 +7,14 @@ class CardSession extends StatefulWidget {
   const CardSession(
       {Key? key,
       required this.userData,
+      required this.deviceId,
       required this.session,
       required this.gpsPosition,
       required this.gpsNavigation})
       : super(key: key);
   final UserData userData;
 
+  final String deviceId;
   final Session session;
   final List<GpsPosition> gpsPosition;
   final List<GpsNavigation> gpsNavigation;
@@ -51,7 +53,10 @@ class _CardSessionState extends State<CardSession> {
             children: [
               SlidableAction(
                 onPressed: (con) async {
-                  //TODO DELETE
+                  EasyLoading.show();
+                  await DatabaseSession(deviceID: widget.deviceId)
+                      .delete(id: widget.session.id);
+                  EasyLoading.dismiss();
                 },
                 backgroundColor: CupertinoColors.destructiveRed,
                 foregroundColor: Colors.black,

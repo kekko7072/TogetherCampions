@@ -42,6 +42,10 @@ class DatabaseSession {
     });
   }
 
+  Future delete({required String id}) async {
+    return await sessionCollection.doc(id).delete();
+  }
+
   ///SERIALIZATION
   static Session sessionFromSnapshot(
       DocumentSnapshot<Map<String, dynamic>?> snapshot) {

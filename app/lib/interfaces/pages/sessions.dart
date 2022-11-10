@@ -106,6 +106,7 @@ class _SessionsState extends State<Sessions> {
 
                                           return CardSession(
                                             userData: userData,
+                                            deviceId: deviceID,
                                             session: session,
                                             gpsPosition:
                                                 snapshot.snapshot1.data!,

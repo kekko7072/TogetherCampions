@@ -16,7 +16,7 @@ class GpsPosition {
   static bool isAvailable(List<int> bit) {
     ByteBuffer buffer = Int8List.fromList(bit).buffer;
     ByteData byteData = ByteData.view(buffer);
-    return byteData.getFloat32(4, Endian.little).toInt() == 0;
+    return byteData.getFloat32(4, Endian.little).toInt() == 1;
   }
 
   factory GpsPosition.formListInt(List<int> bit) {
@@ -24,7 +24,7 @@ class GpsPosition {
     ByteData byteData = ByteData.view(buffer);
     return GpsPosition(
       timestamp: byteData.getFloat32(0, Endian.little).toInt(),
-      available: byteData.getFloat32(4, Endian.little) == 0.0,
+      available: byteData.getFloat32(4, Endian.little).toInt() == 1,
       latLng: MapLatLng(byteData.getFloat32(8, Endian.little),
           byteData.getFloat32(12, Endian.little)),
       speed: byteData.getFloat32(16, Endian.little),
@@ -65,7 +65,7 @@ class GpsNavigation {
   static bool isAvailable(List<int> bit) {
     ByteBuffer buffer = Int8List.fromList(bit).buffer;
     ByteData byteData = ByteData.view(buffer);
-    return byteData.getFloat32(4, Endian.little).toInt() == 0;
+    return byteData.getFloat32(4, Endian.little).toInt() == 1;
   }
 
   factory GpsNavigation.formListInt(List<int> bit) {
@@ -73,7 +73,7 @@ class GpsNavigation {
     ByteData byteData = ByteData.view(buffer);
     return GpsNavigation(
       timestamp: byteData.getFloat32(0, Endian.little).toInt(),
-      available: byteData.getFloat32(4, Endian.little) == 0.0,
+      available: byteData.getFloat32(4, Endian.little).toInt() == 1,
       altitude: byteData.getFloat32(8, Endian.little),
       course: byteData.getFloat32(12, Endian.little),
       variation: byteData.getFloat32(16, Endian.little),
