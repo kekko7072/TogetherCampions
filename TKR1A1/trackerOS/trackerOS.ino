@@ -1,5 +1,5 @@
 #include <ArduinoBLE.h>
-#include <TinyGPSPlus.h>
+#include <TinyGPS++.h>
 //#include <Adafruit_MPU6050.h>
 //#include <Adafruit_Sensor.h>
 #include <Wire.h>
@@ -77,7 +77,6 @@ void setup() {
 
   //MPU-6050
   setupMPU();
-  
 
   //GPS
   setupGPS();
@@ -90,17 +89,21 @@ void loop() {
 
   BLEDevice central = BLE.central();  // Wait for a Bluetooth® Low Energy central
 
-  //if (central) {
-  //digitalWrite(LED_BUILTIN, HIGH);
-
-  //BLE.poll();
-
-  //while (central.connected()) {
-
   long currentMillis = millis();
 
   if (Serial1.available() > 0) {
-    if (gps.encode(Serial1.read())) {}
+    if (gps.encode(Serial1.read())) {
+      //Do nothing
+      //TinyGPSCustom magneticxVariation(gps, "GPRMC", 10);
+      Serial.println(magneticVariation.value());
+      Serial.print("LAT=");
+      Serial.println(gps.location.lat(), 6);
+      Serial.print("LONG=");
+      Serial.println(gps.location.lng(), 6);
+      Serial.print("ALT=");
+      Serial.println(gps.altitude.meters());
+      Serial.println(gps.altitude.isUpdated());
+    }
   }
   //mpu.getEvent(&a, &g, &temp);
 
@@ -116,8 +119,4 @@ void loop() {
 
     previousMillis = currentMillis;  //Clean to re-run cicle
   }
-  
-  //}
-  //digitalWrite(LED_BUILTIN, LOW);
-  //}
 }
