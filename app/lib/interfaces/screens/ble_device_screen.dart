@@ -621,10 +621,6 @@ class _BLEDeviceScreenState extends State<BLEDeviceScreen> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
-                            Text(
-                              characteristic,
-                              style: Theme.of(context).textTheme.subtitle1,
-                            ),
                             if (c.isNotifying) ...[
                               if (gpsPosition.isNotEmpty) ...[
                                 if (kDebugMode) ...[
@@ -687,18 +683,12 @@ class _BLEDeviceScreenState extends State<BLEDeviceScreen> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
-                            Text(
-                              characteristic,
-                              style: Theme.of(context).textTheme.subtitle1,
-                            ),
                             if (c.isNotifying) ...[
                               if (gpsPosition.isNotEmpty) ...[
-                                Wrap(
-                                  spacing: 10,
-                                  children: [
-                                    Text('Available: $gpsNavigationAvailable'),
-                                  ],
-                                ),
+                                Visibility(
+                                    visible: kDebugMode,
+                                    child: Text(
+                                        'Available: $gpsNavigationAvailable')),
                                 TrackTelemetries(
                                   gpsNavigation: gpsNavigation,
                                 ),

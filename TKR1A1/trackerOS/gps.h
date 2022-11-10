@@ -10,9 +10,6 @@ void setupGPS() {
 
 void updateGPS(BLECharacteristic position, BLECharacteristic navigation, TinyGPSPlus gps, TinyGPSCustom magneticVariation) {
 
-  //Do nothing
-  //TinyGPSCustom magneticxVariation(gps, "GPRMC", 10);
-
   float GPSPositionData[5];
   GPSPositionData[0] = millis();
   GPSPositionData[1] = gps.location.isValid();  // 0: FALSE, 1: TRUE

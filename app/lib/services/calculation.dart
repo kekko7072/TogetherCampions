@@ -41,13 +41,13 @@ class CalculationService {
       speedMedium = speedMedium + log.speed;
 
       if (speedMax < log.speed) {
-        speedMax = CalculationService.roundDouble(
-            number: log.speed * 0.539957, decimal: 3);
+        speedMax =
+            CalculationService.roundDouble(number: log.speed, decimal: 3);
       }
 
       if (speedMin > log.speed) {
-        speedMin = CalculationService.roundDouble(
-            number: log.speed * 0.539957, decimal: 3);
+        speedMin =
+            CalculationService.roundDouble(number: log.speed, decimal: 3);
       }
     }
     for (GpsNavigation log in gpsNavigation) {
@@ -94,7 +94,7 @@ class CalculationService {
     return TelemetryAnalytics(
       speed: RangeAnalytics(
         medium: CalculationService.roundDouble(
-            number: (speedMedium / gpsPosition.length) * 0.539957, decimal: 3),
+            number: (speedMedium / gpsPosition.length), decimal: 3),
         max: speedMax,
         min: speedMin,
       ),
@@ -134,20 +134,20 @@ class CalculationService {
       speedMedium = speedMedium + log.speed;
 
       if (speedMax < log.speed) {
-        speedMax = CalculationService.roundDouble(
-            number: log.speed * 0.539957, decimal: 3);
+        speedMax =
+            CalculationService.roundDouble(number: log.speed, decimal: 3);
       }
 
       if (speedMin > log.speed) {
-        speedMin = CalculationService.roundDouble(
-            number: log.speed * 0.539957, decimal: 3);
+        speedMin =
+            CalculationService.roundDouble(number: log.speed, decimal: 3);
       }
     }
 
     return TelemetryPosition(
       speed: RangeAnalytics(
         medium: CalculationService.roundDouble(
-            number: (speedMedium / gpsPosition.length) * 0.539957, decimal: 3),
+            number: (speedMedium / gpsPosition.length), decimal: 3),
         max: speedMax,
         min: speedMin,
       ),

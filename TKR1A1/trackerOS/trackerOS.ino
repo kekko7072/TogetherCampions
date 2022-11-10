@@ -54,15 +54,14 @@ void setup() {
 }
 
 void loop() {
-
-  BLEDevice central = BLE.central();  // Wait for a Bluetooth® Low Energy central
+  BLE.poll();
 
   long currentMillis = millis();
 
   while (Serial1.available() > 0) {
     gps.encode(Serial1.read());
   }
-  
+
   //mpu.getEvent(&a, &g, &temp);
 
   if (currentMillis - previousMillis >= measurements_milliseconds) {

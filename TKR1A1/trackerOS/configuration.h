@@ -107,7 +107,7 @@ void DisconnectHandler(BLEDevice central) {
   Serial.print("Disconnected event, central: ");
   Serial.println(central.address());
 
-  initializationBLE();
+  BLE.advertise();
 }
 
 double randomDouble(double minf, double maxf) {
