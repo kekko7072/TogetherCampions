@@ -1,22 +1,20 @@
 import 'package:flutter/cupertino.dart';
 import 'package:app/services/imports.dart';
 
-class AddEditSession extends StatefulWidget {
-  const AddEditSession({
+class AddSession extends StatefulWidget {
+  const AddSession({
     Key? key,
     required this.userData,
-    required this.isEdit,
     this.session,
   }) : super(key: key);
   final UserData userData;
-  final bool isEdit;
   final Session? session;
 
   @override
-  State<AddEditSession> createState() => _AddEditSessionState();
+  State<AddSession> createState() => _AddSessionState();
 }
 
-class _AddEditSessionState extends State<AddEditSession> {
+class _AddSessionState extends State<AddSession> {
   final formKey = GlobalKey<FormState>();
 
   bool showLoading = false;
@@ -39,21 +37,6 @@ class _AddEditSessionState extends State<AddEditSession> {
   int totalProgress = 0;
 
   bool showUploading = false;
-
-  @override
-  void initState() {
-    super.initState();
-    deviceID = widget.userData.devices.first;
-
-    if (widget.isEdit && widget.session != null) {
-      name.text = widget.session!.info.name;
-      start = widget.session!.info.start;
-      end = widget.session!.info.end;
-      x = widget.session!.devicePosition.x;
-      y = widget.session!.devicePosition.y;
-      z = widget.session!.devicePosition.z;
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -79,7 +62,7 @@ class _AddEditSessionState extends State<AddEditSession> {
             )
           ] else ...[
             Text(
-              '${widget.isEdit ? 'Edit' : 'Upload'} session',
+              'Upload session',
               style: Theme.of(context).textTheme.titleLarge,
             ),
             const SizedBox(height: 10),
@@ -91,42 +74,38 @@ class _AddEditSessionState extends State<AddEditSession> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   const SizedBox(height: 10),
-                  if (!widget.isEdit) ...[
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        FilterChip(
-                            backgroundColor: isLocal
-                                ? AppStyle.primaryColor
-                                : Colors.black12,
-                            label: Text(
-                              'LOCAL FILE',
-                              style: TextStyle(
-                                  fontWeight: isLocal
-                                      ? FontWeight.bold
-                                      : FontWeight.normal,
-                                  color: Colors.white),
-                            ),
-                            onSelected: (value) =>
-                                setState(() => isLocal = true)),
-                        const SizedBox(width: 20),
-                        FilterChip(
-                            backgroundColor: !isLocal
-                                ? AppStyle.primaryColor
-                                : Colors.black12,
-                            label: Text(
-                              'SD CARD',
-                              style: TextStyle(
-                                  fontWeight: !isLocal
-                                      ? FontWeight.bold
-                                      : FontWeight.normal,
-                                  color: Colors.white),
-                            ),
-                            onSelected: (value) =>
-                                setState(() => isLocal = false)),
-                      ],
-                    ),
-                  ],
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      FilterChip(
+                          backgroundColor:
+                              isLocal ? AppStyle.primaryColor : Colors.black12,
+                          label: Text(
+                            'LOCAL FILE',
+                            style: TextStyle(
+                                fontWeight: isLocal
+                                    ? FontWeight.bold
+                                    : FontWeight.normal,
+                                color: Colors.white),
+                          ),
+                          onSelected: (value) =>
+                              setState(() => isLocal = true)),
+                      const SizedBox(width: 20),
+                      FilterChip(
+                          backgroundColor:
+                              !isLocal ? AppStyle.primaryColor : Colors.black12,
+                          label: Text(
+                            'SD CARD',
+                            style: TextStyle(
+                                fontWeight: !isLocal
+                                    ? FontWeight.bold
+                                    : FontWeight.normal,
+                                color: Colors.white),
+                          ),
+                          onSelected: (value) =>
+                              setState(() => isLocal = false)),
+                    ],
+                  ),
                   Wrap(
                     alignment: WrapAlignment.start,
                     direction: Axis.horizontal,
@@ -207,8 +186,7 @@ class _AddEditSessionState extends State<AddEditSession> {
                           : () async {
                               try {
                                 EasyLoading.show();
-                                var body = json.decode(String.fromCharCodes(
-                                    await File(file!.path!).readAsBytes()));
+
                                 var url = Uri.http(
                                     "together-champions.ew.r.appspot.com",
                                     '/upload');
@@ -358,9 +336,9 @@ class _AddEditSessionState extends State<AddEditSession> {
                           Navigator.of(context).pop();
                         });*/
                       },
-                      child: Text(
-                        widget.isEdit ? 'Modifica' : 'Carica',
-                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      child: const Text(
+                        'Upload',
+                        style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                     ),
                   ]

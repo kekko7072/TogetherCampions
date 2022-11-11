@@ -96,10 +96,7 @@ class _SessionsState extends State<Sessions> {
                 shape: AppStyle.kModalBottomStyle,
                 isScrollControlled: true,
                 isDismissible: true,
-                builder: (context) => AddEditSession(
-                  userData: userData,
-                  isEdit: false,
-                ),
+                builder: (context) => AddSession(userData: userData),
               ),
               child: Card(
                   color: Theme.of(context).primaryColor,

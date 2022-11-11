@@ -6,17 +6,17 @@ class DatabaseGpsPosition {
   final String sessionID;
 
   ///COLLECTIONS & DOCS
-  late CollectionReference<Map<String, dynamic>> gpsPositionCollection =
-      FirebaseFirestore.instance
-          .collection('devices')
-          .doc(deviceID)
-          .collection('sessions')
-          .doc(sessionID)
-          .collection('gps_position');
+  late CollectionReference<Map<String, dynamic>> collection = FirebaseFirestore
+      .instance
+      .collection('devices')
+      .doc(deviceID)
+      .collection('sessions')
+      .doc(sessionID)
+      .collection('gps_position');
 
   ///CRUD
   Future add(GpsPosition gps) async {
-    return gpsPositionCollection.doc('${gps.timestamp}').set({
+    return collection.doc('${gps.timestamp}').set({
       'available': gps.available,
       'latitude': gps.latLng.latitude,
       'longitude': gps.latLng.longitude,
@@ -49,13 +49,10 @@ class DatabaseGpsPosition {
 
   ///STREAMS
   Stream<GpsPosition> stream({required String telemetryID}) =>
-      gpsPositionCollection
-          .doc(telemetryID)
-          .snapshots()
-          .map(gpsPositionFromSnapshot);
+      collection.doc(telemetryID).snapshots().map(gpsPositionFromSnapshot);
 
   Stream<List<GpsPosition>> get streamList =>
-      gpsPositionCollection.snapshots().map(gpsPositionListFromSnapshot);
+      collection.snapshots().map(gpsPositionListFromSnapshot);
 }
 
 class DatabaseGpsNavigation {
@@ -64,17 +61,17 @@ class DatabaseGpsNavigation {
   final String sessionID;
 
   ///COLLECTIONS & DOCS
-  late CollectionReference<Map<String, dynamic>> gpsNavigationCollection =
-      FirebaseFirestore.instance
-          .collection('devices')
-          .doc(deviceID)
-          .collection('sessions')
-          .doc(sessionID)
-          .collection('gps_navigation');
+  late CollectionReference<Map<String, dynamic>> collection = FirebaseFirestore
+      .instance
+      .collection('devices')
+      .doc(deviceID)
+      .collection('sessions')
+      .doc(sessionID)
+      .collection('gps_navigation');
 
   ///CRUD
   Future add(GpsNavigation gps) async {
-    return gpsNavigationCollection.doc('${gps.timestamp}').set({
+    return collection.doc('${gps.timestamp}').set({
       'available': gps.available,
       'altitude': gps.altitude,
       'course': gps.course,
@@ -109,11 +106,8 @@ class DatabaseGpsNavigation {
 
   ///STREAMS
   Stream<GpsNavigation> stream({required String telemetryID}) =>
-      gpsNavigationCollection
-          .doc(telemetryID)
-          .snapshots()
-          .map(gpsNavigationFromSnapshot);
+      collection.doc(telemetryID).snapshots().map(gpsNavigationFromSnapshot);
 
   Stream<List<GpsNavigation>> get streamList =>
-      gpsNavigationCollection.snapshots().map(gpsNavigationListFromSnapshot);
+      collection.snapshots().map(gpsNavigationListFromSnapshot);
 }

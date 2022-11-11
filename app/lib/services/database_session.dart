@@ -43,6 +43,39 @@ class DatabaseSession {
   }
 
   Future delete({required String id}) async {
+    var systems = await DatabaseSystem(deviceID: deviceID, sessionID: id)
+        .collection
+        .get();
+    for (var element in systems.docs) {
+      await element.reference.delete();
+    }
+    var gpsPosition =
+        await DatabaseGpsPosition(deviceID: deviceID, sessionID: id)
+            .collection
+            .get();
+    for (var element in gpsPosition.docs) {
+      await element.reference.delete();
+    }
+    var gpsNavigation =
+        await DatabaseGpsNavigation(deviceID: deviceID, sessionID: id)
+            .collection
+            .get();
+    for (var element in gpsNavigation.docs) {
+      await element.reference.delete();
+    }
+    var accelerometer =
+        await DatabaseAccelerometer(deviceID: deviceID, sessionID: id)
+            .collection
+            .get();
+    for (var element in accelerometer.docs) {
+      await element.reference.delete();
+    }
+    var gyroscope = await DatabaseGyroscope(deviceID: deviceID, sessionID: id)
+        .collection
+        .get();
+    for (var element in gyroscope.docs) {
+      await element.reference.delete();
+    }
     return await sessionCollection.doc(id).delete();
   }
 

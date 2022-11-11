@@ -3,6 +3,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:intl/intl.dart';
 
+import 'edit_session.dart';
+
 class CardSession extends StatelessWidget {
   const CardSession({
     Key? key,
@@ -66,9 +68,8 @@ class CardSession extends StatelessWidget {
                         shape: AppStyle.kModalBottomStyle,
                         isScrollControlled: true,
                         isDismissible: true,
-                        builder: (context) => AddEditSession(
-                          userData: userData,
-                          isEdit: true,
+                        builder: (context) => EditSession(
+                          deviceID: deviceID,
                           session: session,
                         ),
                       ),

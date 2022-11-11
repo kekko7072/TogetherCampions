@@ -6,17 +6,17 @@ class DatabaseSystem {
   final String sessionID;
 
   ///COLLECTIONS & DOCS
-  late CollectionReference<Map<String, dynamic>> serviceCollection =
-      FirebaseFirestore.instance
-          .collection('devices')
-          .doc(deviceID)
-          .collection('sessions')
-          .doc(sessionID)
-          .collection('services');
+  late CollectionReference<Map<String, dynamic>> collection = FirebaseFirestore
+      .instance
+      .collection('devices')
+      .doc(deviceID)
+      .collection('sessions')
+      .doc(sessionID)
+      .collection('services');
 
   ///CRUD
   Future add(System system) async {
-    return serviceCollection.doc('${system.timestamp}').set({
+    return collection.doc('${system.timestamp}').set({
       'battery': system.battery,
       'temperature': system.temperature,
     });
@@ -43,8 +43,8 @@ class DatabaseSystem {
 
   ///STREAMS
   Stream<System> singleTelemetry({required String telemetryID}) =>
-      serviceCollection.doc(telemetryID).snapshots().map(serviceFromSnapshot);
+      collection.doc(telemetryID).snapshots().map(serviceFromSnapshot);
 
   Stream<List<System>> telemetries({required Session session}) =>
-      serviceCollection.snapshots().map(servicesListFromSnapshot);
+      collection.snapshots().map(servicesListFromSnapshot);
 }

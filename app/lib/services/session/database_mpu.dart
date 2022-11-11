@@ -6,17 +6,17 @@ class DatabaseAccelerometer {
   final String sessionID;
 
   ///COLLECTIONS & DOCS
-  late CollectionReference<Map<String, dynamic>> accelerometerCollection =
-      FirebaseFirestore.instance
-          .collection('devices')
-          .doc(deviceID)
-          .collection('sessions')
-          .doc(sessionID)
-          .collection('accelerometer');
+  late CollectionReference<Map<String, dynamic>> collection = FirebaseFirestore
+      .instance
+      .collection('devices')
+      .doc(deviceID)
+      .collection('sessions')
+      .doc(sessionID)
+      .collection('accelerometer');
 
   ///CRUD
   Future add(Accelerometer mpu) async {
-    return accelerometerCollection.doc('${mpu.timestamp}').set({
+    return collection.doc('${mpu.timestamp}').set({
       'aX': mpu.aX,
       'aY': mpu.aY,
       'aZ': mpu.aZ,
@@ -40,13 +40,10 @@ class DatabaseAccelerometer {
 
   ///STREAMS
   Stream<Accelerometer> stream({required String telemetryID}) =>
-      accelerometerCollection
-          .doc(telemetryID)
-          .snapshots()
-          .map(telemetryFromSnapshot);
+      collection.doc(telemetryID).snapshots().map(telemetryFromSnapshot);
 
   Stream<List<Accelerometer>> get streamList =>
-      accelerometerCollection.snapshots().map(telemetriesListFromSnapshot);
+      collection.snapshots().map(telemetriesListFromSnapshot);
 }
 
 class DatabaseGyroscope {
@@ -55,17 +52,17 @@ class DatabaseGyroscope {
   final String sessionID;
 
   ///COLLECTIONS & DOCS
-  late CollectionReference<Map<String, dynamic>> gyroscopeCollection =
-      FirebaseFirestore.instance
-          .collection('devices')
-          .doc(deviceID)
-          .collection('sessions')
-          .doc(sessionID)
-          .collection('gyroscope');
+  late CollectionReference<Map<String, dynamic>> collection = FirebaseFirestore
+      .instance
+      .collection('devices')
+      .doc(deviceID)
+      .collection('sessions')
+      .doc(sessionID)
+      .collection('gyroscope');
 
   ///CRUD
   Future add(Gyroscope mpu) async {
-    return gyroscopeCollection.doc('${mpu.timestamp}').set({
+    return collection.doc('${mpu.timestamp}').set({
       'gX': mpu.gX,
       'gY': mpu.gY,
       'gZ': mpu.gZ,
@@ -94,11 +91,9 @@ class DatabaseGyroscope {
   }
 
   ///STREAMS
-  Stream<Gyroscope> stream({required String telemetryID}) => gyroscopeCollection
-      .doc(telemetryID)
-      .snapshots()
-      .map(telemetryFromSnapshot);
+  Stream<Gyroscope> stream({required String telemetryID}) =>
+      collection.doc(telemetryID).snapshots().map(telemetryFromSnapshot);
 
   Stream<List<Gyroscope>> get streamList =>
-      gyroscopeCollection.snapshots().map(telemetriesListFromSnapshot);
+      collection.snapshots().map(telemetriesListFromSnapshot);
 }
