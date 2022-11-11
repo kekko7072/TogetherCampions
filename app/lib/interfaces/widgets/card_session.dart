@@ -107,13 +107,31 @@ class CardSession extends StatelessWidget {
                                   Row(
                                     children: [
                                       const Icon(
+                                        CupertinoIcons.calendar,
+                                        color: Colors.white70,
+                                        size: 20,
+                                      ),
+                                      const SizedBox(width: 10),
+                                      Text(
+                                        DateFormat('EEE dd MMM')
+                                            .format(session.info.start),
+                                        style: const TextStyle(
+                                          color: Colors.white70,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 5),
+                                  Row(
+                                    children: [
+                                      const Icon(
                                         CupertinoIcons.clock,
                                         color: Colors.white70,
                                         size: 20,
                                       ),
                                       const SizedBox(width: 10),
                                       Text(
-                                        DateFormat('EEE dd')
+                                        DateFormat('kk:mm')
                                             .format(session.info.start),
                                         style: const TextStyle(
                                           color: Colors.white70,
@@ -129,7 +147,7 @@ class CardSession extends StatelessWidget {
                                       const SizedBox(width: 5),
                                       Text(
                                         DateFormat('kk:mm')
-                                            .format(session.info.start),
+                                            .format(session.info.end),
                                         style: const TextStyle(
                                           color: Colors.white70,
                                         ),

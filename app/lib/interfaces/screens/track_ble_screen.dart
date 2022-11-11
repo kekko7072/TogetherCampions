@@ -1,8 +1,8 @@
 import 'package:app/services/imports.dart';
 import 'package:flutter/cupertino.dart';
 
-class BLEDeviceScreen extends StatefulWidget {
-  const BLEDeviceScreen(
+class TrackBLEScreen extends StatefulWidget {
+  const TrackBLEScreen(
       {Key? key,
       required this.deviceBLE,
       //required this.device,
@@ -16,10 +16,10 @@ class BLEDeviceScreen extends StatefulWidget {
   final UnitsSystem unitsSystem;
 
   @override
-  State<BLEDeviceScreen> createState() => _BLEDeviceScreenState();
+  State<TrackBLEScreen> createState() => _TrackBLEScreenState();
 }
 
-class _BLEDeviceScreenState extends State<BLEDeviceScreen> {
+class _TrackBLEScreenState extends State<TrackBLEScreen> {
   bool recording = false;
   bool reconnectAutomatically = true;
 

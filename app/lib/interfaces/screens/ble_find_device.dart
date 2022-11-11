@@ -102,7 +102,7 @@ class _BLEFindDevicesState extends State<BLEFindDevices> {
                                         onPressed: () => Navigator.of(context)
                                             .push(MaterialPageRoute(
                                                 builder: (context) =>
-                                                    BLEDeviceScreen(
+                                                    TrackBLEScreen(
                                                       deviceBLE: d,
                                                       //device: device,
                                                       unitsSystem: unitSystem,
@@ -136,7 +136,7 @@ class _BLEFindDevicesState extends State<BLEFindDevices> {
                                             Navigator.of(context).push(
                                                 MaterialPageRoute(
                                                     builder: (context) {
-                                              return BLEDeviceScreen(
+                                              return TrackBLEScreen(
                                                 deviceBLE: r.device,
                                                 unitsSystem: unitSystem,
                                               );

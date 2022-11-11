@@ -465,9 +465,8 @@ class SessionMapState extends State<SessionMap>
                                                       size: 40,
                                                     ),
                                                     const SizedBox(height: 5),
-                                                    //TODO change units
                                                     Text(
-                                                      '${widget.gpsPosition[index].speed.toStringAsFixed(2)} kts',
+                                                      '${UnitsService.speedUnitsConvertFromKTS(widget.unitsSystem.speedUnits, widget.gpsPosition[index].speed).roundToDouble()} ${UnitsService.speedUnitsToString(widget.unitsSystem.speedUnits)}',
                                                       style: Theme.of(context)
                                                           .textTheme
                                                           .titleLarge!
