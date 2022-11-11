@@ -18,15 +18,23 @@ class CardSession extends StatelessWidget {
   Widget build(BuildContext context) {
     final unitSystem = Provider.of<UnitsSystem>(context);
 
-    return StreamBuilder2<List<GpsPosition>, List<GpsNavigation>>(
-        streams: StreamTuple2(
+    return StreamBuilder4<List<GpsPosition>, List<GpsNavigation>,
+            List<Accelerometer>, List<Gyroscope>>(
+        streams: StreamTuple4(
             DatabaseGpsPosition(deviceID: deviceID, sessionID: session.id)
                 .streamList,
             DatabaseGpsNavigation(deviceID: deviceID, sessionID: session.id)
+                .streamList,
+            DatabaseAccelerometer(deviceID: deviceID, sessionID: session.id)
+                .streamList,
+            DatabaseGyroscope(deviceID: deviceID, sessionID: session.id)
                 .streamList),
         builder: (context, snapshot) {
           List<GpsPosition>? gpsPosition = snapshot.snapshot1.data;
           List<GpsNavigation>? gpsNavigation = snapshot.snapshot2.data;
+          List<Accelerometer>? accelerometer = snapshot.snapshot3.data;
+          List<Gyroscope>? gyroscope = snapshot.snapshot4.data;
+
           return Padding(
             padding: const EdgeInsets.all(5.0),
             child: Container(
@@ -183,7 +191,11 @@ class CardSession extends StatelessWidget {
                       if (gpsPosition != null &&
                           gpsPosition.isNotEmpty &&
                           gpsNavigation != null &&
-                          gpsNavigation.isNotEmpty) {
+                          gpsNavigation.isNotEmpty &&
+                          accelerometer != null &&
+                          accelerometer.isNotEmpty &&
+                          gyroscope != null &&
+                          gyroscope.isNotEmpty) {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
@@ -192,8 +204,12 @@ class CardSession extends StatelessWidget {
                                     unitsSystem: unitSystem,
                                     gpsPosition: gpsPosition,
                                     gpsNavigation: gpsNavigation,
+                                    accelerometer: accelerometer,
+                                    gyroscope: gyroscope,
                                   )),
                         );
+                      } else {
+                        EasyLoading.showInfo('Loading data...');
                       }
                     }),
               ),

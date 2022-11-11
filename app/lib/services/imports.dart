@@ -61,7 +61,6 @@ export 'package:app/interfaces/screens/ble_find_device.dart';
 export 'package:app/interfaces/screens/ble_device_screen.dart';
 
 ///##Widgets
-export 'package:app/interfaces/widgets/card_telemetry.dart';
 export 'package:app/interfaces/widgets/add_edit_session.dart';
 export 'package:app/interfaces/widgets/card_info.dart';
 export 'package:app/interfaces/widgets/card_session.dart';

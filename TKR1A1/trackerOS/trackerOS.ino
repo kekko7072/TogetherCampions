@@ -38,7 +38,26 @@ void setup() {
       ;
   }
 
-  initializationBLE();
+  BLE.setDeviceName("TKR1A1");  //Setting a name that will appear when scanning for Bluetooth® devices
+  BLE.setLocalName("TKR1A1");
+  byte data[19] = { 0x00, 0x00, 0x46, 0x72, 0x61, 0x6e, 0x63, 0x65, 0x73, 0x63, 0x6f, 0x20, 0x56, 0x65, 0x7a, 0x7a, 0x61, 0x6e, 0x69 };
+  BLE.setManufacturerData(data, 19);
+
+  BLE.setAdvertisedService(systemService);
+  BLE.setAdvertisedService(gpsService);
+  BLE.setAdvertisedService(mpuService);
+
+  systemService.addCharacteristic(systemCharacteristic);
+  gpsService.addCharacteristic(poitionCharacteristic);
+  gpsService.addCharacteristic(navigationCharacteristic);
+  mpuService.addCharacteristic(accelerometerCharacteristic);
+  mpuService.addCharacteristic(gyroscopeCharacteristic);
+
+  BLE.addService(systemService);
+  BLE.addService(gpsService);
+  BLE.addService(mpuService);
+
+  BLE.advertise();
 
   BLE.setEventHandler(BLEConnected, ConnectHandler);
   BLE.setEventHandler(BLEDisconnected, DisconnectHandler);
@@ -54,7 +73,7 @@ void setup() {
 }
 
 void loop() {
-  BLE.central();
+  BLE.poll();
 
   long currentMillis = millis();
 

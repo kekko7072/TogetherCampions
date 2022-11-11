@@ -69,29 +69,6 @@ BLEService mpuService("00003000-0000-1000-8000-00805F9B34FB");
 BLECharacteristic accelerometerCharacteristic("00003001-0000-1000-8000-00805F9B34FB", BLERead | BLENotify, 16);  //MPU 2002
 BLECharacteristic gyroscopeCharacteristic("00003002-0000-1000-8000-00805F9B34FB", BLERead | BLENotify, 16);      //MPU 2002
 
-void initializationBLE() {
-  BLE.setDeviceName("TKR1A1");  //Setting a name that will appear when scanning for Bluetooth® devices
-  BLE.setLocalName("TKR1A1");
-  byte data[19] = { 0x00, 0x00, 0x46, 0x72, 0x61, 0x6e, 0x63, 0x65, 0x73, 0x63, 0x6f, 0x20, 0x56, 0x65, 0x7a, 0x7a, 0x61, 0x6e, 0x69 };
-  BLE.setManufacturerData(data, 19);
-
-  BLE.setAdvertisedService(systemService);
-  BLE.setAdvertisedService(gpsService);
-  BLE.setAdvertisedService(mpuService);
-
-  systemService.addCharacteristic(systemCharacteristic);
-  gpsService.addCharacteristic(poitionCharacteristic);
-  gpsService.addCharacteristic(navigationCharacteristic);
-  mpuService.addCharacteristic(accelerometerCharacteristic);
-  mpuService.addCharacteristic(gyroscopeCharacteristic);
-
-  BLE.addService(systemService);
-  BLE.addService(gpsService);
-  BLE.addService(mpuService);
-
-  BLE.advertise();
-}
-
 void ConnectHandler(BLEDevice central) {
   // central connected event handler
 

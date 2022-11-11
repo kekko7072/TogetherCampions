@@ -48,13 +48,6 @@ class TrackMapState extends State<TrackMap> {
     polylinePoints.add(widget.gpsPositions.last.latLng);
   }
 
-  Timer timer() =>
-      movePosition = Timer.periodic(const Duration(seconds: 5), (timer) {
-        _zoomPanBehavior
-          ..focalLatLng = widget.gpsPositions.last.latLng
-          ..zoomLevel = 17;
-      });
-
   @override
   void dispose() {
     movePosition.cancel();
