@@ -89,9 +89,6 @@ export 'package:app/models/telemetry_analytics.dart';
 
 ///SERVICES
 export 'package:app/services/database_session.dart';
-export '../../services/session/database_gps.dart';
-export 'package:app/services/session/database_mpu.dart';
-export 'package:app/services/session/database_system.dart';
 export 'package:app/services/database_user.dart';
 export 'package:app/services/database_device.dart';
 export 'package:app/services/auth.dart';

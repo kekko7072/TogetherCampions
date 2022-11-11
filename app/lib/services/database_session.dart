@@ -89,8 +89,6 @@ class DatabaseSession {
   }
 
   Future<bool> uploadFile({required SessionFile sessionFile}) async {
-    print("DEVICEID: $deviceID");
-
     ///1. Create Session
     await DatabaseSession(deviceID: deviceID).add(
         session: Session(
@@ -107,7 +105,17 @@ class DatabaseSession {
         .child("devices/$deviceID/${sessionFile.sessionId}.json");
 
     try {
-      await islandRef.putFile(file);
+      final metadata = SettableMetadata(
+        contentType: 'data/json',
+        //customMetadata: {'picked-file-path': file.path},
+      );
+
+      if (kIsWeb) {
+        await islandRef.putData(await file.readAsBytes(), metadata);
+      } else {
+        await islandRef.putFile(file, metadata);
+      }
+
       return true;
     } on FirebaseException catch (e) {
       debugPrint("ERROR: $e");
