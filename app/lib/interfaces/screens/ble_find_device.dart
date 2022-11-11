@@ -1,3 +1,5 @@
+import 'package:flutter/cupertino.dart';
+
 import '../../services/imports.dart';
 
 class BLEFindDevices extends StatefulWidget {
@@ -13,6 +15,7 @@ class _BLEFindDevicesState extends State<BLEFindDevices> {
   @override
   Widget build(BuildContext context) {
     final unitSystem = Provider.of<UnitsSystem>(context);
+    final userData = Provider.of<UserData?>(context);
 
     return Scaffold(
       body: RefreshIndicator(
@@ -61,63 +64,6 @@ class _BLEFindDevicesState extends State<BLEFindDevices> {
                 ),
               ),
               if (model.text == kDeviceModelTKR1A1) ...[
-                StreamBuilder<List<BluetoothDevice>>(
-                  stream: Stream.periodic(const Duration(seconds: 2)).asyncMap(
-                      (_) => FlutterBluePlus.instance.connectedDevices),
-                  initialData: const [],
-                  builder: (c, snapshot) => Column(
-                    children: snapshot.data!
-                        .where((element) => element.name == model.text)
-                        .map((d) => StreamBuilder<Device>(
-                            stream:
-                                DatabaseDevice().device(id: d.id.toString()),
-                            builder: (context, snapshot) {
-                              if (snapshot.hasError) {
-                                return Text('Error: ${snapshot.error}');
-                              }
-
-                              if (!snapshot.hasData) {
-                                return const Text("Device not found");
-                              }
-                              final device = snapshot.data!;
-                              return ListTile(
-                                leading: Image(
-                                  image: AssetImage(
-                                    'assets/${d.name}.png',
-                                  ),
-                                  fit: BoxFit.cover,
-                                  height: 150,
-                                ),
-                                title: Text(d.name),
-                                subtitle: Text(d.id.toString()),
-                                trailing: StreamBuilder<BluetoothDeviceState>(
-                                  stream: d.state,
-                                  initialData:
-                                      BluetoothDeviceState.disconnected,
-                                  builder: (c, snapshot) {
-                                    if (snapshot.data ==
-                                        BluetoothDeviceState.connected) {
-                                      return ElevatedButton(
-                                        child: const Text('OPEN'),
-                                        onPressed: () => Navigator.of(context)
-                                            .push(MaterialPageRoute(
-                                                builder: (context) =>
-                                                    TrackBLEScreen(
-                                                      deviceBLE: d,
-                                                      //TODO ANDROID SHOW A LIST OF DEVICE IDS AND SELECT ONE
-                                                      deviceID: "device",
-                                                      unitsSystem: unitSystem,
-                                                    ))),
-                                      );
-                                    }
-                                    return Text(snapshot.data.toString());
-                                  },
-                                ),
-                              );
-                            }))
-                        .toList(),
-                  ),
-                ),
                 if (Platform.isAndroid) ...[
                   StreamBuilder<List<ScanResult>>(
                       stream: FlutterBluePlus.instance.scanResults,
@@ -128,32 +74,87 @@ class _BLEFindDevicesState extends State<BLEFindDevices> {
                                   element.device.name == model.text)
                               .map((r) => ScanResultTile(
                                     result: r,
-                                    onTap: () async {
-                                      try {
-                                        if (!connecting) {
-                                          setState(() => connecting = true);
-                                          EasyLoading.show();
-                                          await r.device.connect();
-                                          setState(() => connecting = false);
-                                          EasyLoading.dismiss().then((value) =>
-                                              Navigator.of(context).push(
-                                                  MaterialPageRoute(
-                                                      builder: (context) {
-                                                return TrackBLEScreen(
-                                                  deviceBLE: r.device,
-                                                  unitsSystem: unitSystem,
-                                                  deviceID: '',
-                                                );
-                                              })));
-                                        }
-                                      } catch (e) {
-                                        EasyLoading.showError(e.toString());
-                                      }
-                                    },
+                                    onTap: () => showDialog(
+                                        context: context,
+                                        builder: (_) => CupertinoAlertDialog(
+                                              title: const Text(
+                                                  'Select device id'),
+                                              content: StreamBuilder<
+                                                      List<Device>>(
+                                                  stream: DatabaseDevice()
+                                                      .allDevices(
+                                                          uid: userData!.uid),
+                                                  builder: (context, snapshot) {
+                                                    if (snapshot.hasError) {
+                                                      return Text(
+                                                          "Error: ${snapshot.error}");
+                                                    }
+                                                    if (!snapshot.hasData) {
+                                                      return const Text(
+                                                          "No device found");
+                                                    }
+                                                    List<Device> devices =
+                                                        snapshot.data!;
+                                                    return SizedBox(
+                                                      height:
+                                                          (50 * devices.length)
+                                                              .toDouble(),
+                                                      child: ListView.builder(
+                                                          itemCount:
+                                                              devices.length,
+                                                          itemBuilder:
+                                                              (_, index) =>
+                                                                  ListTile(
+                                                                    title: Text(
+                                                                        devices[index]
+                                                                            .name),
+                                                                    subtitle:
+                                                                        Text(
+                                                                      devices[index]
+                                                                          .serialNumber,
+                                                                    ),
+                                                                    trailing: IconButton(
+                                                                        onPressed: () async {
+                                                                          try {
+                                                                            if (!connecting) {
+                                                                              setState(() => connecting = true);
+                                                                              EasyLoading.show();
+                                                                              await r.device.connect();
+                                                                              setState(() => connecting = false);
+                                                                              EasyLoading.dismiss().then((value) => Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+                                                                                    return TrackBLEScreen(
+                                                                                      deviceBLE: r.device,
+                                                                                      unitsSystem: unitSystem,
+                                                                                      device: devices[index],
+                                                                                    );
+                                                                                  })));
+                                                                            }
+                                                                          } catch (e) {
+                                                                            EasyLoading.showError(e.toString());
+                                                                          }
+                                                                        },
+                                                                        icon: Icon(
+                                                                          CupertinoIcons
+                                                                              .arrow_right_circle_fill,
+                                                                          color:
+                                                                              AppStyle.primaryColor,
+                                                                        )),
+                                                                  )),
+                                                    );
+                                                  }),
+                                              actions: [
+                                                CupertinoDialogAction(
+                                                  isDestructiveAction: true,
+                                                  onPressed: () =>
+                                                      Navigator.of(context)
+                                                          .pop(),
+                                                  child: const Text('Cancel'),
+                                                )
+                                              ],
+                                            )),
                                   ))
                               .toList()))
                 ] else ...[
-                  ///STREAM NOT WORKING ON ANDOIRD
                   StreamBuilder<List<ScanResult>>(
                     stream: FlutterBluePlus.instance.scanResults,
                     initialData: const [],
@@ -182,8 +183,7 @@ class _BLEFindDevicesState extends State<BLEFindDevices> {
                                               return TrackBLEScreen(
                                                   deviceBLE: r.device,
                                                   unitsSystem: unitSystem,
-                                                  deviceID:
-                                                      device.serialNumber);
+                                                  device: device);
                                             }))),
                                   );
                                 }),
