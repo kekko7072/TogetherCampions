@@ -27,17 +27,6 @@ class UploadSessionDialog extends StatefulWidget {
 
 class _UploadSessionDialogState extends State<UploadSessionDialog> {
   bool showUploading = false;
-  int progress = 0;
-  int totalProgress = 0;
-  @override
-  void initState() {
-    super.initState();
-    totalProgress = widget.system.length +
-        widget.gpsPosition.length +
-        widget.gpsNavigation.length +
-        widget.accelerometer.length +
-        widget.gyroscope.length;
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -48,15 +37,9 @@ class _UploadSessionDialogState extends State<UploadSessionDialog> {
       content: Column(
         children: [
           if (showUploading) ...[
-            Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 15.0),
-                  child: CircularProgressIndicator(),
-                ),
-                Text("Progress: $progress/$totalProgress"),
-              ],
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 15.0),
+              child: CircularProgressIndicator(),
             )
           ] else ...[
             Text('System log: ${widget.system.length}'),

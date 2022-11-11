@@ -40,8 +40,6 @@ void setup() {
 
   BLE.setDeviceName("TKR1A1");  //Setting a name that will appear when scanning for Bluetooth® devices
   BLE.setLocalName("TKR1A1");
-  byte data[19] = { 0x00, 0x00, 0x46, 0x72, 0x61, 0x6e, 0x63, 0x65, 0x73, 0x63, 0x6f, 0x20, 0x56, 0x65, 0x7a, 0x7a, 0x61, 0x6e, 0x69 };
-  BLE.setManufacturerData(data, 19);
 
   BLE.setAdvertisedService(systemService);
   BLE.setAdvertisedService(gpsService);
@@ -59,8 +57,8 @@ void setup() {
 
   BLE.advertise();
 
-  BLE.setEventHandler(BLEConnected, ConnectHandler);
-  BLE.setEventHandler(BLEDisconnected, DisconnectHandler);
+  //BLE.setEventHandler(BLEConnected, ConnectHandler);
+  //BLE.setEventHandler(BLEDisconnected, DisconnectHandler);
 
   //MPU-6050
   setupMPU();
@@ -73,28 +71,39 @@ void setup() {
 }
 
 void loop() {
-  BLE.poll();
+  // wait for a Bluetooth® Low Energy central
+  BLEDevice central = BLE.central();
 
-  long currentMillis = millis();
+  // if a central is connected to the peripheral:
+  if (central) {
+    Serial.print("Connected to central: ");
+    // print the central's BT address:
+    Serial.println(central.address());
 
-  while (Serial1.available() > 0) {
-    gps.encode(Serial1.read());
-    //Serial.println("@: GPSA AVAILABLE");
-    //Serial.write(Serial1.read());
-  }
+    // check the battery level every 200ms
+    // while the central is connected:
+    while (central.connected()) {  //BLE.poll();
 
-  //mpu.getEvent(&a, &g, &temp);
+      long currentMillis = millis();
 
-  if (currentMillis - previousMillis >= measurements_milliseconds) {
-    //System
-    updateSystem(systemCharacteristic);
+      while (Serial1.available() > 0) {
+        gps.encode(Serial1.read());
+      }
 
-    //GPS
-    updateGPS(poitionCharacteristic, navigationCharacteristic, gps, magneticVariation);
+      //mpu.getEvent(&a, &g, &temp);
 
-    //MPU
-    updateMPU(accelerometerCharacteristic, gyroscopeCharacteristic);
+      if (currentMillis - previousMillis >= measurements_milliseconds) {
+        //System
+        updateSystem(systemCharacteristic);
 
-    previousMillis = currentMillis;  //Clean to re-run cicle
+        //GPS
+        updateGPS(poitionCharacteristic, navigationCharacteristic, gps, magneticVariation);
+
+        //MPU
+        updateMPU(accelerometerCharacteristic, gyroscopeCharacteristic);
+
+        previousMillis = currentMillis;  //Clean to re-run cicle
+      }
+    }
   }
 }
