@@ -32,7 +32,6 @@ class _AddSessionState extends State<AddSession> {
   PlatformFile? file;
   List<String> value = [];
   int progress = 0;
-  String deviceID = '';
 
   int totalProgress = 0;
 
@@ -74,39 +73,7 @@ class _AddSessionState extends State<AddSession> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   const SizedBox(height: 10),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      FilterChip(
-                          backgroundColor:
-                              isLocal ? AppStyle.primaryColor : Colors.black12,
-                          label: Text(
-                            'LOCAL FILE',
-                            style: TextStyle(
-                                fontWeight: isLocal
-                                    ? FontWeight.bold
-                                    : FontWeight.normal,
-                                color: Colors.white),
-                          ),
-                          onSelected: (value) =>
-                              setState(() => isLocal = true)),
-                      const SizedBox(width: 20),
-                      FilterChip(
-                          backgroundColor:
-                              !isLocal ? AppStyle.primaryColor : Colors.black12,
-                          label: Text(
-                            'SD CARD',
-                            style: TextStyle(
-                                fontWeight: !isLocal
-                                    ? FontWeight.bold
-                                    : FontWeight.normal,
-                                color: Colors.white),
-                          ),
-                          onSelected: (value) =>
-                              setState(() => isLocal = false)),
-                    ],
-                  ),
-                  Wrap(
+                  /*  Wrap(
                     alignment: WrapAlignment.start,
                     direction: Axis.horizontal,
                     spacing: 5,
@@ -133,7 +100,7 @@ class _AddSessionState extends State<AddSession> {
                       ],
                     ],
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 20),*/
                   if (isLocal) ...[
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -187,24 +154,20 @@ class _AddSessionState extends State<AddSession> {
                               try {
                                 EasyLoading.show();
 
-                                var url = Uri.http(
-                                    "together-champions.ew.r.appspot.com",
-                                    '/upload');
-                                var response = await post(url,
-                                    headers: {
-                                      "Content-Type": "application/json",
-                                      // "Authorization": "Bearer iasUSnalspwoid@asw",
-                                      "Access-Control-Allow-Origin": "*",
-                                    },
-                                    body: json.encode(json.decode(
-                                        String.fromCharCodes(
-                                            await File(file!.path!)
-                                                .readAsBytes()))));
+                                SessionFile sessionFile = SessionFile.fromJson(
+                                    json.decode(String.fromCharCodes(
+                                        await File(file!.path!)
+                                            .readAsBytes())));
+
+                                bool success = await DatabaseSession(
+                                        deviceID: sessionFile.deviceId)
+                                    .uploadFile(sessionFile: sessionFile);
+
                                 EasyLoading.dismiss();
-                                debugPrint("RESPONSE: ${response.body}");
-                                if (response.statusCode == 200) {
+
+                                if (success) {
                                   EasyLoading.showSuccess(
-                                      "Session uploaded to server!It will take some time processing...");
+                                      "Session uploaded to server!");
                                   Navigator.of(context).pop();
                                 }
                               } catch (e) {
@@ -212,130 +175,6 @@ class _AddSessionState extends State<AddSession> {
                                 print(e);
                               }
                             },
-                      child: const Text(
-                        'Upload',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                  ] else ...[
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 5.0, horizontal: 20),
-                      child: TextFormField(
-                        controller: name,
-                        textAlign: TextAlign.center,
-                        decoration: AppStyle().kTextFieldDecoration(
-                            icon: Icons.label, hintText: 'Enter title'),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(left: 20.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const Text(
-                            'Inizio sessione: ',
-                          ),
-                          CupertinoButton(
-                            child: Text(
-                                '${start.hour}:${start.minute}   ${start.day}/${start.month}/${start.year}'),
-                            onPressed: () async {
-                              DateTime value = await _selectDateTime(
-                                  context: context, input: start);
-                              setState(() {
-                                start = value;
-                              });
-                            },
-                          ),
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    CupertinoButton.filled(
-                      onPressed: () async {
-                        result = await FilePicker.platform.pickFiles(
-                          dialogTitle:
-                              'Seleziona il file datalog.txt dalla sd card',
-                          type: FileType.custom,
-                          allowedExtensions: ["txt"], //tkrlg
-                        );
-
-                        if (result != null) {
-                          EasyLoading.show();
-                          file = result!.files.first;
-                          debugPrint(
-                              "PATH: ${file!.path}\nNAME: ${file!.name}\nEXTENSION: ${file!.extension}\nSIZE: ${file!.size}\nBYTES AVAILABLE: ${file!.bytes != null}");
-                          if (file!.bytes != null) {
-                            String convertedValue =
-                                String.fromCharCodes(file!.bytes!);
-                            setState(() => value = convertedValue.split(","));
-                          } else {
-                            String convertedValue = String.fromCharCodes(
-                                await File(file!.path!).readAsBytes());
-                            setState(() => value = convertedValue.split(","));
-                          }
-
-                          debugPrint("LOGS: ${value.length}");
-                          EasyLoading.dismiss();
-                        } else {
-                          debugPrint("User cancelled");
-                        }
-                      },
-                      child: const Text('Select file'),
-                    ),
-                    const SizedBox(height: 10),
-                    Text('N° Log: ${value.length}'),
-                    const SizedBox(height: 10),
-                    CupertinoButton.filled(
-                      onPressed: () async {
-                        setState(() => showLoading = true);
-
-                        for (progress = 0;
-                            progress < value.length;
-                            progress++) {
-                          String body =
-                              CalculationService.formatOutputWithNewTimestamp(
-                                  input: value[progress], start: start);
-                          Uri url = Uri.https(kServerAddress, 'post',
-                              {'serialNumber': deviceID});
-                          var response = await post(
-                            url,
-                            headers: {
-                              "Content-Type":
-                                  "application/x-www-form-urlencoded"
-                            }, //CLOCK AND FREQUENCY ARE NOW SAVED DIRECTLY ON SD CARD, before clock=6&frequency=10
-                            body: body,
-                          );
-                          debugPrint(
-                              'RESPONSE\nStatus: ${response.statusCode}\nBody: ${response.body}');
-                          if (response.statusCode == 200) {
-                            //OK GO ON
-                            setState(() => ++progress);
-                          } else {
-                            //RETRY WITH SAME LOG
-                            setState(() => --progress);
-                          }
-                        }
-
-                        //TODO DECIDE HOW FORMAT DATA FROM SD CARD AND UPLOAD SESSION AND OOTHER TELEMETRY ETCC..
-                        /* await DatabaseUser.sessionCreateRemove(
-                                isCreate: true,
-                                uid: widget.userData.uid,
-                                session: Session(
-                                    name: name.text,
-                                    start: start,
-                                    end: CalculationService.getLastNewTimestamp(
-                                        lastInput: value
-                                            .where((element) =>
-                                                element.contains("timestamp="))
-                                            .last,
-                                        start: start),
-                                    deviceID: deviceID))
-                            .then((value) {
-                          setState(() => showLoading = false);
-                          Navigator.of(context).pop();
-                        });*/
-                      },
                       child: const Text(
                         'Upload',
                         style: TextStyle(fontWeight: FontWeight.bold),
@@ -350,7 +189,7 @@ class _AddSessionState extends State<AddSession> {
       ),
     );
   }
-
+/*
   Future<DateTime> _selectDate(
       {required BuildContext context, required DateTime placeholder}) async {
     final selected = await showDatePicker(
@@ -395,5 +234,5 @@ class _AddSessionState extends State<AddSession> {
       time.hour,
       time.minute,
     );
-  }
+  }*/
 }

@@ -5,7 +5,7 @@ import 'package:intl/intl.dart';
 class UploadSessionDialog extends StatefulWidget {
   const UploadSessionDialog({
     Key? key,
-    required this.device,
+    required this.deviceID,
     required this.devicePosition,
     required this.system,
     required this.gpsPosition,
@@ -13,7 +13,7 @@ class UploadSessionDialog extends StatefulWidget {
     required this.accelerometer,
     required this.gyroscope,
   }) : super(key: key);
-  final BluetoothDevice device;
+  final String deviceID;
   final DevicePosition devicePosition;
   final List<System> system;
   final List<GpsPosition> gpsPosition;
@@ -110,7 +110,7 @@ class _UploadSessionDialogState extends State<UploadSessionDialog> {
               }
 
               Map<String, dynamic> content = {
-                "deviceID": widget.device.id.toString(),
+                "deviceID": widget.deviceID.toString(),
                 "sessionID": sessionID,
                 "info": {
                   "name": DateFormat.yMd()
@@ -162,60 +162,27 @@ class _UploadSessionDialogState extends State<UploadSessionDialog> {
             try {
               setState(() => showUploading = true);
 
-              ///1. Create Session
-              await DatabaseSession(deviceID: widget.device.id.id).add(
-                  session: Session(
-                      id: sessionID,
-                      info: SessionInfo(
-                          name: DateFormat('dd/MM/yyyy')
-                              .add_Hms()
-                              .format(DateTime.now())
-                              .toString(),
-                          start: DateTime.now().subtract(Duration(
-                              milliseconds: widget.system.last.timestamp)),
-                          end: DateTime.now()),
-                      devicePosition: widget.devicePosition));
+              bool success = await DatabaseSession(deviceID: widget.deviceID)
+                  .uploadFile(
+                      sessionFile: SessionFile(
+                          deviceId: widget.deviceID,
+                          sessionId: sessionID,
+                          info: SessionInfo(
+                              name: DateFormat('dd/MM/yyyy')
+                                  .add_Hms()
+                                  .format(DateTime.now())
+                                  .toString(),
+                              start: DateTime.now().subtract(Duration(
+                                  milliseconds: widget.system.last.timestamp)),
+                              end: DateTime.now()),
+                          devicePosition: widget.devicePosition,
+                          system: widget.system,
+                          gpsPosition: widget.gpsPosition,
+                          gpsNavigation: widget.gpsNavigation,
+                          accelerometer: widget.accelerometer,
+                          gyroscope: widget.gyroscope));
 
-              ///1. Add System
-              for (System sys in widget.system) {
-                setState(() => ++progress);
-                await DatabaseSystem(
-                        deviceID: widget.device.id.toString(),
-                        sessionID: sessionID)
-                    .add(sys);
-              }
-
-              ///2. Add Gps
-              for (GpsPosition gps in widget.gpsPosition) {
-                setState(() => ++progress);
-                await DatabaseGpsPosition(
-                        deviceID: widget.device.id.toString(),
-                        sessionID: sessionID)
-                    .add(gps);
-              }
-              for (GpsNavigation gps in widget.gpsNavigation) {
-                setState(() => ++progress);
-                await DatabaseGpsNavigation(
-                        deviceID: widget.device.id.toString(),
-                        sessionID: sessionID)
-                    .add(gps);
-              }
-
-              ///3. Add Mpu
-              for (Accelerometer mpu in widget.accelerometer) {
-                setState(() => ++progress);
-                await DatabaseAccelerometer(
-                        deviceID: widget.device.id.toString(),
-                        sessionID: sessionID)
-                    .add(mpu);
-              }
-              for (Gyroscope mpu in widget.gyroscope) {
-                setState(() => ++progress);
-                await DatabaseGyroscope(
-                        deviceID: widget.device.id.toString(),
-                        sessionID: sessionID)
-                    .add(mpu);
-              }
+              debugPrint("SUCCESS: $success");
             } catch (e) {
               debugPrint(
                   "\n\n\n\n\n\n\n\n\n\n\n\nERRRORRR: $e\n\n\n\n\n\n\n\n\n\n\n\n");

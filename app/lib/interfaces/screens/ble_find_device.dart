@@ -104,7 +104,8 @@ class _BLEFindDevicesState extends State<BLEFindDevices> {
                                                 builder: (context) =>
                                                     TrackBLEScreen(
                                                       deviceBLE: d,
-                                                      //device: device,
+                                                      //TODO ANDROID SHOW A LIST OF DEVICE IDS AND SELECT ONE
+                                                      deviceID: "device",
                                                       unitsSystem: unitSystem,
                                                     ))),
                                       );
@@ -117,68 +118,80 @@ class _BLEFindDevicesState extends State<BLEFindDevices> {
                         .toList(),
                   ),
                 ),
-                StreamBuilder<List<ScanResult>>(
-                  stream: FlutterBluePlus.instance.scanResults,
-                  initialData: const [],
-                  builder: (c, snapshot) => Column(
-                    children: snapshot.data!
-                        .where((element) => element.device.name == model.text)
-                        .map((r) => ScanResultTile(
-                                  result: r,
-                                  onTap: () async {
-                                    try {
-                                      if (!connecting) {
-                                        setState(() => connecting = true);
-                                        EasyLoading.show();
-                                        await r.device.connect();
-                                        setState(() => connecting = false);
-                                        EasyLoading.dismiss().then((value) =>
-                                            Navigator.of(context).push(
-                                                MaterialPageRoute(
+                if (Platform.isAndroid) ...[
+                  StreamBuilder<List<ScanResult>>(
+                      stream: FlutterBluePlus.instance.scanResults,
+                      initialData: const [],
+                      builder: (c, snapshot) => Column(
+                          children: snapshot.data!
+                              .where((element) =>
+                                  element.device.name == model.text)
+                              .map((r) => ScanResultTile(
+                                    result: r,
+                                    onTap: () async {
+                                      try {
+                                        if (!connecting) {
+                                          setState(() => connecting = true);
+                                          EasyLoading.show();
+                                          await r.device.connect();
+                                          setState(() => connecting = false);
+                                          EasyLoading.dismiss().then((value) =>
+                                              Navigator.of(context).push(
+                                                  MaterialPageRoute(
+                                                      builder: (context) {
+                                                return TrackBLEScreen(
+                                                  deviceBLE: r.device,
+                                                  unitsSystem: unitSystem,
+                                                  deviceID: '',
+                                                );
+                                              })));
+                                        }
+                                      } catch (e) {
+                                        EasyLoading.showError(e.toString());
+                                      }
+                                    },
+                                  ))
+                              .toList()))
+                ] else ...[
+                  ///STREAM NOT WORKING ON ANDOIRD
+                  StreamBuilder<List<ScanResult>>(
+                    stream: FlutterBluePlus.instance.scanResults,
+                    initialData: const [],
+                    builder: (c, snapshot) => Column(
+                      children: snapshot.data!
+                          .where((element) => element.device.name == model.text)
+                          .map(
+                            (r) => StreamBuilder<Device>(
+                                stream: DatabaseDevice()
+                                    .device(id: r.device.id.toString()),
+                                builder: (context, snapshot) {
+                                  if (snapshot.hasError) {
+                                    return Text('Error: ${snapshot.error}');
+                                  }
+                                  if (!snapshot.hasData) {
+                                    return const Text("Device not found");
+                                  }
+                                  final device = snapshot.data!;
+                                  return ScanResultTile(
+                                    result: r,
+                                    onTap: () async => await r.device
+                                        .connect()
+                                        .then((value) => Navigator.of(context)
+                                                .push(MaterialPageRoute(
                                                     builder: (context) {
                                               return TrackBLEScreen(
-                                                deviceBLE: r.device,
-                                                unitsSystem: unitSystem,
-                                              );
-                                            })));
-                                      }
-                                    } catch (e) {
-                                      EasyLoading.showError(e.toString());
-                                    }
-                                  },
-                                ) /*
-
-                          ///STREAM NOT WORKING ON ANDOIRD
-                          StreamBuilder<Device>(
-                              stream: DatabaseDevice()
-                                  .device(id: r.device.id.toString()),
-                              builder: (context, snapshot) {
-                                if (snapshot.hasError) {
-                                  return Text('Error: ${snapshot.error}');
-                                }
-                                print('DEVICE:\n\n\n\n\n\n${r}');
-                                if (!snapshot.hasData) {
-                                  return const Text("Device not found");
-                                }
-                                final device = snapshot.data!;
-                                return ScanResultTile(
-                                  result: r,
-                                  onTap: () async => await r.device
-                                      .connect()
-                                      .then((value) => Navigator.of(context)
-                                              .push(MaterialPageRoute(
-                                                  builder: (context) {
-                                            return BLEDeviceScreen(
-                                                deviceBLE: r.device,
-                                                unitsSystem: unitSystem,
-                                                device: device);
-                                          }))),
-                                );
-                              }),*/
-                            )
-                        .toList(),
+                                                  deviceBLE: r.device,
+                                                  unitsSystem: unitSystem,
+                                                  deviceID:
+                                                      device.serialNumber);
+                                            }))),
+                                  );
+                                }),
+                          )
+                          .toList(),
+                    ),
                   ),
-                ),
+                ]
               ] else if (model.text == kDeviceModelTKR1B1) ...[
                 ///STREAM FROM SERVER
               ]

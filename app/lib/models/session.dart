@@ -59,8 +59,8 @@ class DevicePosition {
       };
 }
 
-class SessionUpload {
-  SessionUpload({
+class SessionFile {
+  SessionFile({
     required this.deviceId,
     required this.sessionId,
     required this.info,
@@ -82,7 +82,7 @@ class SessionUpload {
   List<Accelerometer> accelerometer;
   List<Gyroscope> gyroscope;
 
-  factory SessionUpload.fromJson(Map<String, dynamic> json) => SessionUpload(
+  factory SessionFile.fromJson(Map<String, dynamic> json) => SessionFile(
         deviceId: json["deviceID"],
         sessionId: json["sessionID"],
         info: SessionInfo.fromJson(json["info"]),

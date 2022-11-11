@@ -1,3 +1,5 @@
+import 'package:intl/intl.dart';
+
 import 'imports.dart';
 
 class DatabaseSession {
@@ -28,7 +30,7 @@ class DatabaseSession {
   }
 
   Future edit({required Session session}) async {
-    return await sessionCollection.doc(session.id).set({
+    return await sessionCollection.doc(session.id).update({
       'info': {
         'name': session.info.name,
         'start': session.info.start,
@@ -43,40 +45,74 @@ class DatabaseSession {
   }
 
   Future delete({required String id}) async {
-    var systems = await DatabaseSystem(deviceID: deviceID, sessionID: id)
-        .collection
-        .get();
-    for (var element in systems.docs) {
-      await element.reference.delete();
-    }
-    var gpsPosition =
-        await DatabaseGpsPosition(deviceID: deviceID, sessionID: id)
-            .collection
-            .get();
-    for (var element in gpsPosition.docs) {
-      await element.reference.delete();
-    }
-    var gpsNavigation =
-        await DatabaseGpsNavigation(deviceID: deviceID, sessionID: id)
-            .collection
-            .get();
-    for (var element in gpsNavigation.docs) {
-      await element.reference.delete();
-    }
-    var accelerometer =
-        await DatabaseAccelerometer(deviceID: deviceID, sessionID: id)
-            .collection
-            .get();
-    for (var element in accelerometer.docs) {
-      await element.reference.delete();
-    }
-    var gyroscope = await DatabaseGyroscope(deviceID: deviceID, sessionID: id)
-        .collection
-        .get();
-    for (var element in gyroscope.docs) {
-      await element.reference.delete();
-    }
+    final islandRef =
+        FirebaseStorage.instance.ref().child("devices/$deviceID/$id.json");
+
+// Delete the file
+    await islandRef.delete();
+
     return await sessionCollection.doc(id).delete();
+  }
+
+  Future<String> downloadFile({required String sessionID}) async {
+    final islandRef = FirebaseStorage.instance
+        .ref()
+        .child("devices/$deviceID/$sessionID.json");
+
+    final Directory directory = await getApplicationDocumentsDirectory();
+    final File file =
+        File('${directory.path}/devices/$deviceID/$sessionID.json');
+    // await file.writeAsString(jsonEncode(content));
+
+    final downloadTask = islandRef.writeToFile(file);
+
+    downloadTask.snapshotEvents.listen((taskSnapshot) {
+      print(taskSnapshot);
+      switch (taskSnapshot.state) {
+        case TaskState.running:
+          // TODO: Handle this case.
+          break;
+        case TaskState.paused:
+          // TODO: Handle this case.
+          break;
+        case TaskState.success:
+          break;
+        case TaskState.canceled:
+          // TODO: Handle this case.
+          break;
+        case TaskState.error:
+          // TODO: Handle this case.
+          break;
+      }
+    });
+    return await file.readAsString();
+  }
+
+  Future<bool> uploadFile({required SessionFile sessionFile}) async {
+    print("DEVICEID: $deviceID");
+
+    ///1. Create Session
+    await DatabaseSession(deviceID: deviceID).add(
+        session: Session(
+            id: sessionFile.sessionId,
+            info: sessionFile.info,
+            devicePosition: sessionFile.devicePosition));
+
+    final Directory directory = await getApplicationDocumentsDirectory();
+    final File file = File('${directory.path}/${sessionFile.sessionId}.json');
+    await file.writeAsString(jsonEncode(sessionFile.toJson()));
+
+    final islandRef = FirebaseStorage.instance
+        .ref()
+        .child("devices/$deviceID/${sessionFile.sessionId}.json");
+
+    try {
+      await islandRef.putFile(file);
+      return true;
+    } on FirebaseException catch (e) {
+      debugPrint("ERROR: $e");
+      return false;
+    }
   }
 
   ///SERIALIZATION

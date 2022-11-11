@@ -5,14 +5,15 @@ class TrackBLEScreen extends StatefulWidget {
   const TrackBLEScreen(
       {Key? key,
       required this.deviceBLE,
-      //required this.device,
+      required this.deviceID,
       required this.unitsSystem})
       : super(key: key);
 
   final BluetoothDevice deviceBLE;
 
   ///Not working on ANDROID
-  // final Device device;
+
+  final String deviceID;
   final UnitsSystem unitsSystem;
 
   @override
@@ -213,7 +214,7 @@ class _TrackBLEScreenState extends State<TrackBLEScreen> {
                                         .then((value) => showCupertinoDialog(
                                             context: context,
                                             builder: (_) => UploadSessionDialog(
-                                                  device: widget.deviceBLE,
+                                                  deviceID: widget.deviceID,
                                                   devicePosition:
                                                       DevicePosition(
                                                           x: 0, y: 0, z: 0),

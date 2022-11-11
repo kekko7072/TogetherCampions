@@ -20,23 +20,19 @@ class CardSession extends StatelessWidget {
   Widget build(BuildContext context) {
     final unitSystem = Provider.of<UnitsSystem>(context);
 
-    return StreamBuilder4<List<GpsPosition>, List<GpsNavigation>,
-            List<Accelerometer>, List<Gyroscope>>(
-        streams: StreamTuple4(
-            DatabaseGpsPosition(deviceID: deviceID, sessionID: session.id)
-                .streamList,
-            DatabaseGpsNavigation(deviceID: deviceID, sessionID: session.id)
-                .streamList,
-            DatabaseAccelerometer(deviceID: deviceID, sessionID: session.id)
-                .streamList,
-            DatabaseGyroscope(deviceID: deviceID, sessionID: session.id)
-                .streamList),
+    return FutureBuilder<SessionFile>(
+        future: DatabaseSession(deviceID: deviceID)
+            .downloadFile(sessionID: session.id)
+            .then((value) => SessionFile.fromJson(jsonDecode(value))),
         builder: (context, snapshot) {
-          List<GpsPosition>? gpsPosition = snapshot.snapshot1.data;
-          List<GpsNavigation>? gpsNavigation = snapshot.snapshot2.data;
-          List<Accelerometer>? accelerometer = snapshot.snapshot3.data;
-          List<Gyroscope>? gyroscope = snapshot.snapshot4.data;
+          if (snapshot.hasError) {
+            debugPrint("ERROR: ${snapshot.error}");
+          }
 
+          List<GpsPosition>? gpsPosition = snapshot.data?.gpsPosition;
+          List<GpsNavigation>? gpsNavigation = snapshot.data?.gpsNavigation;
+          List<Accelerometer>? accelerometer = snapshot.data?.accelerometer;
+          List<Gyroscope>? gyroscope = snapshot.data?.gyroscope;
           return Padding(
             padding: const EdgeInsets.all(5.0),
             child: Container(
@@ -156,28 +152,28 @@ class CardSession extends StatelessWidget {
                                     ],
                                   ),
                                   /*
-                                //REMOVED BECAUSE REQUIRE STREAM OF HEAVY OBJECT
-                                const SizedBox(height: 5),
-                                Row(
-                                  children: [
-                                    const Icon(
-                                      CupertinoIcons.map,
-                                      color: Colors.white70,
-                                      size: 20,
-                                    ),
-                                    const SizedBox(width: 10),
-                                    Text(
-                                      '${UnitsService.distanceUnitsConvertFromMETER(unitSystem.distanceUnits, CalculationService.telemetry(
-                                            gpsPosition: widget.gpsPosition,
-                                            gpsNavigation: widget.gpsNavigation,
-                                            segment: polylinePoints,
-                                          ).distance).toStringAsFixed(2)} ${UnitsService.distanceUnitsToString(unitSystem.distanceUnits)}',
-                                      style: const TextStyle(
-                                        color: Colors.white70,
-                                      ),
-                                    ),
-                                  ],
-                                ),*/
+                                    //REMOVED BECAUSE REQUIRE STREAM OF HEAVY OBJECT
+                                    const SizedBox(height: 5),
+                                    Row(
+                                      children: [
+                                        const Icon(
+                                          CupertinoIcons.map,
+                                          color: Colors.white70,
+                                          size: 20,
+                                        ),
+                                        const SizedBox(width: 10),
+                                        Text(
+                                          '${UnitsService.distanceUnitsConvertFromMETER(unitSystem.distanceUnits, CalculationService.telemetry(
+                                                gpsPosition: widget.gpsPosition,
+                                                gpsNavigation: widget.gpsNavigation,
+                                                segment: polylinePoints,
+                                              ).distance).toStringAsFixed(2)} ${UnitsService.distanceUnitsToString(unitSystem.distanceUnits)}',
+                                          style: const TextStyle(
+                                            color: Colors.white70,
+                                          ),
+                                        ),
+                                      ],
+                                    ),*/
                                 ],
                               ),
                             ),
@@ -186,9 +182,7 @@ class CardSession extends StatelessWidget {
                               gpsPosition.isNotEmpty) ...[
                             Expanded(
                               flex: 2,
-                              child: TrackPreview(
-                                gps: snapshot.snapshot1.data!,
-                              ),
+                              child: TrackPreview(gps: gpsPosition),
                             )
                           ] else ...[
                             Expanded(
