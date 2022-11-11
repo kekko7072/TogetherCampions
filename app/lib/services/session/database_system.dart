@@ -33,8 +33,13 @@ class DatabaseSystem {
   }
 
   static List<System> servicesListFromSnapshot(
-          QuerySnapshot<Map<String, dynamic>> snapshot) =>
-      snapshot.docs.map((snapshot) => serviceFromSnapshot(snapshot)).toList();
+      QuerySnapshot<Map<String, dynamic>> snapshot) {
+    List<System> value =
+        snapshot.docs.map((snapshot) => serviceFromSnapshot(snapshot)).toList();
+
+    value.sort((a, b) => a.timestamp.compareTo(b.timestamp));
+    return value;
+  }
 
   ///STREAMS
   Stream<System> singleTelemetry({required String telemetryID}) =>

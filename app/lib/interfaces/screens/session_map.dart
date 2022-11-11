@@ -222,6 +222,8 @@ class SessionMapState extends State<SessionMap>
                               ),
                               markerTooltipBuilder:
                                   (BuildContext context, int index) {
+                                print(widget.gpsPosition[index].timestamp);
+                                print(widget.gpsPosition[index].latLng);
                                 return ClipRRect(
                                   borderRadius: const BorderRadius.all(
                                       Radius.circular(8)),
@@ -285,6 +287,7 @@ class SessionMapState extends State<SessionMap>
                                 );
                               },
                               markerBuilder: (BuildContext context, int index) {
+                                print(index);
                                 return MapMarker(
                                   latitude:
                                       widget.gpsPosition[index].latLng.latitude,
@@ -306,7 +309,7 @@ class SessionMapState extends State<SessionMap>
                                                     widget.gpsPosition.length -
                                                         1
                                             ? 50
-                                            : 20),
+                                            : 30),
                                   ),
                                 );
                               },

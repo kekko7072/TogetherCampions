@@ -84,8 +84,14 @@ class DatabaseGyroscope {
   }
 
   static List<Gyroscope> telemetriesListFromSnapshot(
-          QuerySnapshot<Map<String, dynamic>> snapshot) =>
-      snapshot.docs.map((snapshot) => telemetryFromSnapshot(snapshot)).toList();
+      QuerySnapshot<Map<String, dynamic>> snapshot) {
+    List<Gyroscope> value = snapshot.docs
+        .map((snapshot) => telemetryFromSnapshot(snapshot))
+        .toList();
+
+    value.sort((a, b) => a.timestamp.compareTo(b.timestamp));
+    return value;
+  }
 
   ///STREAMS
   Stream<Gyroscope> stream({required String telemetryID}) => gyroscopeCollection

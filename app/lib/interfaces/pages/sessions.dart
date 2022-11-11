@@ -75,45 +75,11 @@ class _SessionsState extends State<Sessions> {
                                 runSpacing: 5,
                                 children: [
                                   for (Session session in sessions) ...[
-                                    StreamBuilder2<List<GpsPosition>,
-                                            List<GpsNavigation>>(
-                                        streams: StreamTuple2(
-                                            DatabaseGpsPosition(
-                                                    deviceID: deviceID,
-                                                    sessionID: session.id)
-                                                .streamList,
-                                            DatabaseGpsNavigation(
-                                                    deviceID: deviceID,
-                                                    sessionID: session.id)
-                                                .streamList),
-                                        builder: (context, snapshot) {
-                                          if (!snapshot.snapshot1.hasData) {
-                                            return const Center(
-                                                child: Padding(
-                                              padding: EdgeInsets.all(20.0),
-                                              child:
-                                                  CircularProgressIndicator(),
-                                            ));
-                                          } else if (!snapshot
-                                              .snapshot2.hasData) {
-                                            return const Center(
-                                                child: Padding(
-                                              padding: EdgeInsets.all(20.0),
-                                              child:
-                                                  CircularProgressIndicator(),
-                                            ));
-                                          }
-
-                                          return CardSession(
-                                            userData: userData,
-                                            deviceId: deviceID,
-                                            session: session,
-                                            gpsPosition:
-                                                snapshot.snapshot1.data!,
-                                            gpsNavigation:
-                                                snapshot.snapshot2.data!,
-                                          );
-                                        }),
+                                    CardSession(
+                                      userData: userData,
+                                      deviceID: deviceID,
+                                      session: session,
+                                    )
                                   ]
                                 ],
                               ),

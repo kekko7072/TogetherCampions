@@ -30,7 +30,7 @@ class DatabaseGpsPosition {
     bool available = snapshot.data()?['available'] ?? false;
     return GpsPosition(
       timestamp: int.parse(snapshot.id),
-      available: available,
+      available: snapshot.data()?['available'] ?? false,
       latLng: MapLatLng(available ? snapshot.data()!['latitude'] : 0.0,
           available ? snapshot.data()!['longitude'] : 0.0),
       speed: available ? snapshot.data()!['speed']?.toDouble() ?? 0.0 : 0.0,
@@ -38,10 +38,14 @@ class DatabaseGpsPosition {
   }
 
   static List<GpsPosition> gpsPositionListFromSnapshot(
-          QuerySnapshot<Map<String, dynamic>> snapshot) =>
-      snapshot.docs
-          .map((snapshot) => gpsPositionFromSnapshot(snapshot))
-          .toList();
+      QuerySnapshot<Map<String, dynamic>> snapshot) {
+    List<GpsPosition> value = snapshot.docs
+        .map((snapshot) => gpsPositionFromSnapshot(snapshot))
+        .toList();
+
+    value.sort((a, b) => a.timestamp.compareTo(b.timestamp));
+    return value;
+  }
 
   ///STREAMS
   Stream<GpsPosition> stream({required String telemetryID}) =>
@@ -94,10 +98,14 @@ class DatabaseGpsNavigation {
   }
 
   static List<GpsNavigation> gpsNavigationListFromSnapshot(
-          QuerySnapshot<Map<String, dynamic>> snapshot) =>
-      snapshot.docs
-          .map((snapshot) => gpsNavigationFromSnapshot(snapshot))
-          .toList();
+      QuerySnapshot<Map<String, dynamic>> snapshot) {
+    List<GpsNavigation> value = snapshot.docs
+        .map((snapshot) => gpsNavigationFromSnapshot(snapshot))
+        .toList();
+
+    value.sort((a, b) => a.timestamp.compareTo(b.timestamp));
+    return value;
+  }
 
   ///STREAMS
   Stream<GpsNavigation> stream({required String telemetryID}) =>
