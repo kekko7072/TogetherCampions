@@ -37,78 +37,7 @@ admin.initializeApp({
 
 admin.firestore().settings({ ignoreUndefinedProperties: true });
 
-app.get("/settings", async (req, res) => {
-  try {
-    const SERIAL_NUMBER = req.query.serialNumber;
-    const MODEL_NUMBER = req.query.modelNumber;
-    const CLOCK = req.query.clock;
-    const SD_CARD_AVAILABLE = req.query.sdCardAvailable;
-
-    const SOFTWARE_NAME = req.query.softwareName;
-    const SOFTWARE_VERSION = req.query.softwareVersion;
-
-    const document = await admin
-      .firestore()
-      .collection("devices")
-      .doc(SERIAL_NUMBER)
-      .get();
-
-    if (document.exists) {
-      await document.ref.update({
-        modelNumber: MODEL_NUMBER,
-        clock: parseInt(CLOCK),
-        sdCardAvailable: SD_CARD_AVAILABLE == "true",
-        software: {
-          name: SOFTWARE_NAME,
-          version: SOFTWARE_VERSION,
-        },
-      });
-
-      const mode = document.data().mode;
-      const frequency = document.data().frequency;
-
-      res.writeHead(200, { "Content-Type": "application/json" });
-      res.end(`{"mode": "${mode}","frequency": ${frequency}}`);
-    } else {
-      res.writeHead(404, { "Content-Type": "plain/text" });
-      res.end("Device not found, please register it before turning on.");
-    }
-  } catch (e) {
-    console.log(e);
-    res.sendStatus(400);
-  }
-});
-
-app.post("/initialize", async (req, res) => {
-  try {
-    const SERIAL_NUMBER = req.query.serialNumber;
-
-    const value = JSON.parse(JSON.stringify(req.body));
-
-    await admin
-      .firestore()
-      .collection("devices")
-      .doc(SERIAL_NUMBER)
-      .set({
-        modelNumber: value.modelNumber,
-        clock: parseInt(value.clock),
-        frequency: parseInt(value.frequency),
-        sdCardAvailable: value.sdCardAvailable == "true",
-        mode: value.mode,
-        software: {
-          name: value.softwareName,
-          version: value.softwareVersion,
-        },
-      });
-
-    res.sendStatus(200);
-  } catch (e) {
-    console.log(e);
-    res.sendStatus(400);
-  }
-});
-
-app.post("/post", async (req, res) => {
+/*app.post("/post", async (req, res) => {
   try {
     const SERIAL_NUMBER = req.query.serialNumber;
 
@@ -147,7 +76,7 @@ app.post("/post", async (req, res) => {
     console.log(e);
     res.sendStatus(400);
   }
-});
+});*/
 
 app.post("/upload", async (req, res) => {
   try {

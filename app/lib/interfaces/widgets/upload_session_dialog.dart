@@ -81,31 +81,31 @@ class _UploadSessionDialogState extends State<UploadSessionDialog> {
               ///1. Add System
               List<Map> systemListJSON = [];
               for (System sys in widget.system) {
-                setState(() => ++progress);
+                //setState(() => ++progress);
                 systemListJSON.add(sys.toJson());
               }
 
               ///2. Add Gps
               List<Map> gpsPositionListJSON = [];
               for (GpsPosition gps in widget.gpsPosition) {
-                setState(() => ++progress);
+                //setState(() => ++progress);
                 gpsPositionListJSON.add(gps.toJson());
               }
               List<Map> gpsNavigationListJSON = [];
               for (GpsNavigation gps in widget.gpsNavigation) {
-                setState(() => ++progress);
+                //setState(() => ++progress);
                 gpsNavigationListJSON.add(gps.toJson());
               }
 
               ///3. Add Mpu
               List<Map> accelerometerListJSON = [];
               for (Accelerometer mpu in widget.accelerometer) {
-                setState(() => ++progress);
+                //setState(() => ++progress);
                 accelerometerListJSON.add(mpu.toJson());
               }
               List<Map> gyroscopeListJSON = [];
               for (Gyroscope mpu in widget.gyroscope) {
-                setState(() => ++progress);
+                //setState(() => ++progress);
                 gyroscopeListJSON.add(mpu.toJson());
               }
 
@@ -143,6 +143,8 @@ class _UploadSessionDialogState extends State<UploadSessionDialog> {
               debugPrint(
                   "\n\n\n\n\n\n\n\n\n\n\n\nERRRORRR: $e\n\n\n\n\n\n\n\n\n\n\n\n");
             }
+
+            setState(() => showUploading = false);
 
             Navigator.of(context).pop();
             Navigator.of(context).pop();

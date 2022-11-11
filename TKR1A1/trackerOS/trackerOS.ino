@@ -54,12 +54,14 @@ void setup() {
 }
 
 void loop() {
-  BLE.poll();
+  BLE.central();
 
   long currentMillis = millis();
 
   while (Serial1.available() > 0) {
     gps.encode(Serial1.read());
+    //Serial.println("@: GPSA AVAILABLE");
+    //Serial.write(Serial1.read());
   }
 
   //mpu.getEvent(&a, &g, &temp);
