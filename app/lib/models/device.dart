@@ -1,8 +1,5 @@
 import 'package:app/models/session.dart';
 
-@Deprecated('WITH BLE DEVICE IS NO MORE NECESSARY')
-enum Mode { realtime, record, sync }
-
 class Device {
   Device({
     required this.serialNumber,

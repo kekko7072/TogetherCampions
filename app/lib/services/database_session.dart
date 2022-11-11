@@ -1,5 +1,3 @@
-import 'package:intl/intl.dart';
-
 import 'imports.dart';
 
 class DatabaseSession {
@@ -48,44 +46,45 @@ class DatabaseSession {
     final islandRef =
         FirebaseStorage.instance.ref().child("devices/$deviceID/$id.json");
 
-// Delete the file
     await islandRef.delete();
 
     return await sessionCollection.doc(id).delete();
   }
 
   Future<String> downloadFile({required String sessionID}) async {
-    final islandRef = FirebaseStorage.instance
-        .ref()
-        .child("devices/$deviceID/$sessionID.json");
-
     final Directory directory = await getApplicationDocumentsDirectory();
     final File file =
         File('${directory.path}/devices/$deviceID/$sessionID.json');
-    // await file.writeAsString(jsonEncode(content));
+    if (await file.exists()) {
+      return await file.readAsString();
+    } else {
+      final islandRef = FirebaseStorage.instance
+          .ref()
+          .child("devices/$deviceID/$sessionID.json");
 
-    final downloadTask = islandRef.writeToFile(file);
+      final downloadTask = islandRef.writeToFile(file);
 
-    downloadTask.snapshotEvents.listen((taskSnapshot) {
-      print(taskSnapshot);
-      switch (taskSnapshot.state) {
-        case TaskState.running:
-          // TODO: Handle this case.
-          break;
-        case TaskState.paused:
-          // TODO: Handle this case.
-          break;
-        case TaskState.success:
-          break;
-        case TaskState.canceled:
-          // TODO: Handle this case.
-          break;
-        case TaskState.error:
-          // TODO: Handle this case.
-          break;
-      }
-    });
-    return await file.readAsString();
+      downloadTask.snapshotEvents.listen((taskSnapshot) {
+        print(taskSnapshot);
+        switch (taskSnapshot.state) {
+          case TaskState.running:
+            // TODO: Handle this case.
+            break;
+          case TaskState.paused:
+            // TODO: Handle this case.
+            break;
+          case TaskState.success:
+            break;
+          case TaskState.canceled:
+            // TODO: Handle this case.
+            break;
+          case TaskState.error:
+            // TODO: Handle this case.
+            break;
+        }
+      });
+      return await file.readAsString();
+    }
   }
 
   Future<bool> uploadFile({required SessionFile sessionFile}) async {

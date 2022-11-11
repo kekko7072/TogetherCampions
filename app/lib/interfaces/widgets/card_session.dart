@@ -5,7 +5,7 @@ import 'package:intl/intl.dart';
 
 import 'edit_session.dart';
 
-class CardSession extends StatelessWidget {
+class CardSession extends StatefulWidget {
   const CardSession({
     Key? key,
     required this.userData,
@@ -17,13 +17,21 @@ class CardSession extends StatelessWidget {
   final Session session;
 
   @override
+  State<CardSession> createState() => _CardSessionState();
+}
+
+class _CardSessionState extends State<CardSession> {
+  @override
   Widget build(BuildContext context) {
     final unitSystem = Provider.of<UnitsSystem>(context);
 
     return FutureBuilder<SessionFile>(
-        future: DatabaseSession(deviceID: deviceID)
-            .downloadFile(sessionID: session.id)
-            .then((value) => SessionFile.fromJson(jsonDecode(value))),
+        future: DatabaseSession(deviceID: widget.deviceID)
+            .downloadFile(sessionID: widget.session.id)
+            .then((value) {
+          setState(() {});
+          return SessionFile.fromJson(jsonDecode(value));
+        }),
         builder: (context, snapshot) {
           if (snapshot.hasError) {
             debugPrint("ERROR: ${snapshot.error}");
@@ -49,8 +57,8 @@ class CardSession extends StatelessWidget {
                     SlidableAction(
                       onPressed: (con) async {
                         EasyLoading.show();
-                        await DatabaseSession(deviceID: deviceID)
-                            .delete(id: session.id);
+                        await DatabaseSession(deviceID: widget.deviceID)
+                            .delete(id: widget.session.id);
                         EasyLoading.dismiss();
                       },
                       backgroundColor: CupertinoColors.destructiveRed,
@@ -65,8 +73,8 @@ class CardSession extends StatelessWidget {
                         isScrollControlled: true,
                         isDismissible: true,
                         builder: (context) => EditSession(
-                          deviceID: deviceID,
-                          session: session,
+                          deviceID: widget.deviceID,
+                          session: widget.session,
                         ),
                       ),
                       backgroundColor: AppStyle.primaryColor,
@@ -92,7 +100,7 @@ class CardSession extends StatelessWidget {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    session.info.name,
+                                    widget.session.info.name,
                                     style: Theme.of(context)
                                         .textTheme
                                         .titleLarge!
@@ -111,7 +119,7 @@ class CardSession extends StatelessWidget {
                                       const SizedBox(width: 10),
                                       Text(
                                         DateFormat('EEE dd MMM')
-                                            .format(session.info.start),
+                                            .format(widget.session.info.start),
                                         style: const TextStyle(
                                           color: Colors.white70,
                                         ),
@@ -129,7 +137,7 @@ class CardSession extends StatelessWidget {
                                       const SizedBox(width: 10),
                                       Text(
                                         DateFormat('kk:mm')
-                                            .format(session.info.start),
+                                            .format(widget.session.info.start),
                                         style: const TextStyle(
                                           color: Colors.white70,
                                         ),
@@ -144,7 +152,7 @@ class CardSession extends StatelessWidget {
                                       const SizedBox(width: 5),
                                       Text(
                                         DateFormat('kk:mm')
-                                            .format(session.info.end),
+                                            .format(widget.session.info.end),
                                         style: const TextStyle(
                                           color: Colors.white70,
                                         ),
@@ -213,7 +221,7 @@ class CardSession extends StatelessWidget {
                           context,
                           MaterialPageRoute(
                               builder: (context) => SessionMap(
-                                    session: session,
+                                    session: widget.session,
                                     unitsSystem: unitSystem,
                                     gpsPosition: gpsPosition,
                                     gpsNavigation: gpsNavigation,
