@@ -1,11 +1,11 @@
-//import '../imports.dart';
+import '../imports.dart';
 
 class DatabaseSystem {
   DatabaseSystem({required this.deviceID, required this.sessionID});
   final String deviceID;
   final String sessionID;
 
-  /*///COLLECTIONS & DOCS
+  ///COLLECTIONS & DOCS
   late CollectionReference<Map<String, dynamic>> collection = FirebaseFirestore
       .instance
       .collection('devices')
@@ -39,12 +39,12 @@ class DatabaseSystem {
 
     value.sort((a, b) => a.timestamp.compareTo(b.timestamp));
     return value;
-  }*/
+  }
 
-  /*///STREAMS
+  ///STREAMS
   Stream<System> singleTelemetry({required String telemetryID}) =>
       collection.doc(telemetryID).snapshots().map(serviceFromSnapshot);
 
   Stream<List<System>> telemetries({required Session session}) =>
-      collection.snapshots().map(servicesListFromSnapshot);*/
+      collection.snapshots().map(servicesListFromSnapshot);
 }

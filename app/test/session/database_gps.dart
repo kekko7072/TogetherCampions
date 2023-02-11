@@ -1,4 +1,4 @@
-/*import '../imports.dart';
+import '../imports.dart';
 
 class DatabaseGpsPosition {
   DatabaseGpsPosition({required this.deviceID, required this.sessionID});
@@ -111,4 +111,3 @@ class DatabaseGpsNavigation {
   Stream<List<GpsNavigation>> get streamList =>
       collection.snapshots().map(gpsNavigationListFromSnapshot);
 }
-*/

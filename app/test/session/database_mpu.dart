@@ -1,4 +1,4 @@
-/*import '../imports.dart';
+import '../imports.dart';
 
 class DatabaseAccelerometer {
   DatabaseAccelerometer({required this.deviceID, required this.sessionID});
@@ -97,4 +97,3 @@ class DatabaseGyroscope {
   Stream<List<Gyroscope>> get streamList =>
       collection.snapshots().map(telemetriesListFromSnapshot);
 }
-*/

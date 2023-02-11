@@ -7,6 +7,19 @@ const app = express();
 const cors = require("cors");
 const axios = require("axios");
 
+const MQTT = require("async-mqtt");
+const client = MQTT.connect(
+  "mqtt://firringer362:jw0J2rrtse7v9Pw5@firringer362.cloud.shiftr.io"
+);
+
+const fs = require("fs-extra");
+const gcs = require("@google-cloud/storage");
+
+const path = require("path");
+const os = require("os");
+
+const json2csv = require("json2csv");
+
 app.use(cors());
 app.use(express.urlencoded({ extended: false }));
 // fixing "413 Request Entity Too Large" errors
@@ -36,6 +49,35 @@ admin.initializeApp({
 });
 
 admin.firestore().settings({ ignoreUndefinedProperties: true });
+
+// When passing async functions as event listeners, make sure to have a try catch block
+
+const doStuff = async () => {
+  console.log("Starting");
+  try {
+    await client.subscribe("#");
+    //await client.publish("wow/so/cool", "It works!");
+    // This line doesn't run until the server responds to the publish
+    //await client.end();
+    // This line doesn't run until the client has disconnected without error
+    console.log("Subscribed");
+  } catch (e) {
+    // Do something about it!
+    console.log(e.stack);
+    process.exit();
+  }
+};
+
+client.on("connect", doStuff);
+
+client.on("message", function (topic, message) {
+  // message is Buffer
+  console.log(topic.toString());
+  const value = JSON.parse(message.toString());
+  console.log(value);
+  admin.firestore().doc(`devices/${topic.toString()}`).set(value);
+  // client.end();
+});
 
 /*app.post("/post", async (req, res) => {
   try {
@@ -183,92 +225,54 @@ app.post("/upload", async (req, res) => {
   }
 });
 
-app.get("/download", async (req, res) => {
-  try {
-    const SERIAL_NUMBER = req.query.serialNumber;
-    const START_TIMESTAMP = req.query.startTimestamp;
-    const END_TIMESTAMP = req.query.startTimestamp;
-    const COMBINE_WEATHER = req.query.combineWeatthr;
+//TODO https://fireship.io/lessons/csv-exports-from-firestore-database-with-cloud-functions/
+app.get("/export", async (req, res) => {
+  /*exports.createCSV = functions.firestore
+    .document("reports/{reportId}")
+    .onCreate((event) => {*/
+  // Step 1. Set main variables
 
-    const device = await admin
-      .firestore()
-      .collection("devices")
-      .doc(SERIAL_NUMBER)
-      .get();
+  const reportId = req.body.reportId;
+  const fileName = `reports/${reportId}.csv`;
+  const tempFilePath = path.join(os.tmpdir(), fileName);
 
-    if (device.exists) {
-      const logs = await device.ref
-        .collection("logs")
-        .where(
-          "timestamp",
-          "<=",
-          Timestamp.fromMillis(END_TIMESTAMP),
-          ">=",
-          Timestamp.fromMillis(START_TIMESTAMP)
-        )
-        .get();
+  // Reference report in Firestore
+  const db = admin.firestore();
+  const reportRef = db.collection("reports").doc(reportId);
 
-      let output = {};
-      let i = 0;
+  // Reference Storage Bucket
+  const storage = gcs.bucket("YOUR_BUCKET_URL"); // or set to env variable
 
-      //LIMIT to 100/month free then for each + 0,001 USD each other
-      console.log(logs.lenght);
+  // Step 2. Query collection
+  return db
+    .collection("orders")
+    .get()
+    .then((querySnapshot) => {
+      /// Step 3. Creates CSV file from with orders collection
+      const orders = [];
 
-      for (i = 0; i < logs.lenght; i++) {
-        if (COMBINE_WEATHER) {
-          //TODO use this docs to develop https://rapidapi.com/darkskyapis/api/dark-sky/
-          const options = {
-            method: "GET",
-            url: "https://dark-sky.p.rapidapi.com/37.774929,-122.419418,2019-02-20T00:22:01",
-            headers: {
-              "X-RapidAPI-Key":
-                "5348a538e9mshde917c5524280abp1cc057jsn741def713239",
-              "X-RapidAPI-Host": "dark-sky.p.rapidapi.com",
-            },
-          };
-          axios
-            .request(options)
-            .then(function (response) {
-              console.log(response.data);
-            })
-            .catch(function (error) {
-              console.error(error);
-            });
+      // create array of order data
+      querySnapshot.forEach((doc) => {
+        orders.push(doc.data());
+      });
 
-          axios
-            .request(options)
-            .then(function (response) {
-              console.log(response.data);
-            })
-            .catch(function (error) {
-              console.error(error);
-            });
-          await c;
-          output.add({
-            timestamp: logs[i].timestamp,
-            battery: logs[i].battery,
-            gps: {
-              latitude: logs[i][gps].latitude,
-              longitude: logs[i][gps].longitude,
-              altitude: logs[i][gps].altitude,
-              speed: logs[i][gps].speed,
-              course: logs[i][gps].course,
-              satellites: logs[i][gps].satellites,
-            },
-          });
-        } else {
-        }
-      }
+      return json2csv({ data: orders });
+    })
+    .then((csv) => {
+      // Step 4. Write the file to cloud function tmp storage
+      return fs.outputFile(tempFilePath, csv);
+    })
+    .then(() => {
+      // Step 5. Upload the file to Firebase cloud storage
+      return storage.upload(tempFilePath, { destination: fileName });
+    })
+    .then((file) => {
+      // Step 6. Update status to complete in Firestore
 
-      res.writeHead(200, { "Content-Type": "application/json" });
-      res.end(output);
-    } else {
-      res.sendStatus(404);
-    }
-  } catch (e) {
-    console.log(e);
-    res.sendStatus(400);
-  }
+      return reportRef.update({ status: "complete" });
+    })
+    .catch((err) => console.log(err));
+  //});
 });
 
 const PORT = parseInt(process.env.PORT) || 8080;

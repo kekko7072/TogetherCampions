@@ -1,6 +1,9 @@
 import 'package:app/services/imports.dart';
 import 'package:flutter/cupertino.dart';
 
+///TODO see https://medium.com/itnext/how-to-build-interactive-charts-in-flutter-e317492d5ba1
+///to build the polar
+
 class TrackBLEScreen extends StatefulWidget {
   const TrackBLEScreen(
       {Key? key,

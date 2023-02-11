@@ -37,15 +37,15 @@
   CLOCK: Is the time the code run in loop fetching data from GPS to SERVER [aproximatly]. 
     Ex. clock = 60  Means run 60 times then data are send
 */
-#define DEVICE_CLOCK 6
+
 
 /* 
   Sim parameters for connction of GPRS service
 */
-#define SIM_PIN "1503"             //[WIND-TRE] "" || [TIM] "" || [THINGS MOBILE] 1503 not working
-#define SIM_APN "TM"  // [WIND-TRE] internet.it || [TIM] "ibox.tim.it" || [THINGS MOBILE] TM not working
-#define SIM_LOGIN ""           // replace with your GPRS login
-#define SIM_PASSWORD ""        // replace with your GPRS password
+#define SIM_PIN "1503"   //[WIND-TRE] "" || [TIM] "" || [THINGS MOBILE] 1503 not working
+#define SIM_APN "TM"     // [WIND-TRE] internet.it || [TIM] "ibox.tim.it" || [THINGS MOBILE] TM not working
+#define SIM_LOGIN ""     // replace with your GPRS login
+#define SIM_PASSWORD ""  // replace with your GPRS password
 
 
 
@@ -55,10 +55,10 @@
   Server address and enpionds witch are used to store data on the cloud.
   Link to dashboard: https://console.cloud.google.com/appengine?project=together-champions&supportedpurview=project&serviceId=default
 */
-#define SERVER_ADDRESS "together-champions.ew.r.appspot.com"
-#define SERVER_SETTINGS "/settings?serialNumber="
-#define SERVER_INITIALIZE "/initialize?serialNumber="
-#define SERVER_POST "/post?serialNumber="
+#define MQTT_SERVER "firringer362.cloud.shiftr.io"  // broker, with shiftr.io it's "broker.shiftr.io"
+#define MQTT_SERVER_PORT 1883                       // broker mqtt port
+#define MQTT_SERVER_KEY "firringer362"              // broker key
+#define MQTT_SERVER_SECRET "tw8hqY2Cx0v65tjp"       // broker secret
 
 /*
   SWITCH meaning and pinouts

@@ -209,7 +209,9 @@ class SessionMapState extends State<SessionMap>
                       int index = (_animationController.value *
                               (widget.gpsPosition.length - 1))
                           .toInt();
+
                       int timestamp = widget.gpsPosition[index].timestamp;
+
                       if (index == 0) {
                         polylinePointsAnimation.clear();
                       }

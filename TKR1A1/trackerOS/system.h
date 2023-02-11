@@ -1,7 +1,7 @@
 #ifndef SYSTEM_H
 #define SYSTEM_H
 
-void updateSystem(BLECharacteristic characteristic) {
+void updateSystem(int timestamp, BLECharacteristic characteristic) {
   
   //Temperature
   Wire.beginTransmission(MPU_ADDR);
@@ -11,7 +11,7 @@ void updateSystem(BLECharacteristic characteristic) {
   int16_t temperature = Wire.read() << 8 | Wire.read();  
 
 int sys[3];
-  sys[0] = millis();
+  sys[0] = timestamp;
   sys[1] = map(analogRead(ADC_BATTERY), 713, 1023, 0, 100);
   sys[2] = temperature;
   

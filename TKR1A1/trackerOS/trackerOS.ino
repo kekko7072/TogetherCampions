@@ -7,6 +7,7 @@
 #include "system.h"
 #include "mpu.h"
 #include "gps.h"
+#include "UUID.h"
 
 
 
@@ -18,6 +19,8 @@ long previousMillis = 0;
 //GPS
 TinyGPSPlus gps;
 TinyGPSCustom magneticVariation(gps, "GPRMC", 10);
+
+UUID uuid;
 
 //MPU
 //Adafruit_MPU6050 mpu;
@@ -71,6 +74,7 @@ void setup() {
 }
 
 void loop() {
+  Serial.println(uuid);
   // wait for a Bluetooth® Low Energy central
   BLEDevice central = BLE.central();
 
@@ -94,13 +98,15 @@ void loop() {
 
       if (currentMillis - previousMillis >= measurements_milliseconds) {
         //System
-        updateSystem(systemCharacteristic);
+        updateSystem(currentMillis, systemCharacteristic);
 
         //GPS
-        updateGPS(poitionCharacteristic, navigationCharacteristic, gps, magneticVariation);
+        updateGPSPosition(currentMillis, poitionCharacteristic, gps);
+        updateGPSNavigation(currentMillis, navigationCharacteristic, gps, magneticVariation);
 
         //MPU
-        updateMPU(accelerometerCharacteristic, gyroscopeCharacteristic);
+        updateMPUAcceleration(currentMillis, accelerometerCharacteristic);
+        updateMPUGyroscope(currentMillis,  gyroscopeCharacteristic);
 
         previousMillis = currentMillis;  //Clean to re-run cicle
       }
