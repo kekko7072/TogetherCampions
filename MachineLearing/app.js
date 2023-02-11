@@ -25,7 +25,7 @@ async function run() {
   const model = await trainModel(xs, ys);
 
   // Fare una previsione utilizzando il modello addestrato
-  const output = model.predict(tf.tensor2d([5], [1, 1]));
+  const output = model.predict(tf.tensor2d([9], [1, 1]));
   console.log(output.dataSync()[0]);
 }
 
