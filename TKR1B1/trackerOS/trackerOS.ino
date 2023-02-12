@@ -3,7 +3,6 @@
 #include "configuration.h"
 
 
-
 GSMClient net;
 GPRS gprs;
 GSM gsmAccess;
@@ -15,7 +14,7 @@ void connect() {
   while (!Serial)
     ;
   Serial.print("Connecting to cellular network ...");
-  // connection state
+
   bool connected = false;
 
 

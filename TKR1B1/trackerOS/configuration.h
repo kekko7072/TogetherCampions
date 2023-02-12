@@ -42,10 +42,10 @@
 /* 
   Sim parameters for connction of GPRS service
 */
-#define SIM_PIN ""   //[WIND-TRE] "" || [Arduino] "0000" || [TIM] ""  || [THINGS MOBILE] 1503 not working
-#define SIM_APN "internet.it"     // [WIND-TRE] "internet.it" || [Arduino] "prepay.pelion" || [TIM] "ibox.tim.it" || [THINGS MOBILE] TM not working
-#define SIM_LOGIN ""     // replace with your GPRS login [Arduino] "arduino" 
-#define SIM_PASSWORD ""  // replace with your GPRS password [Arduino] "arduino" 
+#define SIM_PIN "0000"   //[WIND-TRE] "" || [Arduino] "0000" || [TIM] ""  || [THINGS MOBILE] 1503 not working
+#define SIM_APN "prepay.pelion"     // [WIND-TRE] "internet.it" || [Arduino] "prepay.pelion" || [TIM] "ibox.tim.it" || [THINGS MOBILE] TM not working
+#define SIM_LOGIN "arduino"     // replace with your GPRS login [Arduino] "arduino" 
+#define SIM_PASSWORD "arduino"  // replace with your GPRS password [Arduino] "arduino" 
 
 
 

@@ -1,12 +1,13 @@
 #include <ArduinoBLE.h>
 #include <TinyGPS++.h>
-//#include <Adafruit_MPU6050.h>
-//#include <Adafruit_Sensor.h>
 #include <Wire.h>
+#include <SPI.h>
+#include <SD.h>
 #include "configuration.h"
 #include "system.h"
 #include "mpu.h"
 #include "gps.h"
+#include "sdcard.h"
 #include "UUID.h"
 
 
@@ -33,6 +34,9 @@ void setup() {
 
   //Initialize the built-in LED
   pinMode(LED_BUILTIN, OUTPUT);
+
+  //SDCARD
+  initializeSDCARD(chip_select);
 
   //Bluetooth®
   if (!BLE.begin()) {
@@ -106,7 +110,7 @@ void loop() {
 
         //MPU
         updateMPUAcceleration(currentMillis, accelerometerCharacteristic);
-        updateMPUGyroscope(currentMillis,  gyroscopeCharacteristic);
+        updateMPUGyroscope(currentMillis, gyroscopeCharacteristic);
 
         previousMillis = currentMillis;  //Clean to re-run cicle
       }

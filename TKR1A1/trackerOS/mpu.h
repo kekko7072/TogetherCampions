@@ -1,6 +1,8 @@
 #ifndef MPU_H
 #define MPU_H
 
+#include "sdcard.h"
+
 void setupMPU() {
   Wire.begin();
   Wire.beginTransmission(MPU_ADDR);
@@ -57,8 +59,12 @@ void updateMPUAcceleration(int timestamp, BLECharacteristic accelerometer) {
   acc[2] = AcY;
   acc[3] = AcZ;
 
+  //Send using BLE
   accelerometer.setValue((byte *)&acc, 16);
 
+  //Save on SDCARD
+  String data = "type:MPU_ACCELERATION;timestamp:" + String(acc[0]) + ";acX:" + String(acc[1]) + ";acY:" + String(acc[2]) + ";acZ:" + String(acc[3]);
+  sdcard_save(data);
 }
 
 void updateMPUGyroscope(int timestamp, BLECharacteristic gyroscope) {
@@ -94,8 +100,12 @@ void updateMPUGyroscope(int timestamp, BLECharacteristic gyroscope) {
   gyr[2] = GyY;
   gyr[3] = GyZ;
 
+  //Send using BLE
   gyroscope.setValue((byte *)&gyr, 16);
 
+  //Save on SDCARD
+  String data = "type:MPU_GYROSCOPE;timestamp:" + String(gyr[0]) + ";gyX:" + String(gyr[1]) + ";gyY:" + String(gyr[2]) + ";gyZ:" + String(gyr[3]);
+  sdcard_save(data);
 }
 
 #endif
