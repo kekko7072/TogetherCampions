@@ -63,7 +63,7 @@ void updateMPUAcceleration(int timestamp, BLECharacteristic accelerometer) {
   accelerometer.setValue((byte *)&acc, 16);
 
   //Save on SDCARD
-  String data = "type:MPU_ACCELERATION;timestamp:" + String(acc[0]) + ";acX:" + String(acc[1]) + ";acY:" + String(acc[2]) + ";acZ:" + String(acc[3]);
+  String data = "MPU_ACCELERATION;" + String(acc[0]) + ";" + String(acc[1]) + ";" + String(acc[2]) + ";" + String(acc[3]);
   sdcard_save(data);
 }
 
@@ -104,7 +104,7 @@ void updateMPUGyroscope(int timestamp, BLECharacteristic gyroscope) {
   gyroscope.setValue((byte *)&gyr, 16);
 
   //Save on SDCARD
-  String data = "type:MPU_GYROSCOPE;timestamp:" + String(gyr[0]) + ";gyX:" + String(gyr[1]) + ";gyY:" + String(gyr[2]) + ";gyZ:" + String(gyr[3]);
+  String data = "MPU_GYROSCOPE;" + String(gyr[0]) + ";" + String(gyr[1]) + ";" + String(gyr[2]) + ";" + String(gyr[3]);
   sdcard_save(data);
 }
 

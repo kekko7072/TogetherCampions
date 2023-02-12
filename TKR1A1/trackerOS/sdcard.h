@@ -6,19 +6,6 @@
     false: data not saved
 */
 
-bool initializeSDCARD(int chipSelect) {
-  Serial.print("Initializing SD card...");
-
-  // see if the card is present and can be initialized:
-  if (!SD.begin(chipSelect)) {
-    Serial.println("Card failed, or not present");
-    // don't do anything more:
-    return false;
-  }
-  Serial.println("card initialized.");
-  return true;
-}
-
 void sdcard_save(String input_data) {
 
   // Open the file. Note that only one file can be open at a time,  so you have to close this one before opening another.
@@ -44,10 +31,23 @@ void sdcard_save(String input_data) {
 bool sdcard_clear() {
   SD.remove("datalog.txt");
   if (SD.exists("datalog.txt")) {
-    Serial.println("error deleting datalog.txt");
+    Serial.println("SDCARD error deleting datalog.txt");
     return false;
   } else {
+    Serial.println("SDCARD initialized.");
     return true;
   }
+}
+
+bool initializeSDCARD(int chipSelect) {
+  Serial.print("Initializing SD card...");
+
+  // see if the card is present and can be initialized:
+  if (!SD.begin(chipSelect)) {
+    Serial.println("SDCARD failed, or not present");
+    // don't do anything more:
+    return false;
+  }
+  return sdcard_clear();
 }
 #endif

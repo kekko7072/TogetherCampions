@@ -24,7 +24,8 @@ void updateGPSPosition(int timestamp, BLECharacteristic position, TinyGPSPlus gp
   position.setValue((byte *)&GPSPos, 20);
 
   //Save on SDCARD
-  String data = "type:GPS_POSITION;timestamp:" + String(GPSPos[0]) + ";available:" + String(GPSPos[1]) + ";lat:" + String(GPSPos[2], 7) + ";lng:" + String(GPSPos[3], 7) + ";speed:" + String(GPSPos[4], 7);
+  String available = GPSPos[1] == 0.00 ? "false" : "true";
+  String data = "GPS_POSITION;" + String(timestamp) + ";" + available + ";" + String(GPSPos[2], 7) + ";" + String(GPSPos[3], 7) + ";" + String(GPSPos[4], 7);
   sdcard_save(data);
 }
 
@@ -48,7 +49,8 @@ void updateGPSNavigation(int timestamp, BLECharacteristic navigation, TinyGPSPlu
   sdcard_save(String input_data);*/
 
   //Save on SDCARD
-  String data = "type:GPS_NAVIGATION;timestamp:" + String(GPSNav[0]) + ";available:" + String(GPSNav[1]) + ";altitude:" + String(GPSNav[2], 4) + ";course:" + String(GPSNav[3], 4) + ";magneticVariation:" + String(GPSNav[4], 4);
+  String available = GPSNav[1] == 0.00 ? "false" : "true";
+  String data = "GPS_NAVIGATION;" + String(timestamp) + ";" + available + ";" + String(GPSNav[2], 4) + ";" + String(GPSNav[3], 4) + ";" + String(GPSNav[4], 4);
   sdcard_save(data);
 }
 

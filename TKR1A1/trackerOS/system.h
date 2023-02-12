@@ -21,7 +21,7 @@ void updateSystem(int timestamp, BLECharacteristic characteristic) {
   characteristic.setValue((byte *)&sys, 12);
   
   //Save on SDCARD
-  String data = "type:SYSTEM;timestamp:" + String(sys[0]) + ";battery:" + String(sys[1]) + ";temp:" + String(sys[2]);
+  String data = "SYSTEM;" + String(sys[0]) + ";" + String(sys[1]) + ";" + String(sys[2]);
   sdcard_save(data);
 }
 
