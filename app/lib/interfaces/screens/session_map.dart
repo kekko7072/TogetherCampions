@@ -405,7 +405,7 @@ class SessionMapState extends State<SessionMap>
                                             );
                                           }
                                         } else {
-                                          return MapMarker(
+                                          return const MapMarker(
                                               latitude: 0.0, longitude: 0.0);
                                         }
                                       },
@@ -742,7 +742,7 @@ class SessionMapState extends State<SessionMap>
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Text(
-                                  '${UnitsService.temperatureUnitsFromCELSIUS(widget.unitsSystem.temperatureUnits, widget.sessionFile.timestamp![index].system!.temperature).toStringAsFixed(2)} ${UnitsService.temperatureUnitsToString(widget.unitsSystem.temperatureUnits)}',
+                                  '${UnitsService.temperatureUnitsFromCELSIUS(widget.unitsSystem.temperatureUnits, widget.sessionFile.timestamp![index].system?.temperature).toStringAsFixed(2)} ${UnitsService.temperatureUnitsToString(widget.unitsSystem.temperatureUnits)}',
                                   style: Theme.of(context)
                                       .textTheme
                                       .titleLarge!
@@ -752,8 +752,8 @@ class SessionMapState extends State<SessionMap>
                                   CalculationService.timestamp(widget
                                       .sessionFile
                                       .timestamp![index]
-                                      .system!
-                                      .timestamp),
+                                      .system
+                                      ?.timestamp),
                                   style: Theme.of(context)
                                       .textTheme
                                       .titleLarge!
@@ -763,8 +763,12 @@ class SessionMapState extends State<SessionMap>
                                   children: [
                                     BatteryIndicator(
                                       batteryFromPhone: false,
-                                      batteryLevel: widget.sessionFile
-                                          .timestamp![index].system!.battery,
+                                      batteryLevel: widget
+                                              .sessionFile
+                                              .timestamp![index]
+                                              .system
+                                              ?.battery ??
+                                          0,
                                       style: BatteryIndicatorStyle.skeumorphism,
                                       colorful: true,
                                       showPercentNum: false,
@@ -774,7 +778,7 @@ class SessionMapState extends State<SessionMap>
                                     ),
                                     const SizedBox(width: 10),
                                     Text(
-                                      "${widget.sessionFile.timestamp![index].system!.battery} %",
+                                      "${widget.sessionFile.timestamp![index].system?.battery} %",
                                       style: Theme.of(context)
                                           .textTheme
                                           .titleMedium!

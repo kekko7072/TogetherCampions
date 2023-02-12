@@ -113,12 +113,12 @@ class UnitsService {
   }
 
   static double temperatureUnitsFromCELSIUS(
-      TemperatureUnits input, double value) {
+      TemperatureUnits input, double? value) {
     switch (input) {
       case TemperatureUnits.C:
-        return value;
+        return value ?? 0;
       case TemperatureUnits.F:
-        return (value * 9 / 5) + 32;
+        return (value ?? 0 * 9 / 5) + 32;
     }
   }
 
