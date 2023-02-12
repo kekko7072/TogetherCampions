@@ -14,7 +14,7 @@ unsigned long lastMillis = 0;
 void connect() {
   while (!Serial)
     ;
-  Serial.print("connecting to cellular network ...");
+  Serial.print("Connecting to cellular network ...");
   // connection state
   bool connected = false;
 
@@ -32,15 +32,15 @@ void connect() {
   client.begin(MQTT_SERVER, MQTT_SERVER_PORT, net);
 
 
-  Serial.print("\nconnecting...");
-  while (!client.connect("arduino", MQTT_SERVER_KEY, MQTT_SERVER_SECRET)) {
+  Serial.print("\nConnecting to MQTT ...");
+  while (!client.connect("TKR1A1", MQTT_SERVER_KEY, MQTT_SERVER_SECRET)) {
     Serial.print(".");
     delay(1000);
   }
 
   Serial.println("\nconnected!");
 
-  client.subscribe("/hello");
+  client.subscribe("/timestamp");
   // client.unsubscribe("/hello");
 }
 
@@ -71,9 +71,12 @@ void loop() {
     connect();
   }
 
-  // publish a message roughly every second.
-  if (millis() - lastMillis > 1000) {
+  // Publish a message roughly every 500 millisecond.
+  if (millis() - lastMillis > 500) {
     lastMillis = millis();
-    client.publish("/hello", "world");
+    client.publish("/AAA000AAA/timestamp", String(millis()));
+    client.publish("/AAA000AAA/latitude", String(32.32));
+    client.publish("/AAA000AAA/longitude", String(322.32));
+    client.publish("/AAA000AAA/speed", String(5.32));
   }
 }

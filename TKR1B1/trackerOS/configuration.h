@@ -42,10 +42,10 @@
 /* 
   Sim parameters for connction of GPRS service
 */
-#define SIM_PIN "1503"   //[WIND-TRE] "" || [TIM] "" || [THINGS MOBILE] 1503 not working
-#define SIM_APN "TM"     // [WIND-TRE] internet.it || [TIM] "ibox.tim.it" || [THINGS MOBILE] TM not working
-#define SIM_LOGIN ""     // replace with your GPRS login
-#define SIM_PASSWORD ""  // replace with your GPRS password
+#define SIM_PIN ""   //[WIND-TRE] "" || [Arduino] "0000" || [TIM] ""  || [THINGS MOBILE] 1503 not working
+#define SIM_APN "internet.it"     // [WIND-TRE] "internet.it" || [Arduino] "prepay.pelion" || [TIM] "ibox.tim.it" || [THINGS MOBILE] TM not working
+#define SIM_LOGIN ""     // replace with your GPRS login [Arduino] "arduino" 
+#define SIM_PASSWORD ""  // replace with your GPRS password [Arduino] "arduino" 
 
 
 
@@ -59,19 +59,3 @@
 #define MQTT_SERVER_PORT 1883                       // broker mqtt port
 #define MQTT_SERVER_KEY "firringer362"              // broker key
 #define MQTT_SERVER_SECRET "tw8hqY2Cx0v65tjp"       // broker secret
-
-/*
-  SWITCH meaning and pinouts
-    CLOUD_SDCARD: Switch beteen CLOUD or SDCARD
-*/
-#define CLOUD_SDCARD 1
-
-/*
-  LED meaning and pinouts
-    GREEN: System ok all working
-    YELLOW: System saving on SDCARD
-    RED: Error on system
-*/
-#define LED_GREEN 2
-#define LED_YELLOW 3
-#define LED_RED 4

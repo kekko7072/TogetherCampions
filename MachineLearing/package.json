@@ -4,11 +4,13 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "test": "node app.js"
+    "angle": "node src/angle.js",
+    "polar": "node src/polar.js"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "@tensorflow/tfjs": "^4.2.0"
-  }
+  },
+  "public": false
 }
