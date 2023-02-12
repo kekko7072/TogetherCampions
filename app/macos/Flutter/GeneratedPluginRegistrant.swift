@@ -15,8 +15,8 @@ import firebase_crashlytics
 import firebase_storage
 import flutter_libserialport
 import geolocator_apple
-import path_provider_macos
-import shared_preferences_macos
+import path_provider_foundation
+import shared_preferences_foundation
 
 func RegisterGeneratedPlugins(registry: FlutterPluginRegistry) {
   BatteryPlusMacosPlugin.register(with: registry.registrar(forPlugin: "BatteryPlusMacosPlugin"))

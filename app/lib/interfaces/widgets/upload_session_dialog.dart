@@ -60,41 +60,55 @@ class _UploadSessionDialogState extends State<UploadSessionDialog> {
             debugPrint('\n\n\n\n\n\n\n\n\n\n\n\n');
             try {
               setState(() => showUploading = true);
+              List<Map<String, dynamic>> data = [];
 
               ///1. Add System
-              List<Map> systemListJSON = [];
-              for (System sys in widget.system) {
-                //setState(() => ++progress);
-                systemListJSON.add(sys.toJson());
+              if (widget.system.isNotEmpty) {
+                for (System sys in widget.system) {
+                  data.add({"system": sys.toJson()});
+                }
               }
 
               ///2. Add Gps
-              List<Map> gpsPositionListJSON = [];
-              for (GpsPosition gps in widget.gpsPosition) {
-                //setState(() => ++progress);
-                gpsPositionListJSON.add(gps.toJson());
+              if (widget.gpsPosition.isNotEmpty) {
+                for (GpsPosition gps in widget.gpsPosition) {
+                  data.add({"gps_position": gps.toJson()});
+                }
               }
-              List<Map> gpsNavigationListJSON = [];
-              for (GpsNavigation gps in widget.gpsNavigation) {
-                //setState(() => ++progress);
-                gpsNavigationListJSON.add(gps.toJson());
+              if (widget.gpsNavigation.isNotEmpty) {
+                for (GpsNavigation gps in widget.gpsNavigation) {
+                  data.add({"gps_navigation": gps.toJson()});
+                }
               }
 
               ///3. Add Mpu
-              List<Map> accelerometerListJSON = [];
-              for (Accelerometer mpu in widget.accelerometer) {
-                //setState(() => ++progress);
-                accelerometerListJSON.add(mpu.toJson());
+              if (widget.accelerometer.isNotEmpty) {
+                for (Accelerometer mpu in widget.accelerometer) {
+                  data.add({"accelerometer": mpu.toJson()});
+                }
               }
-              List<Map> gyroscopeListJSON = [];
-              for (Gyroscope mpu in widget.gyroscope) {
-                //setState(() => ++progress);
-                gyroscopeListJSON.add(mpu.toJson());
+              if (widget.gyroscope.isNotEmpty) {
+                for (Gyroscope mpu in widget.gyroscope) {
+                  data.add({"gyroscope": mpu.toJson()});
+                }
               }
 
+              Map<int, Map<String, dynamic>> groupedData = {};
+              for (Map<String, dynamic> item in data) {
+                int timestamp = item.values.first["timestamp"];
+
+                if (groupedData.containsKey(timestamp)) {
+                  groupedData[timestamp]?.addAll(item);
+                } else {
+                  groupedData[timestamp] = item;
+                }
+              }
+
+              print(groupedData.values.toList());
+
               Map<String, dynamic> content = {
-                "deviceID": widget.deviceID.toString(),
-                "sessionID": sessionID,
+                "device_id": widget.deviceID.toString(),
+                "session_id": sessionID,
                 "info": {
                   "name": DateFormat.yMd()
                       .add_Hms()
@@ -106,16 +120,12 @@ class _UploadSessionDialogState extends State<UploadSessionDialog> {
                       .toIso8601String(),
                   "end": DateTime.now().toIso8601String()
                 },
-                "devicePosition": {
+                "device_position": {
                   "x": widget.devicePosition.x,
                   "y": widget.devicePosition.y,
                   "z": widget.devicePosition.z
                 },
-                "system": systemListJSON,
-                "gps_position": gpsPositionListJSON,
-                "gps_navigation": gpsNavigationListJSON,
-                "accelerometer": accelerometerListJSON,
-                "gyroscope": gyroscopeListJSON,
+                "timestamp": groupedData.values.toList(),
               };
 
               final Directory directory =
@@ -124,7 +134,7 @@ class _UploadSessionDialogState extends State<UploadSessionDialog> {
               await file.writeAsString(jsonEncode(content));
             } catch (e) {
               debugPrint(
-                  "\n\n\n\n\n\n\n\n\n\n\n\nERRRORRR: $e\n\n\n\n\n\n\n\n\n\n\n\n");
+                  "\n\n\n\n\n\n\n\n\n\n\n\nERROR: $e\n\n\n\n\n\n\n\n\n\n\n\n");
             }
 
             setState(() => showUploading = false);
@@ -144,8 +154,8 @@ class _UploadSessionDialogState extends State<UploadSessionDialog> {
 
             try {
               setState(() => showUploading = true);
-
-              bool success = await DatabaseSession(deviceID: widget.deviceID)
+//TODO RE ENABLE
+              /*bool success = await DatabaseSession(deviceID: widget.deviceID)
                   .uploadFile(
                       sessionFile: SessionFile(
                           deviceId: widget.deviceID,
@@ -166,6 +176,8 @@ class _UploadSessionDialogState extends State<UploadSessionDialog> {
                           gyroscope: widget.gyroscope));
 
               debugPrint("SUCCESS: $success");
+
+               */
             } catch (e) {
               debugPrint(
                   "\n\n\n\n\n\n\n\n\n\n\n\nERRRORRR: $e\n\n\n\n\n\n\n\n\n\n\n\n");

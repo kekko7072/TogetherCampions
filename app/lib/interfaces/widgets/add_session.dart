@@ -158,7 +158,7 @@ class _AddSessionState extends State<AddSession> {
                                     json.decode(String.fromCharCodes(
                                         await File(file!.path!)
                                             .readAsBytes())));
-
+/*
                                 bool success = await DatabaseSession(
                                         deviceID: sessionFile.deviceId)
                                     .uploadFile(sessionFile: sessionFile);
@@ -169,7 +169,7 @@ class _AddSessionState extends State<AddSession> {
                                   EasyLoading.showSuccess(
                                       "Session uploaded to server!");
                                   Navigator.of(context).pop();
-                                }
+                                }*/
                               } catch (e) {
                                 EasyLoading.showError("ERROR: $e");
                                 print(e);

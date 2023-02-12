@@ -46,7 +46,6 @@ export 'package:font_awesome_flutter/font_awesome_flutter.dart';
 export 'package:battery_indicator/battery_indicator.dart';
 export 'package:flutter_easyloading/flutter_easyloading.dart';
 export 'package:graphic/graphic.dart';
-export 'package:badges/badges.dart';
 export 'package:cupertino_onboarding/cupertino_onboarding.dart';
 
 ///INTERFACE
@@ -59,6 +58,8 @@ export 'package:app/interfaces/pages/track.dart';
 export 'package:app/interfaces/screens/session_map.dart';
 export 'package:app/interfaces/screens/ble_find_device.dart';
 export 'package:app/interfaces/screens/track_ble_screen.dart';
+export 'package:app/interfaces/screens/geolocation_permission.dart';
+export 'package:app/interfaces/screens/loading_screen.dart';
 
 ///##Widgets
 export 'package:app/interfaces/widgets/add_session.dart';

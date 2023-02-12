@@ -21,13 +21,13 @@ class MapService {
     return MapLatLng(latMidway, lngMidway);
   }
 
-  static int findFastestLogFromList(List<GpsPosition> list) {
+  static int findFastestLogFromList(List<TimestampF> list) {
     int i = 0;
     double speed = 0;
     int index = 0;
     for (i = 0; i < list.length - 1; i++) {
-      if (list[i].speed > speed) {
-        speed = list[i].speed;
+      if (list[i].gpsPosition!.speed > speed) {
+        speed = list[i].gpsPosition!.speed;
         index = i;
       }
     }

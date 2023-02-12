@@ -47,9 +47,9 @@ class DevicePosition {
   final int y;
   final int z;
   factory DevicePosition.fromJson(Map<String, dynamic> json) => DevicePosition(
-        x: json["x"],
-        y: json["y"],
-        z: json["z"],
+        x: json["x"] ?? 0,
+        y: json["y"] ?? 0,
+        z: json["z"] ?? 0,
       );
 
   Map<String, dynamic> toJson() => {
@@ -59,12 +59,8 @@ class DevicePosition {
       };
 }
 
-class SessionFile {
-  SessionFile({
-    required this.deviceId,
-    required this.sessionId,
-    required this.info,
-    required this.devicePosition,
+class TimestampF {
+  TimestampF({
     required this.system,
     required this.gpsPosition,
     required this.gpsNavigation,
@@ -72,44 +68,72 @@ class SessionFile {
     required this.gyroscope,
   });
 
-  String deviceId;
-  String sessionId;
-  SessionInfo info;
-  DevicePosition devicePosition;
-  List<System> system;
-  List<GpsPosition> gpsPosition;
-  List<GpsNavigation> gpsNavigation;
-  List<Accelerometer> accelerometer;
-  List<Gyroscope> gyroscope;
+  System? system;
+  GpsPosition? gpsPosition;
+  GpsNavigation? gpsNavigation;
+  Accelerometer? accelerometer;
+  Gyroscope? gyroscope;
 
-  factory SessionFile.fromJson(Map<String, dynamic> json) => SessionFile(
-        deviceId: json["deviceID"],
-        sessionId: json["sessionID"],
-        info: SessionInfo.fromJson(json["info"]),
-        devicePosition: DevicePosition.fromJson(json["devicePosition"]),
-        system:
-            List<System>.from(json["system"].map((x) => System.fromJson(x))),
-        gpsPosition: List<GpsPosition>.from(
-            json["gps_position"].map((x) => GpsPosition.fromJson(x))),
-        gpsNavigation: List<GpsNavigation>.from(
-            json["gps_navigation"].map((x) => GpsNavigation.fromJson(x))),
-        accelerometer: List<Accelerometer>.from(
-            json["accelerometer"].map((x) => Accelerometer.fromJson(x))),
-        gyroscope: List<Gyroscope>.from(
-            json["gyroscope"].map((x) => Gyroscope.fromJson(x))),
+  factory TimestampF.fromJson(Map<String, dynamic> json) => TimestampF(
+        system: json["system"] == null ? null : System.fromJson(json["system"]),
+        gpsPosition: json["gps_position"] == null
+            ? null
+            : GpsPosition.fromJson(json["gps_position"]),
+        gpsNavigation: json["gps_navigation"] == null
+            ? null
+            : GpsNavigation.fromJson(json["gps_navigation"]),
+        accelerometer: json["accelerometer"] == null
+            ? null
+            : Accelerometer.fromJson(json["accelerometer"]),
+        gyroscope: json["gyroscope"] == null
+            ? null
+            : Gyroscope.fromJson(json["gyroscope"]),
       );
 
-  Map<String, dynamic> toJson() => {
-        "deviceID": deviceId,
-        "sessionID": sessionId,
+  /*Map<String, dynamic> toJson() => {
+        "system": system.toJson(),
+        "gps_position": gpsPosition.toJson(),
+        "gps_navigation": gpsNavigation.toJson(),
+        "accelerometer": accelerometer.toJson(),
+        "gyroscope": gyroscope.toJson(),
+      };*/
+}
+
+class SessionFile {
+  SessionFile({
+    this.deviceId,
+    this.sessionId,
+    this.info,
+    this.devicePosition,
+    this.timestamp,
+  });
+
+  String? deviceId;
+  String? sessionId;
+  SessionInfo? info;
+  DevicePosition? devicePosition;
+  List<TimestampF>? timestamp;
+
+  factory SessionFile.fromJson(Map<String, dynamic> json) {
+    print(json["timestamp"]);
+    return SessionFile(
+      deviceId: json["device_id"] ?? '',
+      sessionId: json["session_id"] ?? '',
+      info: json["info"] == null ? null : SessionInfo.fromJson(json["info"]),
+      devicePosition: json["device_position"] == null
+          ? null
+          : DevicePosition.fromJson(json["device_position"]),
+      timestamp: json["timestamp"] == null
+          ? null
+          : List<TimestampF>.from(
+              json["timestamp"].map((x) => TimestampF.fromJson(x))),
+    );
+  }
+  /* Map<String, dynamic> toJson() => {
+        "device_id": deviceId,
+        "session_id": sessionId,
         "info": info.toJson(),
-        "devicePosition": devicePosition.toJson(),
-        "system": List<dynamic>.from(system.map((x) => x.toJson())),
-        "gps_position": List<dynamic>.from(gpsPosition.map((x) => x.toJson())),
-        "gps_navigation":
-            List<dynamic>.from(gpsNavigation.map((x) => x.toJson())),
-        "accelerometer":
-            List<dynamic>.from(accelerometer.map((x) => x.toJson())),
-        "gyroscope": List<dynamic>.from(gyroscope.map((x) => x.toJson())),
-      };
+        "device_position": devicePosition.toJson(),
+        "timestamp": List<dynamic>.from(timestamp.map((x) => x.toJson())),
+      };*/
 }

@@ -2,7 +2,7 @@ import csv
 import json
 
 # Apri il file di testo
-with open("datalog.txt", "r") as file:
+with open("DATALOG.TXT", "r") as file:
     data = file.read().split(",")
 
 # Crea un nuovo file CSV
@@ -24,8 +24,6 @@ json_data = []
 
 # Loop through each row of data
 for row in data:
-    print( row[0])
-
     if row[0] == "SYSTEM":
         json_data.append({
             "system":
@@ -37,7 +35,7 @@ for row in data:
             })
     elif  row[0] == "GPS_POSITION":
         json_data.append({
-            "gps":
+            "gps_position":
                     {
                       "timestamp": row[1],
                       "available": row[2],
@@ -48,7 +46,7 @@ for row in data:
             })
     elif  row[0] == "GPS_NAVIGATION":
         json_data.append({
-            "gps":
+            "gps_navigation":
                     {
                       "timestamp": row[1],
                       "available": row[2],
@@ -59,7 +57,7 @@ for row in data:
             })
     elif  row[0] == "MPU_ACCELERATION":
         json_data.append({
-                 "mpu_acceleration":
+                 "accelerometer":
                    {
                      "timestamp": row[1],
                      "x": row[2],
@@ -69,7 +67,7 @@ for row in data:
         })
     elif  row[0] == "MPU_GYROSCOPE":
         json_data.append({
-                 "mpu_gyroscope":
+                 "gyroscope":
                    {
                      "timestamp": row[1],
                      "x": row[2],
@@ -78,7 +76,17 @@ for row in data:
                     }
         })
 
+#Crea una lista di timestamps raggruppando in un unico file json i dati
+#che hanno lo stesso timestamp, ovvero che sono riferiti allo stesso istante
+grouped_data = {}
+
+for item in json_data:
+    for key, value in item.items():
+        timestamp = value['timestamp']
+        if timestamp not in grouped_data:
+            grouped_data[timestamp] = []
+        grouped_data[timestamp].append({key: value})
 
 # Converti il dizionario in un file JSON
 with open("datalog.json", "w") as file:
-    json.dump(json_data, file)
+    json.dump(grouped_data, file)

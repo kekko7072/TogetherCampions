@@ -1,23 +1,23 @@
 import 'imports.dart';
 
 class AppStyle {
-  static int primaryColorValue = 0xFF003F7C;
+  static const int primaryColorValue = 0xFF003F7C;
 
-  static Color primaryColor = Color(primaryColorValue);
+  static const Color primaryColor = Color(primaryColorValue);
 
-  static MaterialColor primaryMaterialColor = MaterialColor(
+  static MaterialColor primaryMaterialColor = const MaterialColor(
     primaryColorValue,
     <int, Color>{
-      50: primaryColor,
-      100: primaryColor,
-      200: primaryColor,
-      300: primaryColor,
-      400: primaryColor,
-      500: primaryColor,
-      600: primaryColor,
-      700: primaryColor,
-      800: primaryColor,
-      900: primaryColor,
+      50: Color(0xFFffffff),
+      100: Color(0xFFe6ecf2),
+      200: Color(0xFFccd9e5),
+      300: Color(0xFFb3c5d8),
+      400: Color(0xFF99b2cb),
+      500: Color(0xFF809fbe),
+      600: Color(0xFF668cb0),
+      700: Color(0xFF4d79a3),
+      800: Color(0xFF336596),
+      900: Color(0xFF1a5289),
     },
   );
 
@@ -26,11 +26,15 @@ class AppStyle {
   static Color backgroundColor = Color(backgroundColorValue);
 
   ///TextStyle
-  static TextStyle kHomeTitle = const TextStyle(fontWeight: FontWeight.bold, fontSize: 50);
-  static TextStyle kSentence = const TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.black);
+  static TextStyle kHomeTitle =
+      const TextStyle(fontWeight: FontWeight.bold, fontSize: 50);
+  static TextStyle kSentence = const TextStyle(
+      fontSize: 15, fontWeight: FontWeight.bold, color: Colors.black);
 
   ///InputDecoration
-  InputDecoration kTextFieldDecoration({required IconData icon, required String hintText}) => InputDecoration(
+  InputDecoration kTextFieldDecoration(
+          {required IconData icon, required String hintText}) =>
+      InputDecoration(
         prefixIcon: Icon(
           icon,
           color: AppStyle.backgroundColor,
@@ -39,7 +43,8 @@ class AppStyle {
         hintStyle: const TextStyle(
           color: Colors.white60,
         ),
-        contentPadding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
+        contentPadding:
+            const EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
         border: const OutlineInputBorder(
           borderRadius: BorderRadius.all(Radius.circular(32.0)),
         ),
@@ -54,10 +59,16 @@ class AppStyle {
       );
 
   ///ModalBottom
-  static RoundedRectangleBorder kModalBottomStyle = const RoundedRectangleBorder(borderRadius: BorderRadius.only(topLeft: Radius.circular(30), topRight: Radius.circular(30)));
+  static RoundedRectangleBorder kModalBottomStyle =
+      const RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(30), topRight: Radius.circular(30)));
 
   ///WIDTH
-  static double resizeAutomaticallyWidth(BuildContext context) => MediaQuery.of(context).size.width >= 400 ? 400 : MediaQuery.of(context).size.width;
+  static double resizeAutomaticallyWidth(BuildContext context) =>
+      MediaQuery.of(context).size.width >= 400
+          ? 400
+          : MediaQuery.of(context).size.width;
 
   ///MENU
 }

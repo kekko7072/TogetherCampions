@@ -87,7 +87,7 @@ class DatabaseSession {
     }
   }
 
-  Future<bool> uploadFile({required SessionFile sessionFile}) async {
+  /*Future<bool> uploadFile({required SessionFile sessionFile}) async {
     ///1. Create Session
     await DatabaseSession(deviceID: deviceID).add(
         session: Session(
@@ -97,7 +97,8 @@ class DatabaseSession {
 
     final Directory directory = await getApplicationDocumentsDirectory();
     final File file = File('${directory.path}/${sessionFile.sessionId}.json');
-    await file.writeAsString(jsonEncode(sessionFile.toJson()));
+    //TODO FIX
+    // await file.writeAsString(jsonEncode(sessionFile.toJson()));
 
     final islandRef = FirebaseStorage.instance
         .ref()
@@ -121,7 +122,7 @@ class DatabaseSession {
       return false;
     }
   }
-
+*/
   ///SERIALIZATION
   static Session sessionFromSnapshot(
       DocumentSnapshot<Map<String, dynamic>?> snapshot) {
@@ -152,4 +153,27 @@ class DatabaseSession {
       .orderBy('info.start', descending: true)
       .snapshots()
       .map(sessionsListFromSnapshot);
+
+  ///FUTURES
+  Future<List<SessionFile>> get futureList async {
+    List<SessionFile> output = [];
+
+    final Directory directory = await getApplicationDocumentsDirectory();
+    List<FileSystemEntity> values = directory.listSync();
+
+    //Remove links of not file
+    values.removeWhere((element) => !element.path.contains(".json"));
+
+    //Parse files
+    for (var element in values) {
+      try {
+        String val = await File.fromUri(element.uri).readAsString();
+        output.add(SessionFile.fromJson(jsonDecode(val)));
+      } catch (e) {
+        debugPrint("ERROR PARSING FILE: $e");
+      }
+    }
+
+    return output;
+  }
 }

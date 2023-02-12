@@ -66,5 +66,7 @@
                 	    <string>Need Location permission</string>
                 	    <key>NSLocationWhenInUseUsageDescription</key>
                 	    <string>Need Location permission</string>
+	<key>UIApplicationSupportsIndirectInputEvents</key>
+	<true/>
 </dict>
 </plist>

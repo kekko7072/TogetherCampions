@@ -78,16 +78,16 @@ class UnitsService {
     }
   }
 
-  static double speedUnitsConvertFromKTS(SpeedUnits unit, double knot) {
+  static double speedUnitsConvertFromKTS(SpeedUnits unit, double? knot) {
     switch (unit) {
       case SpeedUnits.mS:
-        return knot * 0.51444444; // _GPS_MPS_PER_KNOT 0.51444444
+        return knot ?? 0 * 0.51444444; // _GPS_MPS_PER_KNOT 0.51444444
       case SpeedUnits.kts:
-        return knot;
+        return knot ?? 0;
       case SpeedUnits.kmH:
-        return knot * 1.852; // _GPS_KMPH_PER_KNOT 1.852
+        return knot ?? 0 * 1.852; // _GPS_KMPH_PER_KNOT 1.852
       case SpeedUnits.mpH:
-        return knot * 1.15077945; //_GPS_MPH_PER_KNOT 1.15077945
+        return knot ?? 0 * 1.15077945; //_GPS_MPH_PER_KNOT 1.15077945
     }
   }
 
@@ -156,7 +156,6 @@ class UnitsService {
         return meter * 0.00062137112; // _GPS_MILES_PER_METER 0.00062137112
       case DistanceUnits.M:
         return meter * 0.0002; // #define _GPS_NAUTICAL_MILES_PER_METER 0.0002
-
     }
   }
 }

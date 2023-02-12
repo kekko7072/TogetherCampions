@@ -1,8 +1,6 @@
-import 'package:app/interfaces/screens/geolocation_permission.dart';
-import 'package:app/interfaces/screens/loading_screen.dart';
-
 import 'package:flutter/cupertino.dart';
 import 'package:app/services/imports.dart';
+import 'package:badges/badges.dart' as badge;
 
 class Menu extends StatefulWidget {
   const Menu({Key? key}) : super(key: key);
@@ -150,16 +148,22 @@ class MenuState extends State<Menu> {
                                             ),
                                           ),
                                           NavigationRailDestination(
-                                            icon: Badge(
+                                            icon: badge.Badge(
                                               badgeContent: Text(
                                                 '${snapshot.data!.where((element) => element.device.name == kDeviceModelTKR1A1).length}',
                                                 style: const TextStyle(
                                                     fontWeight: FontWeight.bold,
                                                     color: Colors.white),
                                               ),
-                                              badgeColor: currentPage == 1
-                                                  ? AppStyle.backgroundColor
-                                                  : AppStyle.primaryColor,
+                                              badgeStyle: badge.BadgeStyle(
+                                                shape: badge.BadgeShape.circle,
+                                                //toAnimate: false,
+                                                badgeColor: currentPage == 1
+                                                    ? AppStyle.backgroundColor
+                                                    : AppStyle.primaryColor,
+                                              ),
+                                              position:
+                                                  badge.BadgePosition.topEnd(),
                                               showBadge: snapshot.data!
                                                   .where((element) =>
                                                       element.device.name ==
@@ -230,7 +234,7 @@ class MenuState extends State<Menu> {
                                                 ),
                                                 label: 'Sessions'),
                                             NavigationDestination(
-                                                icon: Badge(
+                                                icon: badge.Badge(
                                                   badgeContent: Text(
                                                     '${snapshot.data!.where((element) => element.device.name == kDeviceModelTKR1A1).length}',
                                                     style: const TextStyle(
@@ -238,9 +242,17 @@ class MenuState extends State<Menu> {
                                                             FontWeight.bold,
                                                         color: Colors.white),
                                                   ),
-                                                  badgeColor: currentPage == 1
-                                                      ? AppStyle.backgroundColor
-                                                      : AppStyle.primaryColor,
+                                                  badgeStyle: badge.BadgeStyle(
+                                                    shape:
+                                                        badge.BadgeShape.circle,
+                                                    //toAnimate: false,
+                                                    badgeColor: currentPage == 1
+                                                        ? AppStyle
+                                                            .backgroundColor
+                                                        : AppStyle.primaryColor,
+                                                  ),
+                                                  position: badge.BadgePosition
+                                                      .topEnd(),
                                                   showBadge: snapshot.data!
                                                       .where((element) =>
                                                           element.device.name ==

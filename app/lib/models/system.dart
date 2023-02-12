@@ -22,9 +22,9 @@ class System {
   }
 
   factory System.fromJson(Map<String, dynamic> json) => System(
-        timestamp: json["timestamp"],
-        battery: json["battery"],
-        temperature: json["temperature"],
+        timestamp: json["timestamp"] ?? 0,
+        battery: json["battery"] ?? 0,
+        temperature: json["temperature"] ?? 0,
       );
   Map<String, dynamic> toJson() => {
         "timestamp": timestamp,

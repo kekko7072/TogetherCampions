@@ -21,8 +21,6 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         useMaterial3: true,
         primarySwatch: AppStyle.primaryMaterialColor,
-        primaryColor: AppStyle.primaryColor,
-        backgroundColor: AppStyle.backgroundColor,
       ),
       home: StreamProvider<CurrentUser?>.value(
           value: AuthService().user,

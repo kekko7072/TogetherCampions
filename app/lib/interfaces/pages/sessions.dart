@@ -63,7 +63,7 @@ class _SessionsState extends State<Sessions> {
                           ],
                         ),
                         const SizedBox(height: 10),
-                        StreamBuilder<List<Session>>(
+                        /*StreamBuilder<List<Session>>(
                             stream:
                                 DatabaseSession(deviceID: deviceID).streamList,
                             builder: (context, snapshot) {
@@ -77,6 +77,30 @@ class _SessionsState extends State<Sessions> {
                                   runSpacing: 5,
                                   children: [
                                     for (Session session in sessions) ...[
+                                      CardSession(
+                                        userData: userData,
+                                        deviceID: deviceID,
+                                        session: session,
+                                      )
+                                    ]
+                                  ],
+                                ),
+                              );
+                            }),*/
+                        FutureBuilder<List<SessionFile>>(
+                            future:
+                                DatabaseSession(deviceID: deviceID).futureList,
+                            builder: (context, snapshot) {
+                              final List<SessionFile> sessions =
+                                  snapshot.data ?? [];
+
+                              return Center(
+                                child: Wrap(
+                                  direction: Axis.horizontal,
+                                  spacing: 5,
+                                  runSpacing: 5,
+                                  children: [
+                                    for (SessionFile session in sessions) ...[
                                       CardSession(
                                         userData: userData,
                                         deviceID: deviceID,

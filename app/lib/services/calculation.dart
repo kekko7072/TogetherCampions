@@ -16,8 +16,7 @@ class CalculationService {
   }
 
   static TelemetryAnalytics telemetry({
-    required List<GpsPosition> gpsPosition,
-    required List<GpsNavigation> gpsNavigation,
+    required List<TimestampF> timestamp,
     required List<MapLatLng> segment,
   }) {
     double speedMedium = 0;
@@ -36,77 +35,80 @@ class CalculationService {
     double variationMax = 0;
     double variationMin = 10000;
 
-    for (GpsPosition log in gpsPosition) {
-      ///Speed
-      speedMedium = speedMedium + log.speed;
+    for (TimestampF log in timestamp) {
+      if (log.gpsPosition != null) {
+        ///Speed
+        speedMedium = speedMedium + log.gpsPosition!.speed;
 
-      if (speedMax < log.speed) {
-        speedMax =
-            CalculationService.roundDouble(number: log.speed, decimal: 3);
+        if (speedMax < log.gpsPosition!.speed) {
+          speedMax = CalculationService.roundDouble(
+              number: log.gpsPosition!.speed, decimal: 3);
+        }
+
+        if (speedMin > log.gpsPosition!.speed) {
+          speedMin = CalculationService.roundDouble(
+              number: log.gpsPosition!.speed, decimal: 3);
+        }
       }
 
-      if (speedMin > log.speed) {
-        speedMin =
-            CalculationService.roundDouble(number: log.speed, decimal: 3);
-      }
-    }
-    for (GpsNavigation log in gpsNavigation) {
-      ///Altitude
-      altitudeMedium = altitudeMedium + log.altitude;
+      if (log.gpsNavigation != null) {
+        ///Altitude
+        altitudeMedium = altitudeMedium + log.gpsNavigation!.altitude;
 
-      if (altitudeMax < log.altitude) {
-        altitudeMax =
-            CalculationService.roundDouble(number: log.altitude, decimal: 3);
-      }
+        if (altitudeMax < log.gpsNavigation!.altitude) {
+          altitudeMax = CalculationService.roundDouble(
+              number: log.gpsNavigation!.altitude, decimal: 3);
+        }
 
-      if (altitudeMin > log.altitude) {
-        altitudeMin =
-            CalculationService.roundDouble(number: log.altitude, decimal: 3);
-      }
+        if (altitudeMin > log.gpsNavigation!.altitude) {
+          altitudeMin = CalculationService.roundDouble(
+              number: log.gpsNavigation!.altitude, decimal: 3);
+        }
 
-      ///Course
-      courseMedium = courseMedium + log.course;
+        ///Course
+        courseMedium = courseMedium + log.gpsNavigation!.course;
 
-      if (courseMax < log.course) {
-        courseMax =
-            CalculationService.roundDouble(number: log.course, decimal: 3);
-      }
+        if (courseMax < log.gpsNavigation!.course) {
+          courseMax = CalculationService.roundDouble(
+              number: log.gpsNavigation!.course, decimal: 3);
+        }
 
-      if (courseMin > log.course) {
-        courseMin =
-            CalculationService.roundDouble(number: log.course, decimal: 3);
-      }
+        if (courseMin > log.gpsNavigation!.course) {
+          courseMin = CalculationService.roundDouble(
+              number: log.gpsNavigation!.course, decimal: 3);
+        }
 
-      ///Variation
-      variationMedium = variationMedium + log.variation;
+        ///Variation
+        variationMedium = variationMedium + log.gpsNavigation!.variation;
 
-      if (variationMax < log.variation) {
-        variationMax =
-            CalculationService.roundDouble(number: log.variation, decimal: 3);
-      }
+        if (variationMax < log.gpsNavigation!.variation) {
+          variationMax = CalculationService.roundDouble(
+              number: log.gpsNavigation!.variation, decimal: 3);
+        }
 
-      if (variationMin > log.variation) {
-        variationMin =
-            CalculationService.roundDouble(number: log.variation, decimal: 3);
+        if (variationMin > log.gpsNavigation!.variation) {
+          variationMin = CalculationService.roundDouble(
+              number: log.gpsNavigation!.variation, decimal: 3);
+        }
       }
     }
 
     return TelemetryAnalytics(
       speed: RangeAnalytics(
         medium: CalculationService.roundDouble(
-            number: (speedMedium / gpsPosition.length), decimal: 3),
+            number: (speedMedium / timestamp.length), decimal: 3),
         max: speedMax,
         min: speedMin,
       ),
       altitude: RangeAnalytics(
         medium: CalculationService.roundDouble(
-            number: altitudeMedium / gpsNavigation.length, decimal: 3),
+            number: altitudeMedium / timestamp.length, decimal: 3),
         max: altitudeMax,
         min: altitudeMin,
       ),
       course: RangeAnalytics(
         medium: CalculationService.roundDouble(
-            number: courseMedium / gpsNavigation.length, decimal: 3),
+            number: courseMedium / timestamp.length, decimal: 3),
         max: courseMax,
         min: courseMin,
       ),
@@ -114,7 +116,7 @@ class CalculationService {
           (MapService.findDistanceFromList(segment) * 1000).roundToDouble(),
       variation: RangeAnalytics(
         medium: CalculationService.roundDouble(
-            number: variationMedium / gpsNavigation.length, decimal: 3),
+            number: variationMedium / timestamp.length, decimal: 3),
         max: variationMax,
         min: variationMin,
       ),
@@ -307,8 +309,8 @@ class CalculationService {
             int.parse(originalTimestamp.last.replaceAll("timestamp=", ""))));
   }
 
-  static String timestamp(int input) {
-    Duration duration = Duration(milliseconds: input);
+  static String timestamp(int? input) {
+    Duration duration = Duration(milliseconds: input ?? 0);
     return '${duration.inHours < 1 ? '' : '${duration.inHours}:'}${duration.inMinutes.remainder(60) < 10 ? '0${duration.inMinutes.remainder(60)}' : duration.inMinutes.remainder(60)}:${duration.inSeconds.remainder(60) < 10 ? '0${duration.inSeconds.remainder(60)}' : duration.inSeconds.remainder(60)}';
   }
 
@@ -318,15 +320,18 @@ class CalculationService {
 
   static double temperature(int input) => (input / 340.00) + 36.53;
 
-  static double mediumAcceleration(Accelerometer input) =>
-      sqrt(pow(input.aX / 16384.0, 2) +
+  static double mediumAcceleration(Accelerometer? input) => input != null
+      ? sqrt(pow(input.aX / 16384.0, 2) +
           pow(input.aY / 16384.0, 2) +
-          pow(input.aZ / 16384.0, 2));
+          pow(input.aZ / 16384.0, 2))
+      : 0.0;
 
-  static int pitch(Accelerometer input) =>
-      (atan2(input.aX, sqrt(input.aY * input.aY + input.aZ * input.aZ)) * 57.3)
-          .toInt();
+  static int pitch(Accelerometer? input) => input != null
+      ? (atan2(input.aX, sqrt(input.aY * input.aY + input.aZ * input.aZ)) *
+              57.3)
+          .toInt()
+      : 0;
 
-  static int roll(Accelerometer input) =>
-      (atan2(input.aY, input.aZ) * 57.3).toInt();
+  static int roll(Accelerometer? input) =>
+      input != null ? (atan2(input.aY, input.aZ) * 57.3).toInt() : 0;
 }

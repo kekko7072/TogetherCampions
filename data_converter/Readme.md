@@ -7,6 +7,10 @@ In this system we have this type of data:
     + MPU_ACCELERATION
     + MPU_GYROSCOPE
 
+Insert the file DATALOG.TXT in the current directory (DATA_COVERTER/.) and then run in terminal the command python3 data_converter.py
+
+Remember to leave an empty file named DATALOG.TXT in the SDCARD, otherwise the tracker device will return an error of missing file.
+
 ## Structure
 This are the caracters used to store data:
 
