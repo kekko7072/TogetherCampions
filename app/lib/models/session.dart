@@ -101,22 +101,24 @@ class TimestampF {
 
 class SessionFile {
   SessionFile({
-    this.deviceId,
-    this.sessionId,
+    required this.path,
+    required this.deviceId,
+    required this.sessionId,
     this.info,
     this.devicePosition,
     this.timestamp,
   });
 
-  String? deviceId;
-  String? sessionId;
+  String path;
+  String deviceId;
+  String sessionId;
   SessionInfo? info;
   DevicePosition? devicePosition;
   List<TimestampF>? timestamp;
 
-  factory SessionFile.fromJson(Map<String, dynamic> json) {
-    print(json["timestamp"]);
+  factory SessionFile.fromJson(String path, Map<String, dynamic> json) {
     return SessionFile(
+      path: path,
       deviceId: json["device_id"] ?? '',
       sessionId: json["session_id"] ?? '',
       info: json["info"] == null ? null : SessionInfo.fromJson(json["info"]),

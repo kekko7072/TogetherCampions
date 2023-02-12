@@ -155,6 +155,7 @@ class _AddSessionState extends State<AddSession> {
                                 EasyLoading.show();
 
                                 SessionFile sessionFile = SessionFile.fromJson(
+                                    file!.path!,
                                     json.decode(String.fromCharCodes(
                                         await File(file!.path!)
                                             .readAsBytes())));

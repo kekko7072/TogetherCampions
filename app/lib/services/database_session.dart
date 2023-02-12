@@ -168,7 +168,7 @@ class DatabaseSession {
     for (var element in values) {
       try {
         String val = await File.fromUri(element.uri).readAsString();
-        output.add(SessionFile.fromJson(jsonDecode(val)));
+        output.add(SessionFile.fromJson(element.uri.path, jsonDecode(val)));
       } catch (e) {
         debugPrint("ERROR PARSING FILE: $e");
       }

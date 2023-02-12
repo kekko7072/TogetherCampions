@@ -41,8 +41,13 @@ class _CardSessionState extends State<CardSession> {
               SlidableAction(
                 onPressed: (con) async {
                   EasyLoading.show();
-                  //TODO DELETE FILE
-                  EasyLoading.dismiss();
+                  try {
+                    await File(widget.session.path).delete();
+                    EasyLoading.dismiss();
+                    setState(() {});
+                  } catch (e) {
+                    EasyLoading.showError(e.toString());
+                  }
                 },
                 backgroundColor: CupertinoColors.destructiveRed,
                 foregroundColor: Colors.black,

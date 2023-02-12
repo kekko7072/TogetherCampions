@@ -59,7 +59,7 @@ class _TrackState extends State<Track> {
                                       mainAxisAlignment:
                                           MainAxisAlignment.center,
                                       children: [
-                                        Icon(
+                                        const Icon(
                                           Icons.bluetooth_disabled,
                                           size: 200,
                                           color: AppStyle.primaryColor,
