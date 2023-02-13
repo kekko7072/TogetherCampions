@@ -102,5 +102,5 @@ for item in json_data:
         grouped_data[timestamp].append({key: value})
 
 # Converti il dizionario in un file JSON
-with open("datalog.json", "w") as file:
+with open(str(session_id)+".json", "w") as file:
     json.dump(grouped_data, file)
