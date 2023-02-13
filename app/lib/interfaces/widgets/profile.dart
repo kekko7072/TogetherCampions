@@ -24,9 +24,7 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   void loadFromSettings() async {
-    UnitsSystem val = await SharedPreferences.getInstance().then((value) =>
-        UnitsSystem.fromListString(
-            value.getStringList('units_system') ?? ['km/h', 'km', '°C']));
+    UnitsSystem val = await UnitsSystem.loadFromSettings();
     setState(() => unitsSystem = val);
   }
 

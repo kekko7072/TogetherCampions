@@ -14,7 +14,6 @@ class _BLEFindDevicesState extends State<BLEFindDevices> {
   bool connecting = false;
   @override
   Widget build(BuildContext context) {
-    final unitSystem = Provider.of<UnitsSystem>(context);
     final userData = Provider.of<UserData?>(context);
 
     return Scaffold(
@@ -124,7 +123,6 @@ class _BLEFindDevicesState extends State<BLEFindDevices> {
                                                                               EasyLoading.dismiss().then((value) => Navigator.of(context).push(MaterialPageRoute(builder: (context) {
                                                                                     return TrackBLEScreen(
                                                                                       deviceBLE: r.device,
-                                                                                      unitsSystem: unitSystem,
                                                                                       device: devices[index],
                                                                                     );
                                                                                   })));
@@ -182,7 +180,6 @@ class _BLEFindDevicesState extends State<BLEFindDevices> {
                                                     builder: (context) {
                                               return TrackBLEScreen(
                                                   deviceBLE: r.device,
-                                                  unitsSystem: unitSystem,
                                                   device: device);
                                             }))),
                                   );

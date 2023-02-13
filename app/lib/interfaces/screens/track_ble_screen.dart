@@ -6,15 +6,11 @@ import 'package:flutter/cupertino.dart';
 
 class TrackBLEScreen extends StatefulWidget {
   const TrackBLEScreen(
-      {Key? key,
-      required this.deviceBLE,
-      required this.device,
-      required this.unitsSystem})
+      {Key? key, required this.deviceBLE, required this.device})
       : super(key: key);
 
   final BluetoothDevice deviceBLE;
   final Device device;
-  final UnitsSystem unitsSystem;
 
   @override
   State<TrackBLEScreen> createState() => _TrackBLEScreenState();
@@ -32,6 +28,8 @@ class _TrackBLEScreenState extends State<TrackBLEScreen> {
   List<Accelerometer> accelerometer = [];
   List<Gyroscope> gyroscope = [];
 
+  late UnitsSystem unitsSystem;
+
   @override
   void initState() {
     super.initState();
@@ -39,6 +37,10 @@ class _TrackBLEScreenState extends State<TrackBLEScreen> {
   }
 
   void loadServices() async => await widget.deviceBLE.discoverServices();
+
+  Future<void> loadUnitsSystem() async {
+    await UnitsSystem.loadFromSettings().then((value) => unitsSystem = value);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -522,7 +524,7 @@ class _TrackBLEScreenState extends State<TrackBLEScreen> {
                                     ),
                                 barrierDismissible: true),
                             child: Text(
-                              '${system.isNotEmpty ? UnitsService.temperatureUnitsFromCELSIUS(widget.unitsSystem.temperatureUnits, system.last.temperature).toStringAsFixed(2) : 'Loading...'} ${UnitsService.temperatureUnitsToString(widget.unitsSystem.temperatureUnits)}',
+                              '${system.isNotEmpty ? UnitsService.temperatureUnitsFromCELSIUS(unitsSystem.temperatureUnits, system.last.temperature).toStringAsFixed(2) : 'Loading...'} ${UnitsService.temperatureUnitsToString(unitsSystem.temperatureUnits)}',
                               style: Theme.of(context)
                                   .textTheme
                                   .titleLarge!
@@ -638,7 +640,7 @@ class _TrackBLEScreenState extends State<TrackBLEScreen> {
                                   ),
                                 ],
                                 TrackMap(
-                                  unitsSystem: widget.unitsSystem,
+                                  unitsSystem: unitsSystem,
                                   gpsPositions: gpsPosition,
                                 ),
                               ] else ...[
