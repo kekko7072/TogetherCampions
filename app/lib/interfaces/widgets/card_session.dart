@@ -25,8 +25,6 @@ class CardSession extends StatefulWidget {
 class _CardSessionState extends State<CardSession> {
   @override
   Widget build(BuildContext context) {
-    final unitSystem = Provider.of<UnitsSystem>(context);
-
     return Padding(
       padding: const EdgeInsets.all(5.0),
       child: Container(
@@ -181,17 +179,18 @@ class _CardSessionState extends State<CardSession> {
                   ],
                 ),
               ),
-              onTap: () {
+              onTap: () async {
                 if (widget.session.timestamp != null &&
                     widget.session.timestamp!.isNotEmpty) {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => SessionMap(
-                              unitsSystem: unitSystem,
-                              sessionFile: widget.session,
-                            )),
-                  );
+                  await UnitsSystem.loadFromSettings()
+                      .then((unitSystem) => Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => SessionMap(
+                                      unitsSystem: unitSystem,
+                                      sessionFile: widget.session,
+                                    )),
+                          ));
                 } else {
                   EasyLoading.showInfo('Loading data...');
                 }
