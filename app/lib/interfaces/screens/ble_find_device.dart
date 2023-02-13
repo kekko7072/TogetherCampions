@@ -131,7 +131,7 @@ class _BLEFindDevicesState extends State<BLEFindDevices> {
                                                                             EasyLoading.showError(e.toString());
                                                                           }
                                                                         },
-                                                                        icon: Icon(
+                                                                        icon: const Icon(
                                                                           CupertinoIcons
                                                                               .arrow_right_circle_fill,
                                                                           color:

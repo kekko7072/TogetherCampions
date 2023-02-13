@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 
 import '../../services/imports.dart';
-import '../screens/loading_screen.dart';
 
 class Registration extends StatefulWidget {
   final bool isEdit;
