@@ -9,12 +9,14 @@ class CardSession extends StatefulWidget {
   const CardSession({
     Key? key,
     required this.userData,
-    required this.deviceID,
     required this.session,
+    required this.onDelete,
+    required this.onEdit,
   }) : super(key: key);
   final UserData userData;
-  final String deviceID;
   final SessionFile session;
+  final Future<void> Function() onDelete;
+  final Future<void> Function() onEdit;
 
   @override
   State<CardSession> createState() => _CardSessionState();
@@ -39,40 +41,19 @@ class _CardSessionState extends State<CardSession> {
             motion: const ScrollMotion(),
             children: [
               SlidableAction(
-                onPressed: (con) async {
-                  EasyLoading.show();
-                  try {
-                    await File(widget.session.path).delete();
-                    EasyLoading.dismiss();
-                    setState(() {});
-                  } catch (e) {
-                    EasyLoading.showError(e.toString());
-                  }
-                },
+                onPressed: (con) async => await widget.onDelete(),
                 backgroundColor: CupertinoColors.destructiveRed,
                 foregroundColor: Colors.black,
                 icon: Icons.delete,
                 label: 'Delete',
               ),
-
-              /*
-              TODO EDIT SESSION
-               SlidableAction(
-                onPressed: (cons) async => showModalBottomSheet(
-                  context: context,
-                  shape: AppStyle.kModalBottomStyle,
-                  isScrollControlled: true,
-                  isDismissible: true,
-                  builder: (context) => EditSession(
-                    deviceID: widget.deviceID,
-                    session: widget.session,
-                  ),
-                ),
+              SlidableAction(
+                onPressed: (cons) async => widget.onEdit(),
                 backgroundColor: AppStyle.primaryColor,
                 foregroundColor: Colors.black,
                 icon: Icons.edit,
                 label: 'Edit',
-              ),*/
+              ),
             ],
           ),
           child: GestureDetector(
@@ -246,7 +227,7 @@ class TrackPreviewState extends State<TrackPreview> {
     end = widget.timestamp.last;
 
     for (TimestampF log in widget.timestamp) {
-      if (log.gpsPosition != null) {
+      if (log.gpsPosition != null && log.gpsPosition!.available) {
         segment.add(log.gpsPosition!.latLng);
       }
     }

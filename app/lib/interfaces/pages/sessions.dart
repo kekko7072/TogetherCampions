@@ -1,5 +1,7 @@
 import 'package:app/services/imports.dart';
 
+import '../widgets/edit_session.dart';
+
 class Sessions extends StatefulWidget {
   const Sessions({Key? key, required this.userData}) : super(key: key);
   final UserData userData;
@@ -63,30 +65,6 @@ class _SessionsState extends State<Sessions> {
                           ],
                         ),
                         const SizedBox(height: 10),
-                        /*StreamBuilder<List<Session>>(
-                            stream:
-                                DatabaseSession(deviceID: deviceID).streamList,
-                            builder: (context, snapshot) {
-                              final List<Session> sessions =
-                                  snapshot.hasData ? snapshot.data! : [];
-
-                              return Center(
-                                child: Wrap(
-                                  direction: Axis.horizontal,
-                                  spacing: 5,
-                                  runSpacing: 5,
-                                  children: [
-                                    for (Session session in sessions) ...[
-                                      CardSession(
-                                        userData: userData,
-                                        deviceID: deviceID,
-                                        session: session,
-                                      )
-                                    ]
-                                  ],
-                                ),
-                              );
-                            }),*/
                         FutureBuilder<List<SessionFile>>(
                             future:
                                 DatabaseSession(deviceID: deviceID).futureList,
@@ -103,8 +81,28 @@ class _SessionsState extends State<Sessions> {
                                     for (SessionFile session in sessions) ...[
                                       CardSession(
                                         userData: userData,
-                                        deviceID: deviceID,
                                         session: session,
+                                        onDelete: () async {
+                                          EasyLoading.show();
+                                          try {
+                                            await File(session.path).delete();
+                                            EasyLoading.dismiss();
+                                            setState(
+                                                () => sessions.remove(session));
+                                          } catch (e) {
+                                            EasyLoading.showError(e.toString());
+                                          }
+                                        },
+                                        onEdit: () => showModalBottomSheet(
+                                          context: context,
+                                          shape: AppStyle.kModalBottomStyle,
+                                          isScrollControlled: true,
+                                          isDismissible: true,
+                                          builder: (context) => EditSession(
+                                            deviceID: deviceID,
+                                            session: session.info!,
+                                          ),
+                                        ),
                                       )
                                     ]
                                   ],

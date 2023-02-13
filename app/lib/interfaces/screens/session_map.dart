@@ -44,7 +44,7 @@ class SessionMapState extends State<SessionMap>
       end = widget.sessionFile.timestamp!.last;
 
       for (TimestampF log in widget.sessionFile.timestamp!) {
-        if (log.gpsPosition != null) {
+        if (log.gpsPosition != null && log.gpsPosition!.available) {
           polylinePoints.add(log.gpsPosition!.latLng);
         }
       }
@@ -84,7 +84,8 @@ class SessionMapState extends State<SessionMap>
 
   void moveCam(int index) {
     if (widget.sessionFile.timestamp != null &&
-        widget.sessionFile.timestamp![index].gpsPosition != null) {
+        widget.sessionFile.timestamp![index].gpsPosition != null &&
+        widget.sessionFile.timestamp![index].gpsPosition!.available) {
       polylinePointsAnimation
           .add(widget.sessionFile.timestamp![index].gpsPosition!.latLng);
 
@@ -329,7 +330,9 @@ class SessionMapState extends State<SessionMap>
                                                 null &&
                                             widget.sessionFile.timestamp![index]
                                                     .gpsPosition !=
-                                                null) {
+                                                null &&
+                                            widget.sessionFile.timestamp![index]
+                                                .gpsPosition!.available) {
                                           if (runningAnimation) {
                                             return MapMarker(
                                               latitude: widget

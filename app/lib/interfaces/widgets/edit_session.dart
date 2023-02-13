@@ -8,7 +8,7 @@ class EditSession extends StatefulWidget {
     required this.session,
   }) : super(key: key);
   final String deviceID;
-  final Session session;
+  final SessionInfo session;
 
   @override
   State<EditSession> createState() => _EditSessionState();
@@ -22,7 +22,7 @@ class _EditSessionState extends State<EditSession> {
   @override
   void initState() {
     super.initState();
-    name.text = widget.session.info.name;
+    name.text = widget.session.name;
   }
 
   @override
@@ -60,8 +60,11 @@ class _EditSessionState extends State<EditSession> {
                   onPressed: () async {
                     try {
                       EasyLoading.show();
-                      await DatabaseSession(deviceID: widget.deviceID)
-                          .edit(session: widget.session);
+
+                      ///TODO USING JSON FILE EDIT
+                      ///
+
+                      EasyLoading.dismiss();
                     } catch (e) {
                       EasyLoading.showError("ERROR: $e");
                       debugPrint("ERROR: $e");

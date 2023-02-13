@@ -31,12 +31,14 @@ class GpsPosition {
     );
   }
 
-  factory GpsPosition.fromJson(Map<String, dynamic> json) => GpsPosition(
-        timestamp: json["timestamp"] ?? 0,
-        available: json["available"] ?? false,
-        latLng: MapLatLng(json["latitude"] ?? 0.0, json["longitude"] ?? 0.0),
-        speed: json["speed"] ?? 0.0,
-      );
+  factory GpsPosition.fromJson(Map<String, dynamic> json) {
+    return GpsPosition(
+      timestamp: json["timestamp"] ?? 0,
+      available: json["available"] ?? false,
+      latLng: MapLatLng(json["latitude"], json["longitude"]),
+      speed: json["speed"] ?? 0.0,
+    );
+  }
   Map<String, dynamic> toJson() => {
         "timestamp": timestamp,
         "available": available,
