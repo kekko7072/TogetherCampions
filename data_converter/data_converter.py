@@ -31,41 +31,41 @@ for row in data:
         json_data.append({
             "system":
                     { 
-                      "timestamp": row[1],
-                      "battery": row[2],
-                      "temperature":row[3]
+                      "timestamp": int(row[1]),
+                      "battery":  int(row[2]),
+                      "temperature":float((int(row[3]) / 340.00) + 36.53)
                     }
             })
     elif  row[0] == "GPS_POSITION":
         json_data.append({
             "gps_position":
                     {
-                      "timestamp": row[1],
-                      "available": row[2],
-                      "lat": row[3],
-                      "lng": row[4],
-                      "speed": row[5]
+                      "timestamp": int(row[1]),
+                      "available": row[2]== "true",
+                      "lat": float(row[3]),
+                      "lng": float(row[4]),
+                      "speed": float(row[5])
                    }
             })
     elif  row[0] == "GPS_NAVIGATION":
         json_data.append({
             "gps_navigation":
                     {
-                      "timestamp": row[1],
-                      "available": row[2],
-                      "altitude": row[3],
-                      "course": row[4],
-                      "magnetic_variation": row[5]
+                      "timestamp": int(row[1]),
+                      "available": row[2] == "true",
+                      "altitude": float(row[3]),
+                      "course": float(row[4]),
+                      "variation": float(row[5])
                    }
             })
     elif  row[0] == "MPU_ACCELERATION":
         json_data.append({
                  "accelerometer":
                    {
-                     "timestamp": row[1],
-                     "x": row[2],
-                     "y": row[3],
-                     "z": row[4]
+                     "timestamp": int(row[1]),
+                     "x": int(row[2]),
+                     "y": int(row[3]),
+                     "z": int(row[4])
                     }
         })
     elif  row[0] == "MPU_GYROSCOPE":
@@ -73,10 +73,10 @@ for row in data:
         json_data.append({
                  "gyroscope":
                    {
-                     "timestamp": row[1],
-                     "x": row[2],
-                     "y": row[3],
-                     "z": row[4]
+                     "timestamp": int(row[1]),
+                     "x": int(row[2]),
+                     "y": int(row[3]),
+                     "z": int(row[4])
                     }
         })
 
@@ -86,7 +86,7 @@ session_id = uuid.uuid1()
 print("Session id: " + str(session_id))
 
 print("Device id: 9192B9E2-64A0-91B3-D73D-351BCE2D4858") #TODO remove this and make in app user a way to copy it
-device_id = input("Enter device id: ")
+device_id = "9192B9E2-64A0-91B3-D73D-351BCE2D4858"#input("Enter device id: ")
 
 start_timestamp = datetime.today() #TODO take start timestamp from user input
 end_timestamp = start_timestamp + timedelta(milliseconds=int(last_timestamp))
@@ -94,13 +94,27 @@ end_timestamp = start_timestamp + timedelta(milliseconds=int(last_timestamp))
 # che hanno lo stesso timestamp, ovvero che sono riferiti allo stesso istante
 grouped_data = {"device_id":device_id,"session_id":str(session_id),"info":{"name":"Session imported from logs","start":str(start_timestamp),"end":str(end_timestamp)},"device_position":{"x":0,"y":0,"z":0},"timestamp":[]}
 
+#TODO FIXARE CONVERSIONE DI JSON CHE APP E QUESTO CODICE DANNO RISULTATI DIVERSI!
+middle_json ={}
 for item in json_data:
     for key, value in item.items():
         timestamp = value['timestamp']
-        if timestamp not in grouped_data:
-            grouped_data[timestamp] = []
-        grouped_data[timestamp].append({key: value})
+        middle_json[key] = value
+        if(key=="gyroscope"):
+            grouped_data['timestamp'].append(middle_json)
+            middle_json={}
 
+        #print(key)
+        #print(value)
+        #print(timestamp)
+        #if (key=="system"):
+
+
+        #if timestamp not in grouped_data:
+        #    grouped_data[timestamp] = []
+        #grouped_data['timestamp'].append({key: value})
+
+            
 # Converti il dizionario in un file JSON
 with open(str(session_id)+".json", "w") as file:
     json.dump(grouped_data, file)

@@ -27,10 +27,10 @@ class Accelerometer {
   }
 
   factory Accelerometer.fromJson(Map<String, dynamic> json) => Accelerometer(
-        timestamp: json["timestamp"],
-        aX: json["aX"],
-        aY: json["aY"],
-        aZ: json["aZ"],
+        timestamp: json["timestamp"] ?? 0,
+        aX: json["aX"] ?? 0,
+        aY: json["aY"] ?? 0,
+        aZ: json["aZ"] ?? 0,
       );
   Map<String, dynamic> toJson() => {
         "timestamp": timestamp,
@@ -65,10 +65,10 @@ class Gyroscope {
   }
 
   factory Gyroscope.fromJson(Map<String, dynamic> json) => Gyroscope(
-        timestamp: json["timestamp"],
-        gX: json["gX"],
-        gY: json["gY"],
-        gZ: json["gZ"],
+        timestamp: json["timestamp"] ?? 0,
+        gX: json["gX"] ?? 0,
+        gY: json["gY"] ?? 0,
+        gZ: json["gZ"] ?? 0,
       );
   Map<String, dynamic> toJson() => {
         "timestamp": timestamp,

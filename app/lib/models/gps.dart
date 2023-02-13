@@ -32,10 +32,10 @@ class GpsPosition {
   }
 
   factory GpsPosition.fromJson(Map<String, dynamic> json) => GpsPosition(
-        timestamp: json["timestamp"],
-        available: json["available"],
-        latLng: MapLatLng(json["latitude"], json["longitude"]),
-        speed: json["speed"],
+        timestamp: json["timestamp"] ?? 0,
+        available: json["available"] ?? false,
+        latLng: MapLatLng(json["latitude"] ?? 0.0, json["longitude"] ?? 0.0),
+        speed: json["speed"] ?? 0.0,
       );
   Map<String, dynamic> toJson() => {
         "timestamp": timestamp,
@@ -81,11 +81,11 @@ class GpsNavigation {
   }
 
   factory GpsNavigation.fromJson(Map<String, dynamic> json) => GpsNavigation(
-        timestamp: json["timestamp"],
-        available: json["available"],
-        altitude: json["altitude"],
-        course: json["course"],
-        variation: json["variation"],
+        timestamp: json["timestamp"] ?? 0,
+        available: json["available"] ?? false,
+        altitude: json["altitude"] ?? 0.0,
+        course: json["course"] ?? 0.0,
+        variation: json["variation"] ?? 0.0,
       );
   Map<String, dynamic> toJson() => {
         "timestamp": timestamp,
