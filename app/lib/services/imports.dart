@@ -37,6 +37,7 @@ export 'package:libserialport/libserialport.dart'
 export 'package:geolocator/geolocator.dart';
 export 'package:battery_plus/battery_plus.dart';
 export 'package:flutter_blue_plus/flutter_blue_plus.dart';
+export 'package:mqtt_client/mqtt_client.dart';
 export 'package:sensors_plus/sensors_plus.dart';
 export 'package:multiple_stream_builder/multiple_stream_builder.dart';
 export 'package:shared_preferences/shared_preferences.dart';
@@ -86,7 +87,6 @@ export 'package:app/models/ble_service.dart';
 export 'package:app/models/mpu.dart';
 export 'package:app/models/gps.dart';
 export 'package:app/models/system.dart';
-export 'package:app/models/telemetry_analytics.dart';
 
 ///SERVICES
 export 'package:app/services/database_session.dart';

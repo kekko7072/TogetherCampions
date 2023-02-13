@@ -158,10 +158,11 @@ class DatabaseSession {
   Future<List<SessionFile>> get futureList async {
     List<SessionFile> output = [];
 
+    //Load files url form app directory
     final Directory directory = await getApplicationDocumentsDirectory();
     List<FileSystemEntity> values = directory.listSync();
 
-    //Remove links of not file
+    //Remove links of file not in the correct format
     values.removeWhere((element) => !element.path.contains(".json"));
 
     //Parse files
@@ -173,6 +174,15 @@ class DatabaseSession {
         debugPrint("ERROR PARSING FILE: $e");
       }
     }
+
+    //Order SessionFile by date
+    output.sort((a, b) {
+      DateTime startA = a.info?.start ?? DateTime.now();
+      DateTime startB =
+          b.info?.start ?? DateTime.now().add(const Duration(days: 1));
+
+      return startB.compareTo(startA);
+    });
 
     return output;
   }

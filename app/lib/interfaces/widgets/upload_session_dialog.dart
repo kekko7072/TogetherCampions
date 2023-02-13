@@ -52,7 +52,7 @@ class _UploadSessionDialogState extends State<UploadSessionDialog> {
       ),
       actions: [
         CupertinoDialogAction(
-          isDestructiveAction: true,
+          isDefaultAction: true,
           onPressed: () async {
             setState(() => showUploading = true);
 
@@ -144,50 +144,6 @@ class _UploadSessionDialogState extends State<UploadSessionDialog> {
             Navigator.of(context).pop();
           },
           child: const Text('Save locally'),
-        ),
-        CupertinoDialogAction(
-          isDefaultAction: true,
-          onPressed: () async {
-            setState(() => showUploading = true);
-
-            String sessionID = const Uuid().v4();
-
-            try {
-              setState(() => showUploading = true);
-//TODO RE ENABLE
-              /*bool success = await DatabaseSession(deviceID: widget.deviceID)
-                  .uploadFile(
-                      sessionFile: SessionFile(
-                          deviceId: widget.deviceID,
-                          sessionId: sessionID,
-                          info: SessionInfo(
-                              name: DateFormat('dd/MM/yyyy')
-                                  .add_Hms()
-                                  .format(DateTime.now())
-                                  .toString(),
-                              start: DateTime.now().subtract(Duration(
-                                  milliseconds: widget.system.last.timestamp)),
-                              end: DateTime.now()),
-                          devicePosition: widget.devicePosition,
-                          system: widget.system,
-                          gpsPosition: widget.gpsPosition,
-                          gpsNavigation: widget.gpsNavigation,
-                          accelerometer: widget.accelerometer,
-                          gyroscope: widget.gyroscope));
-
-              debugPrint("SUCCESS: $success");
-
-               */
-            } catch (e) {
-              debugPrint(
-                  "\n\n\n\n\n\n\n\n\n\n\n\nERRRORRR: $e\n\n\n\n\n\n\n\n\n\n\n\n");
-            }
-
-            Navigator.of(context).pop();
-            Navigator.of(context).pop();
-            Navigator.of(context).pop();
-          },
-          child: const Text('Upload cloud'),
         )
       ],
     );

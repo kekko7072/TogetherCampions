@@ -664,7 +664,7 @@ class SessionMapState extends State<SessionMap>
                                               width: 35,
                                               decoration: const BoxDecoration(
                                                   shape: BoxShape.circle,
-                                                  color: Colors.white),
+                                                  color: AppStyle.primaryColor),
                                               child: Center(
                                                 child: Icon(
                                                   runningAnimation
@@ -673,7 +673,8 @@ class SessionMapState extends State<SessionMap>
                                                       : CupertinoIcons
                                                           .play_circle,
                                                   size: 22,
-                                                  color: Colors.black87,
+                                                  color:
+                                                      AppStyle.backgroundColor,
                                                 ),
                                               ),
                                             ),
