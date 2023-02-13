@@ -81,17 +81,19 @@ for row in data:
         })
 
 
-#Insert user input
+# Insert user input
 session_id = uuid.uuid1()
 print("Session id: " + str(session_id))
 
 print("Device id: 9192B9E2-64A0-91B3-D73D-351BCE2D4858") #TODO remove this and make in app user a way to copy it
-device_id = "9192B9E2-64A0-91B3-D73D-351BCE2D4858"#input("Enter device id: ")
+device_id = "9192B9E2-64A0-91B3-D73D-351BCE2D4858" #input("Enter device id: ")
 
 start_timestamp = datetime.today() #TODO take start timestamp from user input
 end_timestamp = start_timestamp + timedelta(milliseconds=int(last_timestamp))
+
 # Crea una lista di timestamps raggruppando in un unico file json i dati
 # che hanno lo stesso timestamp, ovvero che sono riferiti allo stesso istante
+
 grouped_data = {"device_id":device_id,"session_id":str(session_id),"info":{"name":"Session imported from logs","start":str(start_timestamp),"end":str(end_timestamp)},"device_position":{"x":0,"y":0,"z":0},"timestamp":[]}
 
 utility_json ={}
@@ -110,5 +112,5 @@ for item in json_data:
             print(item)
             
 # Converti il dizionario in un file JSON
-with open(str(session_id)+".json", "w") as file:
+with open(str(session_id) + ".json", "w") as file:
     json.dump(grouped_data, file)
