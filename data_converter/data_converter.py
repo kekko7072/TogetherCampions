@@ -1,5 +1,7 @@
 import csv
 import json
+import uuid
+from datetime import datetime, timedelta
 
 # Apri il file di testo
 with open("DATALOG.TXT", "r") as file:
@@ -21,6 +23,7 @@ with open("datalog.csv", "r") as file:
 
 # Crea un dizionario per contenere tutti i dati del file CSV
 json_data = []
+last_timestamp = 0
 
 # Loop through each row of data
 for row in data:
@@ -66,6 +69,7 @@ for row in data:
                     }
         })
     elif  row[0] == "MPU_GYROSCOPE":
+        last_timestamp = row[1]
         json_data.append({
                  "gyroscope":
                    {
@@ -76,9 +80,19 @@ for row in data:
                     }
         })
 
+
+#Insert user input
+session_id = uuid.uuid1()
+print("Session id: " + str(session_id))
+
+print("Device id: 9192B9E2-64A0-91B3-D73D-351BCE2D4858") #TODO remove this and make in app user a way to copy it
+device_id = input("Enter device id: ")
+
+start_timestamp = datetime.today() #TODO take start timestamp from user input
+end_timestamp = start_timestamp + timedelta(milliseconds=int(last_timestamp))
 # Crea una lista di timestamps raggruppando in un unico file json i dati
 # che hanno lo stesso timestamp, ovvero che sono riferiti allo stesso istante
-grouped_data = {}
+grouped_data = {"device_id":device_id,"session_id":str(session_id),"info":{"name":"Session imported from logs","start":str(start_timestamp),"end":str(end_timestamp)},"device_position":{"x":0,"y":0,"z":0},"timestamp":[]}
 
 for item in json_data:
     for key, value in item.items():
