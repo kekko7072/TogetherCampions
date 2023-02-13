@@ -42,8 +42,8 @@ for row in data:
                     {
                       "timestamp": int(row[1]),
                       "available": row[2]== "true",
-                      "lat": float(row[3]),
-                      "lng": float(row[4]),
+                      "latitude": float(row[3]),
+                      "longitude": float(row[4]),
                       "speed": float(row[5])
                    }
             })
