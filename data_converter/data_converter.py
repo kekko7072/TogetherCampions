@@ -94,26 +94,20 @@ end_timestamp = start_timestamp + timedelta(milliseconds=int(last_timestamp))
 # che hanno lo stesso timestamp, ovvero che sono riferiti allo stesso istante
 grouped_data = {"device_id":device_id,"session_id":str(session_id),"info":{"name":"Session imported from logs","start":str(start_timestamp),"end":str(end_timestamp)},"device_position":{"x":0,"y":0,"z":0},"timestamp":[]}
 
-#TODO FIXARE CONVERSIONE DI JSON CHE APP E QUESTO CODICE DANNO RISULTATI DIVERSI!
-middle_json ={}
+utility_json ={}
 for item in json_data:
     for key, value in item.items():
         timestamp = value['timestamp']
-        middle_json[key] = value
-        if(key=="gyroscope"):
-            grouped_data['timestamp'].append(middle_json)
-            middle_json={}
-
-        #print(key)
-        #print(value)
-        #print(timestamp)
-        #if (key=="system"):
-
-
-        #if timestamp not in grouped_data:
-        #    grouped_data[timestamp] = []
-        #grouped_data['timestamp'].append({key: value})
-
+        if key == "system":
+            utility_json[key] = value
+        elif timestamp==utility_json["system"]['timestamp']:
+            utility_json[key] = value
+            if(key=="gyroscope"):
+                grouped_data['timestamp'].append(utility_json)
+                utility_json={}
+        else:
+            print("!Found one data without marching timestamp")
+            print(item)
             
 # Converti il dizionario in un file JSON
 with open(str(session_id)+".json", "w") as file:
