@@ -76,8 +76,8 @@ for row in data:
                     }
         })
 
-#Crea una lista di timestamps raggruppando in un unico file json i dati
-#che hanno lo stesso timestamp, ovvero che sono riferiti allo stesso istante
+# Crea una lista di timestamps raggruppando in un unico file json i dati
+# che hanno lo stesso timestamp, ovvero che sono riferiti allo stesso istante
 grouped_data = {}
 
 for item in json_data:
