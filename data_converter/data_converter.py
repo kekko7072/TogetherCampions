@@ -63,9 +63,9 @@ for row in data:
                  "accelerometer":
                    {
                      "timestamp": int(row[1]),
-                     "x": int(row[2]),
-                     "y": int(row[3]),
-                     "z": int(row[4])
+                     "aX": int(row[2]),
+                     "aY": int(row[3]),
+                     "aZ": int(row[4])
                     }
         })
     elif  row[0] == "MPU_GYROSCOPE":
@@ -74,9 +74,9 @@ for row in data:
                  "gyroscope":
                    {
                      "timestamp": int(row[1]),
-                     "x": int(row[2]),
-                     "y": int(row[3]),
-                     "z": int(row[4])
+                     "gX": int(row[2]),
+                     "gY": int(row[3]),
+                     "gZ": int(row[4])
                     }
         })
 
