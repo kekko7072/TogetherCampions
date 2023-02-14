@@ -47,9 +47,9 @@ class DatabaseDevice {
         version: snapshot.data()?['software']?['version'] ?? '',
       ),
       devicePosition: DevicePosition(
-        x: snapshot.data()?['devicePosition']?['x']?.toInt(),
-        y: snapshot.data()?['devicePosition']?['y']?.toInt(),
-        z: snapshot.data()?['devicePosition']?['z']?.toInt(),
+        x: snapshot.data()?['devicePosition']?['x']?.toInt() ?? 0,
+        y: snapshot.data()?['devicePosition']?['y']?.toInt() ?? 0,
+        z: snapshot.data()?['devicePosition']?['z']?.toInt() ?? 0,
       ),
     );
   }

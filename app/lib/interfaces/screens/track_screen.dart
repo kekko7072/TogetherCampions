@@ -132,11 +132,13 @@ class _TrackScreenState extends State<TrackScreen> {
                                                                                         if (!connecting) {
                                                                                           setState(() => connecting = true);
                                                                                           EasyLoading.show();
+                                                                                          UnitsSystem unitsSystem = await UnitsSystem.loadFromSettings();
                                                                                           await r.device.connect();
                                                                                           setState(() => connecting = false);
                                                                                           EasyLoading.dismiss().then((value) => Navigator.of(context).push(MaterialPageRoute(builder: (context) {
                                                                                                 return TrackBLEScreen(
                                                                                                   deviceBLE: r.device,
+                                                                                                  unitsSystem: unitsSystem,
                                                                                                   device: devices[index],
                                                                                                 );
                                                                                               })));
@@ -192,19 +194,24 @@ class _TrackScreenState extends State<TrackScreen> {
                                               final device = snapshot.data!;
                                               return ScanResultTile(
                                                 result: r,
-                                                onTap: () async => await r
-                                                    .device
-                                                    .connect()
-                                                    .then((value) =>
-                                                        Navigator.of(context).push(
-                                                            MaterialPageRoute(
-                                                                builder:
-                                                                    (context) {
-                                                          return TrackBLEScreen(
-                                                              deviceBLE:
-                                                                  r.device,
-                                                              device: device);
-                                                        }))),
+                                                onTap: () async {
+                                                  UnitsSystem unitsSystem =
+                                                      await UnitsSystem
+                                                          .loadFromSettings();
+                                                  await r.device.connect().then(
+                                                      (value) =>
+                                                          Navigator.of(context).push(
+                                                              MaterialPageRoute(
+                                                                  builder:
+                                                                      (context) {
+                                                            return TrackBLEScreen(
+                                                                deviceBLE:
+                                                                    r.device,
+                                                                unitsSystem:
+                                                                    unitsSystem,
+                                                                device: device);
+                                                          })));
+                                                },
                                               );
                                             }),
                                       )
