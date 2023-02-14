@@ -32,6 +32,7 @@ export 'package:libserialport/libserialport.dart'
 export 'package:geolocator/geolocator.dart';
 export 'package:battery_plus/battery_plus.dart';
 export 'package:flutter_blue_plus/flutter_blue_plus.dart';
+export 'package:mqtt_client/mqtt_server_client.dart';
 export 'package:mqtt_client/mqtt_client.dart';
 export 'package:sensors_plus/sensors_plus.dart';
 export 'package:multiple_stream_builder/multiple_stream_builder.dart';
@@ -52,10 +53,11 @@ export 'package:app/interfaces/pages/track.dart';
 
 ///##Screens
 export 'package:app/interfaces/screens/session_map.dart';
-export 'package:app/interfaces/screens/ble_find_device.dart';
+export 'package:app/interfaces/screens/track_screen.dart';
 export 'package:app/interfaces/screens/track_ble_screen.dart';
 export 'package:app/interfaces/screens/geolocation_permission.dart';
 export 'package:app/interfaces/screens/loading_screen.dart';
+export 'package:app/interfaces/screens/track_mqtt_screen.dart';
 
 ///##Widgets
 export 'package:app/interfaces/widgets/add_session.dart';
@@ -93,3 +95,4 @@ export 'package:app/services/style.dart';
 export 'package:app/services/map.dart';
 export 'package:app/services/bluetooth_helper.dart';
 export 'package:app/services/units.dart';
+export 'package:app/services/mqtt_service.dart';

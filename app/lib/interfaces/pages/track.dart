@@ -45,51 +45,8 @@ class _TrackState extends State<Track> {
                       ],
                     ),
                   )
-                : Center(
-                    child: StreamBuilder<BluetoothState>(
-                        stream: FlutterBluePlus.instance.state,
-                        initialData: BluetoothState.off,
-                        builder: (context, snapshot) {
-                          BluetoothState? state = snapshot.data;
-
-                          return snapshot.hasData
-                              ? state == BluetoothState.on
-                                  ? const BLEFindDevices()
-                                  : Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        const Icon(
-                                          Icons.bluetooth_disabled,
-                                          size: 200,
-                                          color: AppStyle.primaryColor,
-                                        ),
-                                        Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                              vertical: 40.0, horizontal: 15),
-                                          child: Text(
-                                            'Bluetooth Adapter is ${state != null ? state.toString().substring(15) : 'not available'}.',
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .titleMedium!
-                                                .copyWith(
-                                                    fontWeight:
-                                                        FontWeight.w600),
-                                            textAlign: TextAlign.center,
-                                          ),
-                                        ),
-                                        CupertinoButton.filled(
-                                          onPressed: Platform.isAndroid
-                                              ? () => FlutterBluePlus.instance
-                                                  .turnOn()
-                                              : () => setState(() {}),
-                                          child: const Text('TURN ON'),
-                                        ),
-                                      ],
-                                    )
-                              : const CircularProgressIndicator();
-                        }),
-                  ) /*StreamBuilder<List<Log>>(
+                : Center(child: TrackScreen()),
+            /*StreamBuilder<List<Log>>(
                     stream: DatabaseLog(id: userData.devices.first)
                         .liveLog(addTime: time),
                     builder: (context, snapshot) {
@@ -126,7 +83,7 @@ class _TrackState extends State<Track> {
                         );
                       }
                     }),*/
-            )
+          )
         : const Center(
             child: CircularProgressIndicator(),
           );
