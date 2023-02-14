@@ -1,4 +1,3 @@
-#include <ArduinoBLE.h>
 #include <TinyGPS++.h>
 #include <Wire.h>
 #include <SPI.h>
@@ -14,6 +13,23 @@
 
 
 
+#if DEVICE_MODEL == 0
+#include <MKRGSM.h>
+#include <MQTT.h>
+#include "configuration_sim.h"
+GSMClient net;
+GPRS gprs;
+GSM gsmAccess;
+MQTTClient client;
+
+#else if DEVICE_MODEL == 1
+#include <ArduinoBLE.h>
+#include "configuration_ble.h"
+
+#endif
+
+
+
 //SERVICES
 long previousMillis = 0;
 
@@ -23,9 +39,9 @@ TinyGPSCustom magneticVariation(gps, "GPRMC", 10);
 
 UUID uuid;
 
-//MPU
-//Adafruit_MPU6050 mpu;
-//sensors_event_t a, g, temp;
+
+
+#if DEVICE_MODEL == 0
 
 void setup() {
 
@@ -38,40 +54,69 @@ void setup() {
   //SDCARD
   initializeSDCARD(chip_select);
 
-  //Bluetooth®
-  if (!BLE.begin()) {
-    Serial.println("Starting Bluetooth® Low Energy failed!");
-    while (1)
-      ;
+  //MPU-6050
+  setupMPU();
+
+  //GPS
+  setupGPS();
+
+  //MQTT
+  connectMQTT(net, gprs, gsmAccess, client);
+
+  //READY
+  digitalWrite(LED_BUILTIN, HIGH);
+}
+
+void loop() {
+  Serial.println(uuid);
+
+  client.loop();
+
+  if (!client.connected()) {
+    connectMQTT(net, gprs, gsmAccess, client);
   }
 
-  BLE.setDeviceName("TKR1A1");  //Setting a name that will appear when scanning for Bluetooth® devices
-  BLE.setLocalName("TKR1A1");
+  long currentMillis = millis();
 
-  BLE.setAdvertisedService(systemService);
-  BLE.setAdvertisedService(gpsService);
-  BLE.setAdvertisedService(mpuService);
+  if (currentMillis - previousMillis >= measurements_milliseconds) {
 
-  systemService.addCharacteristic(systemCharacteristic);
-  gpsService.addCharacteristic(poitionCharacteristic);
-  gpsService.addCharacteristic(navigationCharacteristic);
-  mpuService.addCharacteristic(accelerometerCharacteristic);
-  mpuService.addCharacteristic(gyroscopeCharacteristic);
+    //System
+    updateSystem(currentMillis, client);
 
-  BLE.addService(systemService);
-  BLE.addService(gpsService);
-  BLE.addService(mpuService);
+    //GPS
+    updateGPSPosition(currentMillis, client, gps);
+    updateGPSNavigation(currentMillis, client, gps, magneticVariation);
 
-  BLE.advertise();
+    //MPU
+    updateMPUAcceleration(currentMillis, client);
+    updateMPUGyroscope(currentMillis, client);
 
-  //BLE.setEventHandler(BLEConnected, ConnectHandler);
-  //BLE.setEventHandler(BLEDisconnected, DisconnectHandler);
+    previousMillis = currentMillis;  //Clean to re-run cicle
+  }
+}
+
+
+#else DEVICE_MODEL == 1
+
+void setup() {
+
+  //Initialize serial communication
+  Serial.begin(9600);
+
+  //Initialize the built-in LED
+  pinMode(LED_BUILTIN, OUTPUT);
+
+  //SDCARD
+  initializeSDCARD(chip_select);
 
   //MPU-6050
   setupMPU();
 
   //GPS
   setupGPS();
+
+  //BLE
+  connectBLE();
 
   //READY
   digitalWrite(LED_BUILTIN, HIGH);
@@ -90,7 +135,7 @@ void loop() {
 
     // check the battery level every 200ms
     // while the central is connected:
-    while (central.connected()) {  //BLE.poll();
+    while (central.connected()) {
 
       long currentMillis = millis();
 
@@ -101,6 +146,7 @@ void loop() {
       //mpu.getEvent(&a, &g, &temp);
 
       if (currentMillis - previousMillis >= measurements_milliseconds) {
+
         //System
         updateSystem(currentMillis, systemCharacteristic);
 
@@ -111,9 +157,10 @@ void loop() {
         //MPU
         updateMPUAcceleration(currentMillis, accelerometerCharacteristic);
         updateMPUGyroscope(currentMillis, gyroscopeCharacteristic);
-
-        previousMillis = currentMillis;  //Clean to re-run cicle
       }
+      previousMillis = currentMillis;  //Clean to re-run cicle
     }
   }
 }
+
+#endif
