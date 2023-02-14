@@ -52,12 +52,22 @@ class _UploadSessionDialogState extends State<UploadSessionDialog> {
       ),
       actions: [
         CupertinoDialogAction(
+          isDestructiveAction: true,
+          child: const Text('Don\'t save'),
+          onPressed: () {
+            Navigator.of(context).pop();
+            Navigator.of(context).pop();
+            Navigator.of(context).pop();
+          },
+        ),
+        CupertinoDialogAction(
           isDefaultAction: true,
+          child: const Text('Save'),
           onPressed: () async {
             setState(() => showUploading = true);
 
             String sessionID = const Uuid().v4();
-            debugPrint('\n\n\n\n\n\n\n\n\n\n\n\n');
+
             try {
               setState(() => showUploading = true);
               List<Map<String, dynamic>> data = [];
@@ -104,7 +114,7 @@ class _UploadSessionDialogState extends State<UploadSessionDialog> {
                 }
               }
 
-              print(groupedData.values.toList());
+              debugPrint("VALUES: ${groupedData.values.toList()}");
 
               Map<String, dynamic> content = {
                 "device_id": widget.deviceID.toString(),
@@ -143,7 +153,6 @@ class _UploadSessionDialogState extends State<UploadSessionDialog> {
             Navigator.of(context).pop();
             Navigator.of(context).pop();
           },
-          child: const Text('Save locally'),
         )
       ],
     );
