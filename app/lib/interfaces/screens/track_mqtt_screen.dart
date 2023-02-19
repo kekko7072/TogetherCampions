@@ -69,7 +69,6 @@ class _TrackMQTTScreenState extends State<TrackMQTTScreen> {
             ],
           )
         : Column(
-            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const SizedBox(height: 20),
               Text('Server address',

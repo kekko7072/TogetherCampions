@@ -137,51 +137,35 @@ class MQTTService {
 
   Future<String> deviceInfo() async {
     DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+    String value = 'UNKNOWN_PLATFORM';
     if (kIsWeb) {
       WebBrowserInfo webBrowserInfo = await deviceInfo.webBrowserInfo;
-      String value = webBrowserInfo.userAgent ??
-          'NOT_FOUND_WEB'; // e.g. "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:61.0) Gecko/20100101 Firefox/61.0"
-      return value.replaceAll(" ", "_");
+      value = webBrowserInfo.userAgent ?? 'NOT_FOUND_WEB';
     } else {
       if (Platform.isAndroid) {
         AndroidDeviceInfo info = await deviceInfo.androidInfo;
-        String value =
-            'MOBILE:ANDROID_MODEL:${info.model}_OS:${info.version}_NAME:${info.product}';
-        return value.replaceAll(" ", "+");
+        value =
+            'DEVICE:${info.model}|OS:${info.version}|NAME:${info.product}|DATE:';
       } else if (Platform.isIOS) {
         IosDeviceInfo info = await deviceInfo.iosInfo;
-        String value =
-            'MOBILE:IOS_MODEL:${info.utsname}_OS:${info.systemVersion}';
-        return value.replaceAll(" ", "+");
+        value =
+            'DEVICE:${info.utsname.machine}|OS:iOS+${info.systemVersion}|DATE:';
       } else if (Platform.isMacOS) {
         MacOsDeviceInfo info = await deviceInfo.macOsInfo;
-        String value =
-            'DESKTOP:MACOS_MODEL:${info.model}_OS:${info.osRelease}_NAME:${info.computerName}';
-        return value.replaceAll(" ", "+");
+        value =
+            'DEVICE:${info.model}|OS:macOS+${info.osRelease}|NAME:${info.computerName}|DATE:';
       } else if (Platform.isWindows) {
         WindowsDeviceInfo info = await deviceInfo.windowsInfo;
-        String value =
-            'DESKTOP:WINDOWS_OS:${info.majorVersion}.${info.minorVersion}${info.buildNumber}_NAME:${info.computerName}_';
-        return value.replaceAll(" ", "+");
+        value =
+            'DEVICE:COMPUTER|OS:Windows${info.majorVersion}.${info.minorVersion}${info.buildNumber}|NAME:${info.computerName}|DATE:';
       } else if (Platform.isLinux) {
         LinuxDeviceInfo info = await deviceInfo.linuxInfo;
-        String value =
-            'DESKTOP:LINUX_OS:${info.name}+${info.version}.${info.buildId}_NAME:${info.machineId}';
-        return value.replaceAll(" ", "+");
-      } else {
-        return 'NOT_FOUND_PLATFORM';
+        value =
+            'DEVICE:COMPUTER|OS:${info.name}+${info.version}.${info.buildId}|NAME:${info.machineId}|DATE:';
       }
     }
 
-    AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
-    print('Running on ${androidInfo.model}'); // e.g. "Moto G (4)"
-
-    IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
-    print('Running on ${iosInfo.utsname.machine}'); // e.g. "iPod7,1"
-
-    WebBrowserInfo webBrowserInfo = await deviceInfo.webBrowserInfo;
-    print(
-        'Running on ${webBrowserInfo.userAgent}'); // e.g. "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:61.0) Gecko/20100101 Firefox/61.0"
+    return value.replaceAll(" ", "+") + DateTime.now().toIso8601String();
   }
 }
 /*
