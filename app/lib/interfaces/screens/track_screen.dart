@@ -286,7 +286,7 @@ class _TrackScreenState extends State<TrackScreen> {
                 }
               },
             )
-          : const Spacer(),
+          : Container(),
     );
   }
 }

@@ -26,7 +26,7 @@ class MapService {
     double speed = 0;
     int index = 0;
     for (i = 0; i < list.length - 1; i++) {
-      if (list[i].gpsPosition!.speed > speed) {
+      if ((list[i].gpsPosition?.speed ?? 0) > speed) {
         speed = list[i].gpsPosition!.speed;
         index = i;
       }
