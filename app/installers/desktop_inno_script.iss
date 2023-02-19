@@ -24,7 +24,7 @@ DisableProgramGroupPage=yes
 ; Uncomment the following line to run in non administrative install mode (install for current user only.)
 PrivilegesRequired=lowest
 OutputDir=C:\Users\franc\Desktop\TogetherCampions\app\installers
-OutputBaseFilename=LMS
+OutputBaseFilename=StoneApp
 SetupIconFile=C:\Users\franc\Desktop\TogetherCampions\app\windows\runner\resources\app_icon.ico
 Compression=lzma
 SolidCompression=yes
@@ -41,8 +41,10 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 Source: "C:\Users\franc\Desktop\TogetherCampions\app\build\windows\runner\Release\{#MyAppExeName}"; DestDir: "{app}"; Flags: ignoreversion
 Source: "C:\Users\franc\Desktop\TogetherCampions\app\build\windows\runner\Release\flutter_windows.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "C:\Users\franc\Desktop\TogetherCampions\app\build\windows\runner\Release\sqlite3.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\Users\franc\Desktop\TogetherCampions\app\build\windows\runner\Release\dynamic_color_plugin.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\Users\franc\Desktop\TogetherCampions\app\build\windows\runner\Release\url_launcher_windows_plugin.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "C:\Users\franc\Desktop\TogetherCampions\app\build\windows\runner\Release\flutter_libserialport_plugin.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "C:\Users\franc\Desktop\TogetherCampions\app\build\windows\runner\Release\battery_plus_plugin.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "C:\Users\franc\Desktop\TogetherCampions\app\build\windows\runner\Release\geolocator_windows_plugin.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "C:\Users\franc\Desktop\TogetherCampions\app\build\windows\runner\Release\serialport.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "C:\Users\franc\Desktop\TogetherCampions\app\build\windows\runner\Release\data\*"; DestDir: "{app}\data"; Flags: ignoreversion recursesubdirs createallsubdirs
 ;Source: "C:\Users\franc\Desktop\TogetherCampions\app\build\windows\runner\Release\db\*"; DestDir: "{app}\db"; Flags: ignoreversion recursesubdirs createallsubdirs
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
