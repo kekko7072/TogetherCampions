@@ -85,67 +85,70 @@ class _TrackScreenState extends State<TrackScreen> {
                                                 result: r,
                                                 onTap: () => showDialog(
                                                     context: context,
-                                                    builder: (_) =>
-                                                        CupertinoAlertDialog(
+                                                    builder: (_) => AlertDialog(
                                                           title: const Text(
-                                                              'Select device id'),
+                                                              'Connect to device'),
                                                           content: SizedBox(
                                                             height: 50,
                                                             child: ListTile(
-                                                              title: Text(
-                                                                  "devices[index].name"),
+                                                              title: Text(r
+                                                                  .device.name),
                                                               subtitle: Text(
-                                                                "devices[index].serialNumber",
+                                                                r.device.id.id,
                                                               ),
-                                                              trailing:
-                                                                  IconButton(
-                                                                      onPressed:
-                                                                          () async {
-                                                                        try {
-                                                                          if (!connecting) {
-                                                                            setState(() =>
-                                                                                connecting = true);
-                                                                            EasyLoading.show();
-                                                                            UnitsSystem
-                                                                                unitsSystem =
-                                                                                await UnitsSystem.loadFromSettings();
-                                                                            await r.device.connect();
-                                                                            setState(() =>
-                                                                                connecting = false);
-                                                                            EasyLoading.dismiss().then((value) =>
-                                                                                Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-                                                                                  return TrackBLEScreen(
-                                                                                    deviceBLE: r.device,
-                                                                                    unitsSystem: unitsSystem,
-                                                                                    device: Device(serialNumber: "serialNumber", modelNumber: "modelNumber", uid: "uid", name: "name", software: Software(name: "", version: "version"), devicePosition: DevicePosition(x: 0, y: 0, z: 0)),
-                                                                                  );
-                                                                                })));
-                                                                          }
-                                                                        } catch (e) {
-                                                                          EasyLoading.showError(
-                                                                              e.toString());
-                                                                        }
-                                                                      },
-                                                                      icon:
-                                                                          const Icon(
-                                                                        CupertinoIcons
-                                                                            .arrow_right_circle_fill,
-                                                                        color: AppStyle
-                                                                            .primaryColor,
-                                                                      )),
                                                             ),
                                                           ),
                                                           actions: [
-                                                            CupertinoDialogAction(
-                                                              isDestructiveAction:
-                                                                  true,
+                                                            TextButton(
                                                               onPressed: () =>
                                                                   Navigator.of(
                                                                           context)
                                                                       .pop(),
                                                               child: const Text(
-                                                                  'Cancel'),
-                                                            )
+                                                                'Cancel',
+                                                                style: TextStyle(
+                                                                    color: Colors
+                                                                        .red),
+                                                              ),
+                                                            ),
+                                                            TextButton(
+                                                                onPressed:
+                                                                    () async {
+                                                                  try {
+                                                                    if (!connecting) {
+                                                                      setState(() =>
+                                                                          connecting =
+                                                                              true);
+                                                                      EasyLoading
+                                                                          .show();
+                                                                      UnitsSystem
+                                                                          unitsSystem =
+                                                                          await UnitsSystem
+                                                                              .loadFromSettings();
+                                                                      await r
+                                                                          .device
+                                                                          .connect();
+                                                                      setState(() =>
+                                                                          connecting =
+                                                                              false);
+                                                                      EasyLoading.dismiss().then((value) =>
+                                                                          Navigator.of(context).push(MaterialPageRoute(builder:
+                                                                              (context) {
+                                                                            return TrackBLEScreen(
+                                                                              deviceBLE: r.device,
+                                                                              unitsSystem: unitsSystem,
+                                                                              device: Device(serialNumber: "serialNumber", modelNumber: "modelNumber", uid: "uid", name: "name", software: Software(name: "", version: "version"), devicePosition: DevicePosition(x: 0, y: 0, z: 0)),
+                                                                            );
+                                                                          })));
+                                                                    }
+                                                                  } catch (e) {
+                                                                    EasyLoading
+                                                                        .showError(
+                                                                            e.toString());
+                                                                  }
+                                                                },
+                                                                child: const Text(
+                                                                    'Connect')),
                                                           ],
                                                         )),
                                               ))
