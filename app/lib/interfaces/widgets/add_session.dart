@@ -105,8 +105,6 @@ class _AddSessionState extends State<AddSession> {
                       children: [
                         CupertinoButton(
                           onPressed: () async {
-                            EasyLoading.show();
-
                             try {
                               result = await FilePicker.platform.pickFiles(
                                 dialogTitle: 'Seleziona il file sessionId.json',
@@ -120,6 +118,16 @@ class _AddSessionState extends State<AddSession> {
                                   debugPrint(
                                       "PATH: ${file!.path}\nNAME: ${file!.name}\nEXTENSION: ${file!.extension}\nSIZE: ${file!.size}\nBYTES AVAILABLE: ${file!.bytes != null}");
                                 });
+
+                                String val = await File.fromUri(
+                                        Uri.dataFromBytes(file!.bytes ?? []))
+                                    .readAsString();
+
+                                final Directory directory =
+                                    await getApplicationDocumentsDirectory();
+                                final File localFile = File(
+                                    '${directory.path}/${const Uuid().v1()}.json');
+                                await localFile.writeAsString(val);
                               } else {
                                 debugPrint("User cancelled");
                               }
@@ -127,7 +135,6 @@ class _AddSessionState extends State<AddSession> {
                               debugPrint(
                                   "\n\n\n\n\n\n\n\n\n\n\n\nERRRORRR: $e\n\n\n\n\n\n\n\n\n\n\n\n");
                             }
-                            EasyLoading.dismiss();
                           },
                           child: const Text(
                             'Select file',
