@@ -118,16 +118,6 @@ class _AddSessionState extends State<AddSession> {
                                   debugPrint(
                                       "PATH: ${file!.path}\nNAME: ${file!.name}\nEXTENSION: ${file!.extension}\nSIZE: ${file!.size}\nBYTES AVAILABLE: ${file!.bytes != null}");
                                 });
-
-                                String val = await File.fromUri(
-                                        Uri.dataFromBytes(file!.bytes ?? []))
-                                    .readAsString();
-
-                                final Directory directory =
-                                    await getApplicationDocumentsDirectory();
-                                final File localFile = File(
-                                    '${directory.path}/${const Uuid().v1()}.json');
-                                await localFile.writeAsString(val);
                               } else {
                                 debugPrint("User cancelled");
                               }
@@ -159,11 +149,18 @@ class _AddSessionState extends State<AddSession> {
                               try {
                                 EasyLoading.show();
 
-                                SessionFile sessionFile = SessionFile.fromJson(
+                                /*SessionFile sessionFile = SessionFile.fromJson(
                                     file!.path!,
                                     json.decode(String.fromCharCodes(
                                         await File(file!.path!)
-                                            .readAsBytes())));
+                                            .readAsBytes())));*/
+                                final Directory directory =
+                                    await getApplicationDocumentsDirectory();
+                                final File localFile = File(
+                                    '${directory.path}/${const Uuid().v1()}.json');
+                                await localFile.writeAsString(
+                                    String.fromCharCodes(
+                                        await File(file!.path!).readAsBytes()));
 /*
                                 bool success = await DatabaseSession(
                                         deviceID: sessionFile.deviceId)
@@ -176,6 +173,8 @@ class _AddSessionState extends State<AddSession> {
                                       "Session uploaded to server!");
                                   Navigator.of(context).pop();
                                 }*/
+                                EasyLoading.showSuccess("Session uploaded!");
+                                Navigator.of(context).pop();
                               } catch (e) {
                                 EasyLoading.showError("ERROR: $e");
                                 print(e);
