@@ -4,11 +4,10 @@ import 'package:app/services/imports.dart';
 class AddEditDevice extends StatefulWidget {
   const AddEditDevice({
     Key? key,
-    required this.uid,
     required this.isEdit,
     this.device,
   }) : super(key: key);
-  final String uid;
+
   final bool isEdit;
   final Device? device;
 
@@ -203,8 +202,9 @@ class _AddEditDeviceState extends State<AddEditDevice> {
                         ? null
                         : () async {
                             setState(() => showLoading = true);
-
-                            await DatabaseDevice()
+                            Navigator.of(context).pop();
+                            setState(() => showLoading = false);
+                            /*  await DatabaseDevice()
                                 .register(
                                     serialNumber: id.text,
                                     modelNumber: model.text,
@@ -213,9 +213,9 @@ class _AddEditDeviceState extends State<AddEditDevice> {
                                     devicePosition:
                                         DevicePosition(x: x, y: y, z: z))
                                 .then((value) {
-                              setState(() => showLoading = false);
-                              Navigator.of(context).pop();
-                            });
+
+
+                            });*/
                           },
                     child: Text(
                       widget.isEdit ? 'Modifica' : 'Crea',

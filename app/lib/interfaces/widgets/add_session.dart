@@ -4,10 +4,8 @@ import 'package:app/services/imports.dart';
 class AddSession extends StatefulWidget {
   const AddSession({
     Key? key,
-    required this.userData,
     this.session,
   }) : super(key: key);
-  final UserData userData;
   final Session? session;
 
   @override

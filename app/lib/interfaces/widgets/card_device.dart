@@ -7,12 +7,10 @@ class CardDevice extends StatefulWidget {
   const CardDevice(
       {Key? key,
       required this.device,
-      required this.uid,
       required this.serialConnected,
       this.serialPort})
       : super(key: key);
   final Device device;
-  final String uid;
   final bool serialConnected;
   final SerialPort? serialPort;
 
@@ -31,8 +29,10 @@ class _CardDeviceState extends State<CardDevice> {
           motion: const ScrollMotion(),
           children: [
             SlidableAction(
-              onPressed: (con) async => await DatabaseDevice()
-                  .delete(id: widget.device.serialNumber, uid: widget.uid),
+              onPressed: (con) async =>
+                  {} /*await DatabaseDevice()
+                  .delete(id: widget.device.serialNumber, uid: widget.uid)*/
+              ,
               backgroundColor: const Color(0xFFFE4A49),
               foregroundColor: Colors.black,
               icon: Icons.delete,
@@ -46,7 +46,6 @@ class _CardDeviceState extends State<CardDevice> {
                 isDismissible: true,
                 builder: (context) => AddEditDevice(
                   isEdit: true,
-                  uid: widget.uid,
                   device: widget.device,
                 ),
               ),

@@ -1,11 +1,7 @@
 import 'package:app/services/imports.dart';
 
 class ProfilePage extends StatefulWidget {
-  const ProfilePage({
-    Key? key,
-    required this.userData,
-  }) : super(key: key);
-  final UserData userData;
+  const ProfilePage({Key? key}) : super(key: key);
 
   @override
   State<ProfilePage> createState() => _ProfilePageState();
@@ -42,29 +38,6 @@ class _ProfilePageState extends State<ProfilePage> {
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      'Profile',
-                      style: Theme.of(context).textTheme.titleLarge,
-                    ),
-                    Wrap(
-                      spacing: 10,
-                      crossAxisAlignment: WrapCrossAlignment.center,
-                      children: [
-                        Text(
-                          'Name: ${widget.userData.profile.name}',
-                        ),
-                        Text(
-                          'Surname:  ${widget.userData.profile.surname}',
-                        ),
-                      ],
-                    ),
-                    Text(
-                      'Email:  ${widget.userData.profile.email}',
-                    ),
-                    const Padding(
-                      padding: EdgeInsets.all(10.0),
-                      child: Divider(),
-                    ),
                     Text(
                       'Settings',
                       style: Theme.of(context).textTheme.titleLarge,

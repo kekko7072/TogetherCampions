@@ -29,7 +29,7 @@ class _GeolocationPermissionState extends State<GeolocationPermission> {
                 : Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(
+                      const Icon(
                         CupertinoIcons.location,
                         size: 100,
                         color: AppStyle.primaryColor,

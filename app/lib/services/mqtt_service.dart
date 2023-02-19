@@ -1,17 +1,34 @@
-import 'package:mqtt_client/mqtt_client.dart';
-
 import 'imports.dart';
+
+enum TopicDevice {
+  SYSTEM,
+  GPS_POSITION,
+  GPS_NAVIGATION,
+  MPU_ACCELERATION,
+  MPU_GYROSCOPE
+}
 
 class MQTTService {
   final MqttServerClient client;
-  MQTTService(this.client);
+  final String deviceId;
+  MQTTService(this.client, this.deviceId);
 
-  final String topic1 = 'AAA000AAA/timestamp'; // Not a wildcard topic
-  final String topic2 = 'AAA000AAA/latitude'; // Not a wildcard topic
-  final String topic3 = 'AAA000AAA/longitude';
+  ///TOPICS
+  late List<String> topicsDevice = [
+    '$deviceId/SYSTEM',
+    '$deviceId/GPS_POSITION',
+    '$deviceId/GPS_NAVIGATION',
+    '$deviceId/MPU_ACCELERATION',
+    '$deviceId/MPU_GYROSCOPE'
+  ];
 
-  Future<bool> connect() async {
-    print(client.port);
+  String topicsPath(String topic) => '$deviceId/$topic';
+
+  Future<bool> connect(
+      {required String user,
+      required String password,
+      required String clientIdentifier}) async {
+    debugPrint("PORT: ${client.port}");
 
     /// Set the correct MQTT protocol for mosquito
     client.setProtocolV311();
@@ -19,34 +36,38 @@ class MQTTService {
     client.keepAlivePeriod = 20;
     client.onDisconnected = onDisconnected;
     client.onSubscribed = onSubscribed;
+
     final connMess = MqttConnectMessage()
-        .authenticateAs("firringer362", "tw8hqY2Cx0v65tjp")
-        .withClientIdentifier('Mqtt_MyClientUniqueId')
+        .authenticateAs(user, password)
+        .withClientIdentifier(clientIdentifier)
         .withWillTopic(
             'willtopic') // If you set this you must set a will message
         .withWillMessage('My Will message')
         .startClean() // Non persistent session for testing
         .withWillQos(MqttQos.atLeastOnce);
-    print('EXAMPLE::Mosquitto client connecting....');
+
+    debugPrint('EXAMPLE::Mosquitto client connecting....');
     client.connectionMessage = connMess;
 
     try {
       await client.connect();
       return true;
     } on Exception catch (e) {
-      print('EXAMPLE::client exception - $e');
+      debugPrint('EXAMPLE::client exception - $e');
       client.disconnect();
       return false;
     }
   }
 
-  void subscribeToTopic() {
+  void subscribeToAllTopic() {
     /// Lets try our subscriptions
-    print('EXAMPLE:: <<<< SUBSCRIBE >>>>');
+    debugPrint('EXAMPLE:: <<<< SUBSCRIBE TO TOPICS >>>>');
 
-    client.subscribe(topic1, MqttQos.atLeastOnce);
+    for (String topic in topicsDevice) {
+      client.subscribe(topic, MqttQos.atLeastOnce);
+    }
 
-    client.subscribe(topic2, MqttQos.atLeastOnce);
+    //client.subscribe(topic2, MqttQos.atLeastOnce);
 
     client.updates!.listen((messageList) {
       final recMess = messageList[0];
@@ -60,19 +81,23 @@ class MQTTService {
     });
   }
 
-  void unsubscribeToTopic() {
-    print('EXAMPLE::Unsubscribing');
-    client.unsubscribe(topic1);
-    client.unsubscribe(topic2);
+  void unsubscribeToAllTopic() {
+    print('EXAMPLE:: <<<< UNSUBSCRIBE TO TOPICS >>>>');
+    for (String topic in topicsDevice) {
+      client.unsubscribe(topic);
+    }
   }
 
-  void publish() {
-    final builder1 = MqttClientPayloadBuilder();
-    builder1.addString('Hello from mqtt_client topic 1');
-    print('EXAMPLE:: <<<< PUBLISH 1 >>>>');
-    client.publishMessage(topic1, MqttQos.atLeastOnce, builder1.payload!);
+  void publish(String topicDevice, String message) {
+    debugPrint('EXAMPLE:: <<<< PUBLISH TO: $topicsDevice >>>>');
 
-    final builder2 = MqttClientPayloadBuilder();
+    final builder1 = MqttClientPayloadBuilder();
+    builder1.addString(message);
+
+    client.publishMessage(
+        topicsPath(topicDevice), MqttQos.atLeastOnce, builder1.payload!);
+
+    /*final builder2 = MqttClientPayloadBuilder();
     builder2.addString('Hello from mqtt_client topic 2');
     print('EXAMPLE:: <<<< PUBLISH 2 >>>>');
     client.publishMessage(topic2, MqttQos.atLeastOnce, builder2.payload!);
@@ -80,33 +105,83 @@ class MQTTService {
     final builder3 = MqttClientPayloadBuilder();
     builder3.addString('Hello from mqtt_client topic 3');
     print('EXAMPLE:: <<<< PUBLISH 3 - NO SUBSCRIPTION >>>>');
-    client.publishMessage(topic3, MqttQos.atLeastOnce, builder3.payload!);
+    client.publishMessage(topic3, MqttQos.atLeastOnce, builder3.payload!);*/
   }
 
   void listen() {
     client.published!.listen((MqttPublishMessage message) {
-      print(
+      debugPrint(
           '\nTopic: ${message.variableHeader!.topicName}\nMessage: ${String.fromCharCodes(message.payload.message)}\n');
 
-      if (message.variableHeader!.topicName == topic3) {
+      /*if (message.variableHeader!.topicName == topic3) {
         print('EXAMPLE:: Non subscribed topic received.');
-      }
+      }*/
     });
   }
 
   void disconnect() {
-    print('EXAMPLE::Disconnecting');
+    debugPrint('EXAMPLE::Disconnecting');
     client.disconnect();
   }
 
   /// The subscribed callback
   void onSubscribed(String topic) {
-    print('EXAMPLE::Subscription confirmed for topic $topic');
+    debugPrint('EXAMPLE::Subscription confirmed for topic $topic');
   }
 
   /// The unsolicited disconnect callback
   void onDisconnected() {
-    print('EXAMPLE::OnDisconnected client callback - Client disconnection');
+    debugPrint(
+        'EXAMPLE::OnDisconnected client callback - Client disconnection');
+  }
+
+  Future<String> deviceInfo() async {
+    DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+    if (kIsWeb) {
+      WebBrowserInfo webBrowserInfo = await deviceInfo.webBrowserInfo;
+      String value = webBrowserInfo.userAgent ??
+          'NOT_FOUND_WEB'; // e.g. "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:61.0) Gecko/20100101 Firefox/61.0"
+      return value.replaceAll(" ", "_");
+    } else {
+      if (Platform.isAndroid) {
+        AndroidDeviceInfo info = await deviceInfo.androidInfo;
+        String value =
+            'MOBILE:ANDROID_MODEL:${info.model}_OS:${info.version}_NAME:${info.product}';
+        return value.replaceAll(" ", "+");
+      } else if (Platform.isIOS) {
+        IosDeviceInfo info = await deviceInfo.iosInfo;
+        String value =
+            'MOBILE:IOS_MODEL:${info.utsname}_OS:${info.systemVersion}';
+        return value.replaceAll(" ", "+");
+      } else if (Platform.isMacOS) {
+        MacOsDeviceInfo info = await deviceInfo.macOsInfo;
+        String value =
+            'DESKTOP:MACOS_MODEL:${info.model}_OS:${info.osRelease}_NAME:${info.computerName}';
+        return value.replaceAll(" ", "+");
+      } else if (Platform.isWindows) {
+        WindowsDeviceInfo info = await deviceInfo.windowsInfo;
+        String value =
+            'DESKTOP:WINDOWS_OS:${info.majorVersion}.${info.minorVersion}${info.buildNumber}_NAME:${info.computerName}_';
+        return value.replaceAll(" ", "+");
+      } else if (Platform.isLinux) {
+        LinuxDeviceInfo info = await deviceInfo.linuxInfo;
+        String value =
+            'DESKTOP:LINUX_OS:${info.name}+${info.version}.${info.buildId}_NAME:${info.machineId}';
+        return value.replaceAll(" ", "+");
+      } else {
+        return 'NOT_FOUND_PLATFORM';
+      }
+    }
+
+    AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
+    print('Running on ${androidInfo.model}'); // e.g. "Moto G (4)"
+
+    IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
+    print('Running on ${iosInfo.utsname.machine}'); // e.g. "iPod7,1"
+
+    WebBrowserInfo webBrowserInfo = await deviceInfo.webBrowserInfo;
+    print(
+        'Running on ${webBrowserInfo.userAgent}'); // e.g. "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:61.0) Gecko/20100101 Firefox/61.0"
   }
 }
 /*

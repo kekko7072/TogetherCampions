@@ -13,11 +13,6 @@ export 'package:flutter/foundation.dart';
 export 'package:flutter/services.dart';
 
 /// #PACKAGES# ///
-/// Database Service
-export 'firebase_options.dart';
-export 'package:firebase_core/firebase_core.dart';
-export 'package:firebase_auth/firebase_auth.dart';
-export 'package:cloud_firestore/cloud_firestore.dart';
 
 ///Basic
 export 'package:provider/provider.dart';
@@ -37,6 +32,7 @@ export 'package:mqtt_client/mqtt_client.dart';
 export 'package:sensors_plus/sensors_plus.dart';
 export 'package:multiple_stream_builder/multiple_stream_builder.dart';
 export 'package:shared_preferences/shared_preferences.dart';
+export 'package:device_info_plus/device_info_plus.dart';
 
 ///Design
 export 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -87,12 +83,10 @@ export 'package:app/models/system.dart';
 
 ///SERVICES
 export 'package:app/services/database_session.dart';
-export 'package:app/services/database_user.dart';
 export 'package:app/services/database_device.dart';
-export 'package:app/services/auth.dart';
 export 'package:app/services/calculation.dart';
 export 'package:app/services/style.dart';
 export 'package:app/services/map.dart';
 export 'package:app/services/bluetooth_helper.dart';
-export 'package:app/services/units.dart';
+export 'package:app/services/units_system.dart';
 export 'package:app/services/mqtt_service.dart';

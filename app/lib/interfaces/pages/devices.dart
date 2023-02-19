@@ -26,6 +26,16 @@ extension IntToString on int {
 }
 
 class _DevicesState extends State<Devices> {
+  List<Device> devices = [
+    Device(
+        serialNumber: "serialNumber",
+        modelNumber: "modelNumber",
+        uid: "uid",
+        name: "name",
+        software: Software(name: "", version: "version"),
+        devicePosition: DevicePosition(x: 0, y: 0, z: 0)),
+  ];
+
   Stream<List<String>> streamPorts() async* {
     await Future.delayed(const Duration(seconds: 1));
     yield SerialConnectionService.connectionEnabled()
@@ -36,97 +46,61 @@ class _DevicesState extends State<Devices> {
 
   @override
   Widget build(BuildContext context) {
-    final userData = Provider.of<UserData?>(context);
-
-    return userData != null
-        ? Scaffold(
-            backgroundColor: Colors.white,
-            body: SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.all(10.0),
-                child: SingleChildScrollView(
-                  child: Center(
-                    child: StreamBuilder<List<Device>>(
-                        stream: DatabaseDevice().allDevices(uid: userData.uid),
-                        builder: (context, snapshot) {
-                          if (!snapshot.hasData) {
-                            return const Text('No data');
-                          }
-                          List<Device> devices = snapshot.data ?? [];
-                          return Wrap(
-                            direction: Axis.horizontal,
-                            spacing: 5,
-                            runSpacing: 5,
-                            children: [
-                              for (Device device in devices) ...[
-                                CardDevice(
-                                  device: device,
-                                  uid: userData.uid,
-                                  serialConnected: false,
-                                )
-                              ]
-                            ],
-                          );
-                          /*   return StreamBuilder<List<String>>(
-                              stream: streamPorts(),
-                              initialData: const [],
-                              builder: (context, snapshot) {
-                                return Wrap(
-                                  direction: Axis.horizontal,
-                                  spacing: 5,
-                                  runSpacing: 5,
-                                  children: [
-                                    for (Device device in devices) ...[
-                                      CardDevice(
-                                        device: device,
-                                        uid: userData.uid,
-                                        serialConnected: SerialConnectionService
-                                            .checkAvailablePorts(
-                                                availablePorts:
-                                                    snapshot.data ?? [''],
-                                                serialNumber:
-                                                    device.serialNumber),
-                                        serialPort: SerialConnectionService
-                                            .setSerialPorts(
-                                                availablePorts: snapshot.data!,
-                                                serialNumber:
-                                                    device.serialNumber),
-                                      )
-                                    ]
-                                  ],
-                                );
-                              });*/
-                        }),
-                  ),
-                ),
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(10.0),
+          child: SingleChildScrollView(
+            child: Center(
+                child: StreamBuilder<List<String>>(
+                    stream: streamPorts(),
+                    initialData: const [],
+                    builder: (context, snapshot) {
+                      return Wrap(
+                        direction: Axis.horizontal,
+                        spacing: 5,
+                        runSpacing: 5,
+                        children: [
+                          for (Device device in devices) ...[
+                            CardDevice(
+                              device: device,
+                              serialConnected:
+                                  SerialConnectionService.checkAvailablePorts(
+                                      availablePorts: snapshot.data ?? [''],
+                                      serialNumber: device.serialNumber),
+                              serialPort:
+                                  SerialConnectionService.setSerialPorts(
+                                      availablePorts: snapshot.data!,
+                                      serialNumber: device.serialNumber),
+                            )
+                          ]
+                        ],
+                      );
+                    })),
+          ),
+        ),
+      ),
+      floatingActionButton: TextButton(
+        onPressed: () async => showModalBottomSheet(
+          context: context,
+          shape: AppStyle.kModalBottomStyle,
+          isScrollControlled: true,
+          isDismissible: true,
+          builder: (context) => AddEditDevice(isEdit: false),
+        ),
+        child: Card(
+            margin: EdgeInsets.zero,
+            color: Theme.of(context).primaryColor,
+            child: const Padding(
+              padding: EdgeInsets.all(10.0),
+              child: Icon(
+                Icons.add,
+                color: Colors.white,
+                size: 30,
               ),
-            ),
-            floatingActionButton: TextButton(
-              onPressed: () async => showModalBottomSheet(
-                context: context,
-                shape: AppStyle.kModalBottomStyle,
-                isScrollControlled: true,
-                isDismissible: true,
-                builder: (context) => AddEditDevice(
-                  uid: userData.uid,
-                  isEdit: false,
-                ),
-              ),
-              child: Card(
-                  margin: EdgeInsets.zero,
-                  color: Theme.of(context).primaryColor,
-                  child: const Padding(
-                    padding: EdgeInsets.all(10.0),
-                    child: Icon(
-                      Icons.add,
-                      color: Colors.white,
-                      size: 30,
-                    ),
-                  )),
-            ),
-          )
-        : const Center(
-            child: CircularProgressIndicator(),
-          );
+            )),
+      ),
+    );
   }
 }

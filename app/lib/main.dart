@@ -1,12 +1,8 @@
-import 'app_director.dart';
+import 'menu.dart';
 import 'services/imports.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
 
   runApp(const MyApp());
 }
@@ -20,13 +16,10 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         useMaterial3: true,
-        primarySwatch: AppStyle.primaryMaterialColor,
+        colorScheme: ColorScheme.fromSwatch(
+            primarySwatch: AppStyle.primaryMaterialColor),
       ),
-      home: StreamProvider<CurrentUser?>.value(
-          value: AuthService().user,
-          initialData: CurrentUser(),
-          catchError: (_, __) => null,
-          child: const AppDirector()),
+      home: const Menu(),
       builder: EasyLoading.init(),
     );
   }

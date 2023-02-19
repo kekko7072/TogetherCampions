@@ -89,71 +89,52 @@ class _TrackScreenState extends State<TrackScreen> {
                                                         CupertinoAlertDialog(
                                                           title: const Text(
                                                               'Select device id'),
-                                                          content: StreamBuilder<
-                                                                  List<Device>>(
-                                                              stream: DatabaseDevice()
-                                                                  .allDevices(
-                                                                      uid: userData!
-                                                                          .uid),
-                                                              builder: (context,
-                                                                  snapshot) {
-                                                                if (snapshot
-                                                                    .hasError) {
-                                                                  return Text(
-                                                                      "Error: ${snapshot.error}");
-                                                                }
-                                                                if (!snapshot
-                                                                    .hasData) {
-                                                                  return const Text(
-                                                                      "No device found");
-                                                                }
-                                                                List<Device>
-                                                                    devices =
-                                                                    snapshot
-                                                                        .data!;
-                                                                return SizedBox(
-                                                                  height: (50 *
-                                                                          devices
-                                                                              .length)
-                                                                      .toDouble(),
-                                                                  child: ListView
-                                                                      .builder(
-                                                                          itemCount: devices
-                                                                              .length,
-                                                                          itemBuilder: (_, index) =>
-                                                                              ListTile(
-                                                                                title: Text(devices[index].name),
-                                                                                subtitle: Text(
-                                                                                  devices[index].serialNumber,
-                                                                                ),
-                                                                                trailing: IconButton(
-                                                                                    onPressed: () async {
-                                                                                      try {
-                                                                                        if (!connecting) {
-                                                                                          setState(() => connecting = true);
-                                                                                          EasyLoading.show();
-                                                                                          UnitsSystem unitsSystem = await UnitsSystem.loadFromSettings();
-                                                                                          await r.device.connect();
-                                                                                          setState(() => connecting = false);
-                                                                                          EasyLoading.dismiss().then((value) => Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-                                                                                                return TrackBLEScreen(
-                                                                                                  deviceBLE: r.device,
-                                                                                                  unitsSystem: unitsSystem,
-                                                                                                  device: devices[index],
-                                                                                                );
-                                                                                              })));
-                                                                                        }
-                                                                                      } catch (e) {
-                                                                                        EasyLoading.showError(e.toString());
-                                                                                      }
-                                                                                    },
-                                                                                    icon: const Icon(
-                                                                                      CupertinoIcons.arrow_right_circle_fill,
-                                                                                      color: AppStyle.primaryColor,
-                                                                                    )),
-                                                                              )),
-                                                                );
-                                                              }),
+                                                          content: SizedBox(
+                                                            height: 50,
+                                                            child: ListTile(
+                                                              title: Text(
+                                                                  "devices[index].name"),
+                                                              subtitle: Text(
+                                                                "devices[index].serialNumber",
+                                                              ),
+                                                              trailing:
+                                                                  IconButton(
+                                                                      onPressed:
+                                                                          () async {
+                                                                        try {
+                                                                          if (!connecting) {
+                                                                            setState(() =>
+                                                                                connecting = true);
+                                                                            EasyLoading.show();
+                                                                            UnitsSystem
+                                                                                unitsSystem =
+                                                                                await UnitsSystem.loadFromSettings();
+                                                                            await r.device.connect();
+                                                                            setState(() =>
+                                                                                connecting = false);
+                                                                            EasyLoading.dismiss().then((value) =>
+                                                                                Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+                                                                                  return TrackBLEScreen(
+                                                                                    deviceBLE: r.device,
+                                                                                    unitsSystem: unitsSystem,
+                                                                                    device: Device(serialNumber: "serialNumber", modelNumber: "modelNumber", uid: "uid", name: "name", software: Software(name: "", version: "version"), devicePosition: DevicePosition(x: 0, y: 0, z: 0)),
+                                                                                  );
+                                                                                })));
+                                                                          }
+                                                                        } catch (e) {
+                                                                          EasyLoading.showError(
+                                                                              e.toString());
+                                                                        }
+                                                                      },
+                                                                      icon:
+                                                                          const Icon(
+                                                                        CupertinoIcons
+                                                                            .arrow_right_circle_fill,
+                                                                        color: AppStyle
+                                                                            .primaryColor,
+                                                                      )),
+                                                            ),
+                                                          ),
                                                           actions: [
                                                             CupertinoDialogAction(
                                                               isDestructiveAction:
@@ -179,41 +160,39 @@ class _TrackScreenState extends State<TrackScreen> {
                                       .where((element) =>
                                           element.device.name == model.text)
                                       .map(
-                                        (r) => StreamBuilder<Device>(
-                                            stream: DatabaseDevice().device(
-                                                id: r.device.id.toString()),
-                                            builder: (context, snapshot) {
-                                              if (snapshot.hasError) {
-                                                return Text(
-                                                    'Error: ${snapshot.error}');
-                                              }
-                                              if (!snapshot.hasData) {
-                                                return const Text(
-                                                    "Device not found");
-                                              }
-                                              final device = snapshot.data!;
-                                              return ScanResultTile(
-                                                result: r,
-                                                onTap: () async {
-                                                  UnitsSystem unitsSystem =
-                                                      await UnitsSystem
-                                                          .loadFromSettings();
-                                                  await r.device.connect().then(
-                                                      (value) =>
-                                                          Navigator.of(context).push(
-                                                              MaterialPageRoute(
-                                                                  builder:
-                                                                      (context) {
-                                                            return TrackBLEScreen(
-                                                                deviceBLE:
-                                                                    r.device,
-                                                                unitsSystem:
-                                                                    unitsSystem,
-                                                                device: device);
-                                                          })));
-                                                },
-                                              );
-                                            }),
+                                        (r) => ScanResultTile(
+                                          result: r,
+                                          onTap: () async {
+                                            UnitsSystem unitsSystem =
+                                                await UnitsSystem
+                                                    .loadFromSettings();
+                                            await r.device.connect().then(
+                                                (value) => Navigator.of(context)
+                                                        .push(MaterialPageRoute(
+                                                            builder: (context) {
+                                                      return TrackBLEScreen(
+                                                          deviceBLE: r.device,
+                                                          unitsSystem:
+                                                              unitsSystem,
+                                                          device: Device(
+                                                              serialNumber:
+                                                                  "serialNumber",
+                                                              modelNumber:
+                                                                  "modelNumber",
+                                                              uid: "uid",
+                                                              name: "name",
+                                                              software: Software(
+                                                                  name: "",
+                                                                  version:
+                                                                      "version"),
+                                                              devicePosition:
+                                                                  DevicePosition(
+                                                                      x: 0,
+                                                                      y: 0,
+                                                                      z: 0)));
+                                                    })));
+                                          },
+                                        ),
                                       )
                                       .toList(),
                                 ),
@@ -288,24 +267,26 @@ class _TrackScreenState extends State<TrackScreen> {
           ),
         ),
       ),
-      floatingActionButton: StreamBuilder<bool>(
-        stream: FlutterBluePlus.instance.isScanning,
-        initialData: false,
-        builder: (c, snapshot) {
-          if (snapshot.data!) {
-            return FloatingActionButton(
-              onPressed: () => FlutterBluePlus.instance.stopScan(),
-              backgroundColor: Colors.red,
-              child: const Icon(Icons.stop),
-            );
-          } else {
-            return FloatingActionButton(
-                child: const Icon(Icons.search),
-                onPressed: () => FlutterBluePlus.instance
-                    .startScan(timeout: const Duration(seconds: 20)));
-          }
-        },
-      ),
+      floatingActionButton: model.text == kDeviceModelTKR1A1
+          ? StreamBuilder<bool>(
+              stream: FlutterBluePlus.instance.isScanning,
+              initialData: false,
+              builder: (c, snapshot) {
+                if (snapshot.data!) {
+                  return FloatingActionButton(
+                    onPressed: () => FlutterBluePlus.instance.stopScan(),
+                    backgroundColor: Colors.red,
+                    child: const Icon(Icons.stop),
+                  );
+                } else {
+                  return FloatingActionButton(
+                      child: const Icon(Icons.search),
+                      onPressed: () => FlutterBluePlus.instance
+                          .startScan(timeout: const Duration(seconds: 20)));
+                }
+              },
+            )
+          : const Spacer(),
     );
   }
 }

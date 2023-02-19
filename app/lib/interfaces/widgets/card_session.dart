@@ -8,12 +8,10 @@ import 'edit_session.dart';
 class CardSession extends StatefulWidget {
   const CardSession({
     Key? key,
-    required this.userData,
     required this.session,
     required this.onDelete,
     required this.onEdit,
   }) : super(key: key);
-  final UserData userData;
   final SessionFile session;
   final Future<void> Function() onDelete;
   final Future<void> Function() onEdit;
