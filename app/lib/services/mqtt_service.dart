@@ -144,28 +144,24 @@ class MQTTService {
     } else {
       if (Platform.isAndroid) {
         AndroidDeviceInfo info = await deviceInfo.androidInfo;
-        value =
-            'DEVICE:${info.model}|OS:${info.version}|NAME:${info.product}|DATE:';
+        value = info.model;
       } else if (Platform.isIOS) {
         IosDeviceInfo info = await deviceInfo.iosInfo;
-        value =
-            'DEVICE:${info.utsname.machine}|OS:iOS+${info.systemVersion}|DATE:';
+        value = '${info.utsname.machine}';
       } else if (Platform.isMacOS) {
         MacOsDeviceInfo info = await deviceInfo.macOsInfo;
-        value =
-            'DEVICE:${info.model}|OS:macOS+${info.osRelease}|NAME:${info.computerName}|DATE:';
+        value = info.model;
       } else if (Platform.isWindows) {
         WindowsDeviceInfo info = await deviceInfo.windowsInfo;
-        value =
-            'DEVICE:COMPUTER|OS:Windows${info.majorVersion}.${info.minorVersion}${info.buildNumber}|NAME:${info.computerName}|DATE:';
+        value = 'Windows';
       } else if (Platform.isLinux) {
         LinuxDeviceInfo info = await deviceInfo.linuxInfo;
-        value =
-            'DEVICE:COMPUTER|OS:${info.name}+${info.version}.${info.buildId}|NAME:${info.machineId}|DATE:';
+        value = info.name;
       }
     }
 
-    return value.replaceAll(" ", "+") + DateTime.now().toIso8601String();
+    return ("${value.replaceAll(" ", "+")}+${const Uuid().v1()}")
+        .substring(0, 23);
   }
 }
 /*
