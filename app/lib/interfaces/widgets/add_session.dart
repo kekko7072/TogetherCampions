@@ -20,6 +20,9 @@ class _AddSessionState extends State<AddSession> {
   bool showLoading = false;
   bool isLocal = true;
 
+  TextEditingController deviceIdController =
+      TextEditingController(text: 'AAAA0000AAAA');
+
   TextEditingController nameController =
       TextEditingController(text: 'Nuova sessione');
 
@@ -111,6 +114,20 @@ class _AddSessionState extends State<AddSession> {
                   ),
                   const SizedBox(height: 20),
                   if (fromCSVFile) ...[
+                    Text('Device id',
+                        style: Theme.of(context).textTheme.titleMedium),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 5.0, horizontal: 20),
+                      child: TextFormField(
+                        controller: deviceIdController,
+                        textAlign: TextAlign.center,
+                        decoration: AppStyle().kTextFieldDecoration(
+                            icon: Icons.devices, hintText: 'Enter deviceId'),
+                      ),
+                    ),
+                    Text('Session name',
+                        style: Theme.of(context).textTheme.titleMedium),
                     Padding(
                       padding: const EdgeInsets.symmetric(
                           vertical: 5.0, horizontal: 20),
@@ -118,7 +135,7 @@ class _AddSessionState extends State<AddSession> {
                         controller: nameController,
                         textAlign: TextAlign.center,
                         decoration: AppStyle().kTextFieldDecoration(
-                            icon: Icons.edit, hintText: 'Enter device name'),
+                            icon: Icons.edit, hintText: 'Enter session name'),
                       ),
                     ),
                     Row(
@@ -182,7 +199,7 @@ class _AddSessionState extends State<AddSession> {
                                 for (String line in dataList) {
                                   List<String> lineData = line.split(";");
                                   data.add(lineData);
-                                  print(lineData);
+                                  //print(lineData);
                                 }
 
                                 /// Crea un dizionario per contenere tutti i dati del file CSV
@@ -258,7 +275,7 @@ class _AddSessionState extends State<AddSession> {
 
                                 /// Create session file
                                 Map<String, dynamic> jsonFile = {
-                                  "device_id": "device_id", //TODO ID DEVICE
+                                  "device_id": deviceIdController.text,
                                   "session_id": const Uuid().v1(),
                                   "info": {
                                     "name": nameController.text,

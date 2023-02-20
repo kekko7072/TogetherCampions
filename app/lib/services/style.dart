@@ -41,7 +41,7 @@ class AppStyle {
         ),
         hintText: hintText,
         hintStyle: const TextStyle(
-          color: Colors.white60,
+          color: Colors.grey,
         ),
         contentPadding:
             const EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),

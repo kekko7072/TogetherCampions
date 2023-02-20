@@ -9,20 +9,21 @@ class TrackMQTTScreen extends StatefulWidget {
 }
 
 class _TrackMQTTScreenState extends State<TrackMQTTScreen> {
-  TextEditingController server =
+  TextEditingController serverController =
       TextEditingController(text: "firringer362.cloud.shiftr.io");
 
-  TextEditingController serverUser =
+  TextEditingController serverUserController =
       TextEditingController(text: "firringer362");
 
-  TextEditingController serverPassword =
+  TextEditingController serverPasswordController =
       TextEditingController(text: "tw8hqY2Cx0v65tjp");
 
-  TextEditingController deviceId = TextEditingController(text: "AAAA0000AAAA");
+  TextEditingController deviceIdController =
+      TextEditingController(text: "AAAA0000AAAA");
 
   var client = MqttServerClient('', '');
 
-  late MQTTService mqttService = MQTTService(client, deviceId.text);
+  late MQTTService mqttService = MQTTService(client, deviceIdController.text);
 
   bool connected = false;
 
@@ -75,36 +76,48 @@ class _TrackMQTTScreenState extends State<TrackMQTTScreen> {
                   style: Theme.of(context).textTheme.titleMedium),
               Padding(
                 padding:
-                    const EdgeInsets.symmetric(horizontal: 20.0, vertical: 5),
-                child: CupertinoTextField(
-                  controller: server,
+                    const EdgeInsets.symmetric(vertical: 5.0, horizontal: 20),
+                child: TextFormField(
+                  controller: serverController,
+                  textAlign: TextAlign.center,
+                  decoration: AppStyle().kTextFieldDecoration(
+                      icon: Icons.device_hub, hintText: 'Server address'),
                 ),
               ),
               const SizedBox(height: 10),
               Text('User', style: Theme.of(context).textTheme.titleMedium),
               Padding(
                 padding:
-                    const EdgeInsets.symmetric(horizontal: 20.0, vertical: 5),
-                child: CupertinoTextField(
-                  controller: serverUser,
+                    const EdgeInsets.symmetric(vertical: 5.0, horizontal: 20),
+                child: TextFormField(
+                  controller: serverUserController,
+                  textAlign: TextAlign.center,
+                  decoration: AppStyle().kTextFieldDecoration(
+                      icon: Icons.person, hintText: 'Server address'),
                 ),
               ),
               const SizedBox(height: 10),
               Text('Password', style: Theme.of(context).textTheme.titleMedium),
               Padding(
                 padding:
-                    const EdgeInsets.symmetric(horizontal: 20.0, vertical: 5),
-                child: CupertinoTextField(
-                  controller: serverPassword,
+                    const EdgeInsets.symmetric(vertical: 5.0, horizontal: 20),
+                child: TextFormField(
+                  controller: serverPasswordController,
+                  textAlign: TextAlign.center,
+                  decoration: AppStyle().kTextFieldDecoration(
+                      icon: Icons.lock, hintText: 'Server address'),
                 ),
               ),
               const SizedBox(height: 10),
               Text('Device id', style: Theme.of(context).textTheme.titleMedium),
               Padding(
                 padding:
-                    const EdgeInsets.symmetric(horizontal: 20.0, vertical: 5),
-                child: CupertinoTextField(
-                  controller: deviceId,
+                    const EdgeInsets.symmetric(vertical: 5.0, horizontal: 20),
+                child: TextFormField(
+                  controller: deviceIdController,
+                  textAlign: TextAlign.center,
+                  decoration: AppStyle().kTextFieldDecoration(
+                      icon: Icons.devices, hintText: 'Server address'),
                 ),
               ),
               const SizedBox(height: 20),
@@ -112,14 +125,15 @@ class _TrackMQTTScreenState extends State<TrackMQTTScreen> {
                 child: CupertinoButton.filled(
                     child: const Text('CONNECT TO MQTT'),
                     onPressed: () async {
-                      client = MqttServerClient(server.text, '');
-                      mqttService = MQTTService(client, deviceId.text);
+                      client = MqttServerClient(serverController.text, '');
+                      mqttService =
+                          MQTTService(client, deviceIdController.text);
 
                       String clientIdentifier = await mqttService.deviceInfo();
 
                       connected = await mqttService.connect(
-                          user: serverUser.text,
-                          password: serverPassword.text,
+                          user: serverUserController.text,
+                          password: serverPasswordController.text,
                           clientIdentifier: clientIdentifier);
                       debugPrint("CONNECTED SUCESSSFULLY: $connected");
                       setState(() {});
