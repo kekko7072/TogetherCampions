@@ -59,8 +59,8 @@ class _CardDeviceState extends State<CardDevice> {
         child: Container(
           margin: EdgeInsets.zero,
           width: AppStyle.resizeAutomaticallyWidth(context),
-          decoration: BoxDecoration(
-              borderRadius: const BorderRadius.all(Radius.circular(20)),
+          decoration: const BoxDecoration(
+              borderRadius: BorderRadius.all(Radius.circular(20)),
               color: AppStyle.primaryColor),
           child: Padding(
             padding: const EdgeInsets.all(5.0),

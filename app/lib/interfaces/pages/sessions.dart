@@ -107,9 +107,7 @@ class _SessionsState extends State<Sessions> {
           isScrollControlled: true,
           isDismissible: true,
           builder: (context) => const AddSession(),
-        ).then((value) =>
-            //Nedded to reload screen
-            setState(() {})),
+        ).then((value) => setState(() {})), //Needed to reload screen
         child: Card(
             color: Theme.of(context).primaryColor,
             child: const Padding(

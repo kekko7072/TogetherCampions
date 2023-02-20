@@ -13,12 +13,15 @@ class AddSession extends StatefulWidget {
 }
 
 class _AddSessionState extends State<AddSession> {
+  bool fromCSVFile = true;
+
   final formKey = GlobalKey<FormState>();
 
   bool showLoading = false;
   bool isLocal = true;
 
-  TextEditingController name = TextEditingController(text: 'Nuova sessione');
+  TextEditingController nameController =
+      TextEditingController(text: 'Nuova sessione');
 
   DateTime start = DateTime.now();
   DateTime end = DateTime.now();
@@ -71,35 +74,53 @@ class _AddSessionState extends State<AddSession> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   const SizedBox(height: 10),
-                  /*  Wrap(
+                  Wrap(
                     alignment: WrapAlignment.start,
                     direction: Axis.horizontal,
                     spacing: 5,
                     children: [
-                      for (String deviceID in widget.userData.devices) ...[
-                        FilterChip(
-                            backgroundColor: deviceID == deviceID
-                                ? AppStyle.primaryColor
-                                : Colors.black12,
-                            label: StreamBuilder<Device>(
-                                stream: DatabaseDevice().device(id: deviceID),
-                                builder: (context, snapshot) {
-                                  return Text(
-                                    snapshot.data?.name ?? '',
-                                    style: TextStyle(
-                                        fontWeight: deviceID == deviceID
-                                            ? FontWeight.bold
-                                            : FontWeight.normal,
-                                        color: Colors.white),
-                                  );
-                                }),
-                            onSelected: (value) =>
-                                setState(() => deviceID = deviceID)),
-                      ],
+                      FilterChip(
+                          backgroundColor: fromCSVFile
+                              ? AppStyle.primaryColor
+                              : Colors.black12,
+                          label: Text(
+                            'CSV File',
+                            style: TextStyle(
+                                fontWeight: fromCSVFile
+                                    ? FontWeight.bold
+                                    : FontWeight.normal,
+                                color: Colors.white),
+                          ),
+                          onSelected: (value) =>
+                              setState(() => fromCSVFile = true)),
+                      FilterChip(
+                          backgroundColor: !fromCSVFile
+                              ? AppStyle.primaryColor
+                              : Colors.black12,
+                          label: Text(
+                            'JSON File',
+                            style: TextStyle(
+                                fontWeight: !fromCSVFile
+                                    ? FontWeight.bold
+                                    : FontWeight.normal,
+                                color: Colors.white),
+                          ),
+                          onSelected: (value) =>
+                              setState(() => fromCSVFile = false)),
                     ],
                   ),
-                  const SizedBox(height: 20),*/
-                  if (isLocal) ...[
+                  const SizedBox(height: 20),
+                  if (fromCSVFile) ...[
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 5.0, horizontal: 20),
+                      child: TextFormField(
+                        controller: nameController,
+                        textAlign: TextAlign.center,
+                        decoration: AppStyle().kTextFieldDecoration(
+                            icon: Icons.edit, hintText: 'Enter device name'),
+                      ),
+                    ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -107,9 +128,9 @@ class _AddSessionState extends State<AddSession> {
                           onPressed: () async {
                             try {
                               result = await FilePicker.platform.pickFiles(
-                                dialogTitle: 'Seleziona il file sessionId.json',
+                                dialogTitle: 'Select file session TXT',
                                 type: FileType.custom,
-                                allowedExtensions: ["json"], //tkrlg
+                                allowedExtensions: ["TXT", "txt"],
                               );
 
                               if (result != null) {
@@ -123,7 +144,7 @@ class _AddSessionState extends State<AddSession> {
                               }
                             } catch (e) {
                               debugPrint(
-                                  "\n\n\n\n\n\n\n\n\n\n\n\nERRRORRR: $e\n\n\n\n\n\n\n\n\n\n\n\n");
+                                  "\n\nERROR ON EDITING UPLOAD SESSION: $e\n");
                             }
                           },
                           child: const Text(
@@ -149,35 +170,195 @@ class _AddSessionState extends State<AddSession> {
                               try {
                                 EasyLoading.show();
 
-                                /*SessionFile sessionFile = SessionFile.fromJson(
-                                    file!.path!,
-                                    json.decode(String.fromCharCodes(
-                                        await File(file!.path!)
-                                            .readAsBytes())));*/
+                                ///Convert file
+                                String dataFromCSV = String.fromCharCodes(
+                                    await File(file!.path!).readAsBytes());
+
+                                List<String> dataList = dataFromCSV.split(",");
+
+                                List<List<String>> data = [];
+
+                                /// Scrive i dati nel file CSV
+                                for (String line in dataList) {
+                                  List<String> lineData = line.split(";");
+                                  data.add(lineData);
+                                  print(lineData);
+                                }
+
+                                /// Crea un dizionario per contenere tutti i dati del file CSV
+                                List<Map<String, dynamic>> jsonTimestampList =
+                                    [];
+                                int lastTimestamp = 0;
+
+                                /// Loop through each row of data
+                                for (List<String> row in data) {
+                                  if (row[0] == "SYSTEM") {
+                                    jsonTimestampList.add({
+                                      "system": {
+                                        "timestamp":
+                                            int.parse(row[1].toString()),
+                                        "battery": int.parse(row[2].toString()),
+                                        "temperature":
+                                            (int.parse(row[3].toString()) /
+                                                    340.00) +
+                                                36.53
+                                      }
+                                    });
+                                  } else if (row[0] == "GPS_POSITION") {
+                                    jsonTimestampList.add({
+                                      "gps_position": {
+                                        "timestamp":
+                                            int.parse(row[1].toString()),
+                                        "available": row[2] == "true",
+                                        "latitude":
+                                            double.parse(row[3].toString()),
+                                        "longitude":
+                                            double.parse(row[4].toString()),
+                                        "speed": double.parse(row[5].toString())
+                                      }
+                                    });
+                                  } else if (row[0] == "GPS_NAVIGATION") {
+                                    jsonTimestampList.add({
+                                      "gps_navigation": {
+                                        "timestamp":
+                                            int.parse(row[1].toString()),
+                                        "available": row[2] == "true",
+                                        "altitude":
+                                            double.parse(row[3].toString()),
+                                        "course":
+                                            double.parse(row[4].toString()),
+                                        "variation":
+                                            double.parse(row[5].toString())
+                                      }
+                                    });
+                                  } else if (row[0] == "MPU_ACCELERATION") {
+                                    jsonTimestampList.add({
+                                      "accelerometer": {
+                                        "timestamp":
+                                            int.parse(row[1].toString()),
+                                        "aX": int.parse(row[2].toString()),
+                                        "aY": int.parse(row[3].toString()),
+                                        "aZ": int.parse(row[4].toString())
+                                      }
+                                    });
+                                  } else if (row[0] == "MPU_GYROSCOPE") {
+                                    lastTimestamp =
+                                        int.parse(row[1].toString());
+                                    jsonTimestampList.add({
+                                      "gyroscope": {
+                                        "timestamp":
+                                            int.parse(row[1].toString()),
+                                        "gX": int.parse(row[2].toString()),
+                                        "gY": int.parse(row[3].toString()),
+                                        "gZ": int.parse(row[4].toString())
+                                      }
+                                    });
+                                  }
+                                }
+
+                                /// Create session file
+                                Map<String, dynamic> jsonFile = {
+                                  "device_id": "device_id", //TODO ID DEVICE
+                                  "session_id": const Uuid().v1(),
+                                  "info": {
+                                    "name": nameController.text,
+                                    "start": DateTime.now().toIso8601String(),
+                                    "end": DateTime.now()
+                                        .add(Duration(
+                                            milliseconds: lastTimestamp))
+                                        .toIso8601String()
+                                  },
+                                  "device_position": {"x": 0, "y": 0, "z": 0},
+                                  "timestamp": jsonTimestampList
+                                };
+
+                                ///Save file
                                 final Directory directory =
                                     await getApplicationDocumentsDirectory();
+
+                                final File localFile = File(
+                                    '${directory.path}/${const Uuid().v1()}.json');
+                                await localFile
+                                    .writeAsString(jsonEncode(jsonFile));
+
+                                EasyLoading.showSuccess("Session uploaded!")
+                                    .then(
+                                        (value) => Navigator.of(context).pop());
+                              } catch (e) {
+                                EasyLoading.showError("ERROR: $e");
+                                debugPrint("ERROR: $e");
+                              }
+                            },
+                      child: const Text(
+                        'Upload',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ] else ...[
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        CupertinoButton(
+                          onPressed: () async {
+                            try {
+                              result = await FilePicker.platform.pickFiles(
+                                dialogTitle: 'Seleziona il file sessionId.json',
+                                type: FileType.custom,
+                                allowedExtensions: ["json"], //tkrlg
+                              );
+
+                              if (result != null) {
+                                setState(() {
+                                  file = result!.files.first;
+                                  debugPrint(
+                                      "PATH: ${file!.path}\nNAME: ${file!.name}\nEXTENSION: ${file!.extension}\nSIZE: ${file!.size}\nBYTES AVAILABLE: ${file!.bytes != null}");
+                                });
+                              } else {
+                                debugPrint("User cancelled");
+                              }
+                            } catch (e) {
+                              debugPrint(
+                                  "\n\nERROR ON EDITING UPLOAD SESSION: $e\n");
+                            }
+                          },
+                          child: const Text(
+                            'Select file',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                        if (file != null) ...[
+                          const SizedBox(width: 20),
+                          const Icon(
+                            CupertinoIcons.check_mark_circled_solid,
+                            color: CupertinoColors.activeGreen,
+                            size: 30,
+                          )
+                        ]
+                      ],
+                    ),
+                    const SizedBox(height: 10),
+                    CupertinoButton.filled(
+                      onPressed: file == null
+                          ? null
+                          : () async {
+                              try {
+                                EasyLoading.show();
+
+                                final Directory directory =
+                                    await getApplicationDocumentsDirectory();
+
                                 final File localFile = File(
                                     '${directory.path}/${const Uuid().v1()}.json');
                                 await localFile.writeAsString(
                                     String.fromCharCodes(
                                         await File(file!.path!).readAsBytes()));
-/*
-                                bool success = await DatabaseSession(
-                                        deviceID: sessionFile.deviceId)
-                                    .uploadFile(sessionFile: sessionFile);
 
-                                EasyLoading.dismiss();
-
-                                if (success) {
-                                  EasyLoading.showSuccess(
-                                      "Session uploaded to server!");
-                                  Navigator.of(context).pop();
-                                }*/
-                                EasyLoading.showSuccess("Session uploaded!");
-                                Navigator.of(context).pop();
+                                EasyLoading.showSuccess("Session uploaded!")
+                                    .then(
+                                        (value) => Navigator.of(context).pop());
                               } catch (e) {
                                 EasyLoading.showError("ERROR: $e");
-                                print(e);
+                                debugPrint("ERROR: $e");
                               }
                             },
                       child: const Text(
