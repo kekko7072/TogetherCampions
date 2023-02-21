@@ -1,26 +1,18 @@
 import 'imports.dart';
 
-enum TopicDevice {
-  SYSTEM,
-  GPS_POSITION,
-  GPS_NAVIGATION,
-  MPU_ACCELERATION,
-  MPU_GYROSCOPE
-}
-
 class MQTTService {
   final MqttServerClient client;
   final String deviceId;
   MQTTService(this.client, this.deviceId);
 
   ///TOPICS
-  late List<String> topicsDevice = [
-    '$deviceId/SYSTEM',
-    '$deviceId/GPS_POSITION',
-    '$deviceId/GPS_NAVIGATION',
-    '$deviceId/MPU_ACCELERATION',
-    '$deviceId/MPU_GYROSCOPE'
-  ];
+  List<String> get topicsDevice => [
+        '$deviceId/SYSTEM',
+        '$deviceId/GPS_POSITION',
+        '$deviceId/GPS_NAVIGATION',
+        '$deviceId/MPU_ACCELERATION',
+        '$deviceId/MPU_GYROSCOPE'
+      ];
 
   String topicsPath(String topic) => '$deviceId/$topic';
 

@@ -41,14 +41,40 @@ class _TrackMQTTScreenState extends State<TrackMQTTScreen> {
             'CONNECTED: ${widget.client.connectionStatus!.state == MqttConnectionState.connected}'),
         Text(
             'MESSAGES: ${widget.client.connectionStatus!.state == MqttConnectionState.connected}'),
-        StreamBuilder<MqttPublishMessage>(
+        StreamBuilder<MqttPublishMessage?>(
             stream: widget.client.published,
             builder: (context, snapshot) {
+              MqttPublishMessage? message = snapshot.data;
+
+              String messageTopic = message?.variableHeader?.topicName ?? '';
+
+              print(message?.variableHeader?.topicName);
+
+              ///PARSING INFO
+              if (messageTopic == widget.mqttService.topicsDevice[0]) {
+                debugPrint(widget.mqttService.topicsDevice[0]);
+                print(String.fromCharCodes(snapshot.data!.payload.message));
+              } else if (messageTopic == widget.mqttService.topicsDevice[1]) {
+                debugPrint(widget.mqttService.topicsDevice[1]);
+                print(String.fromCharCodes(snapshot.data!.payload.message));
+              } else if (messageTopic == widget.mqttService.topicsDevice[2]) {
+                debugPrint(widget.mqttService.topicsDevice[2]);
+                print(String.fromCharCodes(snapshot.data!.payload.message));
+              } else if (messageTopic == widget.mqttService.topicsDevice[3]) {
+                debugPrint(widget.mqttService.topicsDevice[3]);
+                print(String.fromCharCodes(snapshot.data!.payload.message));
+              } else if (messageTopic == widget.mqttService.topicsDevice[4]) {
+                debugPrint(widget.mqttService.topicsDevice[4]);
+                print(String.fromCharCodes(snapshot.data!.payload.message));
+              } else {
+                debugPrint("NOT FOUND MATCHING!");
+              }
+
               return Column(
                 children: [
                   Text(
                       'Topic: ${snapshot.data?.variableHeader?.topicName}\nMessage: ${snapshot.data?.payload.message != null ? String.fromCharCodes(snapshot.data!.payload.message) : 'ND'}\n'),
-                  Row(
+                  /* Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       GestureDetector(
@@ -101,7 +127,7 @@ class _TrackMQTTScreenState extends State<TrackMQTTScreen> {
                         ),
                       ),
                     ],
-                  ),
+                  ),*/
                 ],
               );
             }),
@@ -111,6 +137,8 @@ class _TrackMQTTScreenState extends State<TrackMQTTScreen> {
               widget.mqttService.unsubscribeToAllTopic();
 
               widget.mqttService.disconnect();
+
+              Navigator.of(context).pop();
             }),
       ],
     );

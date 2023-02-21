@@ -337,6 +337,8 @@ class _TrackScreenState extends State<TrackScreen> {
                     child: CupertinoButton.filled(
                         child: const Text('CONNECT TO MQTT'),
                         onPressed: () async {
+                          EasyLoading.show();
+
                           client = MqttServerClient(serverController.text, '');
                           mqttService =
                               MQTTService(client, deviceIdController.text);
@@ -353,6 +355,8 @@ class _TrackScreenState extends State<TrackScreen> {
                           if (connected) {
                             mqttService.subscribeToAllTopic();
                           }
+
+                          EasyLoading.dismiss();
 
                           await UnitsSystem.loadFromSettings().then(
                               (unitsSystem) => Navigator.of(context).push(
