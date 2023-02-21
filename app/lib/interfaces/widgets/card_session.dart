@@ -3,8 +3,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:intl/intl.dart';
 
-import 'edit_session.dart';
-
 class CardSession extends StatefulWidget {
   const CardSession({
     Key? key,
@@ -275,7 +273,7 @@ class TrackPreviewState extends State<TrackPreview> {
                                 child: Text("Tracciato",
                                     style: Theme.of(context)
                                         .textTheme
-                                        .caption!
+                                        .bodySmall!
                                         .copyWith(color: Colors.black)),
                               );
                             }),

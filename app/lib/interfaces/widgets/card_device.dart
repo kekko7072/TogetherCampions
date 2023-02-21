@@ -191,7 +191,7 @@ class _CardDeviceState extends State<CardDevice> {
                                                       mainAxisAlignment:
                                                           MainAxisAlignment
                                                               .spaceBetween,
-                                                      children: [],
+                                                      children: const [],
                                                     ),
                                                   ),
                                                   Padding(

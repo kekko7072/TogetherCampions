@@ -143,7 +143,7 @@ class TrackMapState extends State<TrackMap> {
                         child: Text("Tracciato",
                             style: Theme.of(context)
                                 .textTheme
-                                .caption!
+                                .labelSmall!
                                 .copyWith(color: Colors.black)),
                       );
                     }),

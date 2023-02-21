@@ -87,7 +87,7 @@ class _DevicesState extends State<Devices> {
           shape: AppStyle.kModalBottomStyle,
           isScrollControlled: true,
           isDismissible: true,
-          builder: (context) => AddEditDevice(isEdit: false),
+          builder: (context) => const AddEditDevice(isEdit: false),
         ),
         child: Card(
             margin: EdgeInsets.zero,

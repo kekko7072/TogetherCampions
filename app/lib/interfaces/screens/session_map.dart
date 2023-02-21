@@ -435,7 +435,7 @@ class SessionMapState extends State<SessionMap>
                                                 child: Text("Track",
                                                     style: Theme.of(context)
                                                         .textTheme
-                                                        .caption!
+                                                        .bodySmall!
                                                         .copyWith(
                                                             color:
                                                                 Colors.black)),
@@ -458,7 +458,7 @@ class SessionMapState extends State<SessionMap>
                                                 child: Text("Live",
                                                     style: Theme.of(context)
                                                         .textTheme
-                                                        .caption!
+                                                        .bodySmall!
                                                         .copyWith(
                                                             color:
                                                                 Colors.black)),

@@ -12,10 +12,28 @@ class TrackScreen extends StatefulWidget {
 class _TrackScreenState extends State<TrackScreen> {
   TextEditingController model = TextEditingController(text: kDeviceModelTKR1A1);
   bool connecting = false;
+
+  ///CONNECTION
+  TextEditingController serverController =
+      TextEditingController(text: "firringer362.cloud.shiftr.io");
+
+  TextEditingController serverUserController =
+      TextEditingController(text: "firringer362");
+
+  TextEditingController serverPasswordController =
+      TextEditingController(text: "tw8hqY2Cx0v65tjp");
+
+  TextEditingController deviceIdController =
+      TextEditingController(text: "AAAA0000AAAA");
+
+  MqttServerClient client = MqttServerClient('', '');
+
+  late MQTTService mqttService = MQTTService(client, deviceIdController.text);
+
+  DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+
   @override
   Widget build(BuildContext context) {
-    final userData = Provider.of<UserData?>(context);
-
     return Scaffold(
       body: RefreshIndicator(
         onRefresh: () => FlutterBluePlus.instance
@@ -263,7 +281,90 @@ class _TrackScreenState extends State<TrackScreen> {
                         }
                       })
                 ] else if (model.text == kDeviceModelTKR1B1) ...[
-                  const TrackMQTTScreen()
+                  const SizedBox(height: 20),
+                  Text('Server address',
+                      style: Theme.of(context).textTheme.titleMedium),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 5.0, horizontal: 20),
+                    child: TextFormField(
+                      controller: serverController,
+                      textAlign: TextAlign.center,
+                      decoration: AppStyle().kTextFieldDecoration(
+                          icon: Icons.device_hub, hintText: 'Server address'),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Text('User', style: Theme.of(context).textTheme.titleMedium),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 5.0, horizontal: 20),
+                    child: TextFormField(
+                      controller: serverUserController,
+                      textAlign: TextAlign.center,
+                      decoration: AppStyle().kTextFieldDecoration(
+                          icon: Icons.person, hintText: 'Server address'),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Text('Password',
+                      style: Theme.of(context).textTheme.titleMedium),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 5.0, horizontal: 20),
+                    child: TextFormField(
+                      controller: serverPasswordController,
+                      textAlign: TextAlign.center,
+                      decoration: AppStyle().kTextFieldDecoration(
+                          icon: Icons.lock, hintText: 'Server address'),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Text('Device id',
+                      style: Theme.of(context).textTheme.titleMedium),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                        vertical: 5.0, horizontal: 20),
+                    child: TextFormField(
+                      controller: deviceIdController,
+                      textAlign: TextAlign.center,
+                      decoration: AppStyle().kTextFieldDecoration(
+                          icon: Icons.devices, hintText: 'Server address'),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  Center(
+                    child: CupertinoButton.filled(
+                        child: const Text('CONNECT TO MQTT'),
+                        onPressed: () async {
+                          client = MqttServerClient(serverController.text, '');
+                          mqttService =
+                              MQTTService(client, deviceIdController.text);
+
+                          String clientIdentifier =
+                              await mqttService.deviceInfo();
+
+                          bool connected = await mqttService.connect(
+                              user: serverUserController.text,
+                              password: serverPasswordController.text,
+                              clientIdentifier: clientIdentifier);
+                          debugPrint("CONNECTED SUCESSSFULLY: $connected");
+                          setState(() {});
+                          if (connected) {
+                            mqttService.subscribeToAllTopic();
+                          }
+
+                          await UnitsSystem.loadFromSettings().then(
+                              (unitsSystem) => Navigator.of(context).push(
+                                      MaterialPageRoute(builder: (context) {
+                                    return TrackMQTTScreen(
+                                      unitsSystem: unitsSystem,
+                                      client: client,
+                                      mqttService: mqttService,
+                                    );
+                                  })));
+                        }),
+                  ),
                 ]
               ],
             ),
@@ -313,7 +414,7 @@ class ScanResultTile extends StatelessWidget {
           ),
           Text(
             result.device.id.toString(),
-            style: Theme.of(context).textTheme.caption,
+            style: Theme.of(context).textTheme.labelSmall,
           )
         ],
       );
@@ -328,7 +429,7 @@ class ScanResultTile extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          Text(title, style: Theme.of(context).textTheme.caption),
+          Text(title, style: Theme.of(context).textTheme.labelSmall),
           const SizedBox(
             width: 12.0,
           ),
@@ -337,7 +438,7 @@ class ScanResultTile extends StatelessWidget {
               value,
               style: Theme.of(context)
                   .textTheme
-                  .caption
+                  .labelSmall
                   ?.apply(color: Colors.black),
               softWrap: true,
             ),
@@ -426,11 +527,11 @@ class AdapterStateTile extends StatelessWidget {
       child: ListTile(
         title: Text(
           'Bluetooth adapter is ${state.toString().substring(15)}',
-          style: Theme.of(context).primaryTextTheme.subtitle2,
+          style: Theme.of(context).primaryTextTheme.titleSmall,
         ),
         trailing: Icon(
           Icons.error,
-          color: Theme.of(context).primaryTextTheme.subtitle2?.color,
+          color: Theme.of(context).primaryTextTheme.titleSmall?.color,
         ),
       ),
     );

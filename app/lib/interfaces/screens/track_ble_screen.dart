@@ -118,12 +118,12 @@ class _TrackBLEScreenState extends State<TrackBLEScreen> {
                                                             : '',
                                                         style: Theme.of(context)
                                                             .textTheme
-                                                            .caption);
+                                                            .bodySmall);
                                                   })
                                               : Text('',
                                                   style: Theme.of(context)
                                                       .textTheme
-                                                      .caption),
+                                                      .bodySmall),
                                         ],
                                       ),
                                       title: Text(
@@ -251,7 +251,7 @@ class _TrackBLEScreenState extends State<TrackBLEScreen> {
                 : AppBar(
                     leading: IconButton(
                       padding: EdgeInsets.zero,
-                      icon: Icon(
+                      icon: const Icon(
                         CupertinoIcons.xmark,
                         size: 30,
                         color: AppStyle.primaryColor,
@@ -327,12 +327,12 @@ class _TrackBLEScreenState extends State<TrackBLEScreen> {
                                                             : '',
                                                         style: Theme.of(context)
                                                             .textTheme
-                                                            .caption);
+                                                            .bodySmall);
                                                   })
                                               : Text('',
                                                   style: Theme.of(context)
                                                       .textTheme
-                                                      .caption),
+                                                      .bodySmall),
                                         ],
                                       ),
                                       title: Text(
@@ -411,7 +411,7 @@ class _TrackBLEScreenState extends State<TrackBLEScreen> {
                         initialData: false,
                         builder: (c, snapshot) => IconButton(
                           padding: EdgeInsets.zero,
-                          icon: Icon(
+                          icon: const Icon(
                             Icons.refresh,
                             color: AppStyle.primaryColor,
                             size: 30,
@@ -763,7 +763,7 @@ class _TrackBLEScreenState extends State<TrackBLEScreen> {
                           children: <Widget>[
                             Text(
                               characteristic,
-                              style: Theme.of(context).textTheme.subtitle1,
+                              style: Theme.of(context).textTheme.titleMedium,
                             ),
                             if (c.isNotifying) ...[
                               if (accelerometer.isNotEmpty) ...[
@@ -955,7 +955,7 @@ class _TrackBLEScreenState extends State<TrackBLEScreen> {
                           children: <Widget>[
                             Text(
                               characteristic,
-                              style: Theme.of(context).textTheme.subtitle1,
+                              style: Theme.of(context).textTheme.titleSmall,
                             ),
                             if (c.isNotifying) ...[
                               if (gyroscope.isNotEmpty) ...[

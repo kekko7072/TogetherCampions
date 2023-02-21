@@ -24,7 +24,7 @@ class CardLog extends StatelessWidget {
       title: Text('${gps.timestamp}'),
       subtitle: Wrap(
         spacing: 10,
-        children: [
+        children: const [
           //Text('Speed: ${gps.speed} km/h'),
           //Text('Course: ${gps.course} deg'),
           //Text('Altitude: ${gps.altitude} m'),

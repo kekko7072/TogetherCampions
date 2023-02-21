@@ -32,11 +32,8 @@ class _DataChartVisualizationSystemState
           final value = snapshot.data;
           if (value != null) {
             System? sys = System.formListInt(value);
-            if (sys != null) {
-              system.add(sys);
-            } else {
-              debugPrint("ERROR: SYSTEM IS NULL");
-            }
+
+            system.add(sys);
           }
           switch (widget.systemDataVisualization) {
             case SystemDataVisualization.battery:

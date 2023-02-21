@@ -75,14 +75,14 @@ class MQTTService {
       final pubMess = recMess.payload;
       final pt =
           MqttPublishPayload.bytesToStringAsString(pubMess.payload.message);
-      print(
+      debugPrint(
           'EXAMPLE::Change notification:: topic is <${recMess.topic}>, payload is <-- $pt -->');
-      print('');
+      debugPrint('');
     });
   }
 
   void unsubscribeToAllTopic() {
-    print('EXAMPLE:: <<<< UNSUBSCRIBE TO TOPICS >>>>');
+    debugPrint('EXAMPLE:: <<<< UNSUBSCRIBE TO TOPICS >>>>');
     for (String topic in topicsDevice) {
       client.unsubscribe(topic);
     }
@@ -152,7 +152,7 @@ class MQTTService {
         MacOsDeviceInfo info = await deviceInfo.macOsInfo;
         value = info.model;
       } else if (Platform.isWindows) {
-        WindowsDeviceInfo info = await deviceInfo.windowsInfo;
+        //WindowsDeviceInfo info = await deviceInfo.windowsInfo;
         value = 'Windows';
       } else if (Platform.isLinux) {
         LinuxDeviceInfo info = await deviceInfo.linuxInfo;
