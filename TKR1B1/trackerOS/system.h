@@ -12,12 +12,6 @@ int getTemperature() {
   return Wire.read() << 8 | Wire.read();
 }
 
-char* outputString(int (&sys)[3]) {
-  char result[25];
-  sprintf(result, "SYSTEM;%d;%d;%d", sys[0], sys[1], sys[2]);
-  return result;
-}
-
 
 void updateSystem(int timestamp, MQTTClient client) {
 
@@ -27,11 +21,14 @@ void updateSystem(int timestamp, MQTTClient client) {
   sys[2] = getTemperature();
 
   //Send using MQTT
-  String topicPath = "/" + String(DEVICE_SERIAL_NUMBER) + "/SYSTEM";
-  client.publish(topicPath, outputString(sys));
+  char topic[50];
+  sprintf(topic, "/%s/SYSTEM", DEVICE_SERIAL_NUMBER);
+  char payload[50];
+  sprintf(payload, "SYSTEM;%d;%d;%d", sys[0], sys[1], sys[2]);
+  client.publish(topic, payload);
 
   //Save on SDCARD
-  sdcard_save(outputString(sys));
+  //sdcard_save(payload);
 }
 
 #endif

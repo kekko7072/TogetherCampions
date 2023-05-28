@@ -11,21 +11,13 @@
 #include "UUID.h"
 
 
-
-
-
 //SERVICES
 long previousMillis = 0;
+UUID uuid;
 
 //GPS
 TinyGPSPlus gps;
 TinyGPSCustom magneticVariation(gps, "GPRMC", 10);
-
-UUID uuid;
-
-//MPU
-//Adafruit_MPU6050 mpu;
-//sensors_event_t a, g, temp;
 
 void setup() {
 
@@ -84,7 +76,7 @@ void loop() {
   BLEDevice central = BLE.central();
 
   // If a central is connected to the peripheral:
-  if (central) {
+  if (central && SKIP_BLE_CONNECTION == 1) {
     Serial.print("Connected to central: ");
     // print the central's BT address:
     Serial.println(central.address());
@@ -117,8 +109,7 @@ void loop() {
       }
     }
     // If a central is not connected store data:
-  } 
-  /*else {
+  } else {
     long currentMillis = millis();
 
     while (Serial1.available() > 0) {
@@ -141,5 +132,5 @@ void loop() {
 
       previousMillis = currentMillis;  //Clean to re-run cicle
     }
-  }*/
+  }
 }

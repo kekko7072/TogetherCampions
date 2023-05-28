@@ -9,7 +9,7 @@
 void sdcard_save(String input_data) {
 
   // Open the file. Note that only one file can be open at a time,  so you have to close this one before opening another.
-  File dataFile = SD.open("datalog.txt", FILE_WRITE);
+  File dataFile = SD.open("DATALOG.TXT", FILE_WRITE);
 
   //TODO manage the scenareo where sdcard is full
   //if system online report to app
@@ -24,14 +24,14 @@ void sdcard_save(String input_data) {
 
   // If the file isn't open, pop up an error:
   else {
-    Serial.println("error opening datalog.txt");
+    Serial.println("error opening DATALOG.TXT");
   }
 }
 
 bool sdcard_clear() {
-  SD.remove("datalog.txt");
-  if (SD.exists("datalog.txt")) {
-    Serial.println("SDCARD error deleting datalog.txt");
+  SD.remove("DATALOG.TXT");
+  if (SD.exists("DATALOG.TXT")) {
+    Serial.println("SDCARD error deleting DATALOG.TXT");
     return false;
   } else {
     Serial.println("SDCARD initialized.");

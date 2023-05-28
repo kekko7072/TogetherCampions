@@ -37,6 +37,36 @@ TinyGPSCustom magneticVariation(gps, "GPRMC", 10);
 
 UUID uuid;
 
+void connectSIMandMQTT() {
+  Serial.print("Connecting to cellular network ...");
+
+  bool connected = false;
+
+  // After starting the modem with gsmAccess.begin()
+  // attach to the GPRS network with the APN, login and password
+  while (!connected) {
+    if ((gsmAccess.begin(SIM_PIN) == GSM_READY) && (gprs.attachGPRS(SIM_APN, SIM_LOGIN, SIM_PASSWORD) == GPRS_READY)) {
+      connected = true;
+      Serial.println("\nconnected!");
+    } else {
+      Serial.print(".");
+      delay(1000);
+    }
+  }
+  client.begin(MQTT_SERVER, MQTT_SERVER_PORT, net);
+
+
+  Serial.print("\nConnecting to MQTT ...");
+  while (!client.connect(DEVICE_SERIAL_NUMBER, MQTT_SERVER_KEY, MQTT_SERVER_SECRET)) {
+    Serial.print(".");
+    delay(1000);
+  }
+
+  Serial.println("\nconnected!");
+
+  //client.subscribe("/timestamp");
+}
+
 void setup() {
 
   //Initialize serial communication
@@ -54,20 +84,18 @@ void setup() {
   //GPS
   setupGPS();
 
-  //MQTT
-  connectMQTT(net, gprs, gsmAccess, client);
+  //SIM & MQTT
+  connectSIMandMQTT();
 
   //READY
   digitalWrite(LED_BUILTIN, HIGH);
 }
 
 void loop() {
-  Serial.println(uuid);
-
   client.loop();
 
   if (!client.connected()) {
-    connectMQTT(net, gprs, gsmAccess, client);
+    connectSIMandMQTT();
   }
 
   long currentMillis = millis();
@@ -86,5 +114,7 @@ void loop() {
     updateMPUGyroscope(currentMillis, client);
 
     previousMillis = currentMillis;  //Clean to re-run cicle
+
+    Serial.println("Ended cicle!");
   }
 }

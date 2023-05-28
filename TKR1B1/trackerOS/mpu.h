@@ -13,16 +13,18 @@ void setupMPU() {
   Wire.endTransmission(true);
 }
 
-char* outputStringAcc(int (&acc)[4]) {
+/*String outputStringAcc(int (&acc)[4]) {
   char output[50];
   sprintf(output, "MPU_ACCELERATION;%d;%d;%d;%d", acc[0], acc[1], acc[2], acc[3]);
   return output;
-}
+  return "MPU_ACCELERATION;" + String(acc[0]) + ";" + String(acc[1]) + ";" + String(acc[2]) + ";" + String(acc[3]);
+}*/
 
-char* outputStringGyr(int (&gyr)[4]) {
+String outputStringGyr(int (&gyr)[4]) {
   char* output = new char[50];
   sprintf(output, "MPU_GYROSCOPE;%d;%d;%d;%d", gyr[0], gyr[1], gyr[2], gyr[3]);
   return output;
+  return "MPU_GYROSCOPE;" + String(gyr[0]) + ";" + String(gyr[1]) + ";" + String(gyr[2]) + ";" + String(gyr[3]);
 }
 
 void updateMPUAcceleration(int timestamp, MQTTClient client) {
@@ -45,11 +47,15 @@ void updateMPUAcceleration(int timestamp, MQTTClient client) {
   acc[3] = AcZ;
 
   //Send using MQTT
-  String topicPath = "/" + String(DEVICE_SERIAL_NUMBER) + "/MPU_ACCELERATION";
-  client.publish(topicPath, outputStringAcc(acc));
+  char topic[50];
+  sprintf(topic, "/%s/MPU_ACCELERATION", DEVICE_SERIAL_NUMBER);
+  char payload[50];
+  sprintf(payload, "MPU_ACCELERATION;%d;%d;%d;%d", acc[0], acc[1], acc[2], acc[3]);
+  client.publish(topic, payload);
+
 
   //Save on SDCARD
-  sdcard_save(outputStringAcc(acc));
+  //sdcard_save(payload);
 }
 
 void updateMPUGyroscope(int timestamp, MQTTClient client) {
@@ -71,12 +77,17 @@ void updateMPUGyroscope(int timestamp, MQTTClient client) {
   gyr[2] = GyY;
   gyr[3] = GyZ;
 
+  Serial.print(outputStringGyr(gyr));
+
   //Send using MQTT
-  String topicPath = "/" + String(DEVICE_SERIAL_NUMBER) + "/MPU_GYROSCOPE";
-  client.publish(topicPath, outputStringGyr(gyr));
+  char topic[50];
+  sprintf(topic, "/%s/MPU_GYROSCOPE", DEVICE_SERIAL_NUMBER);
+  char payload[50];
+  sprintf(payload, "MPU_GYROSCOPE;%d;%d;%d;%d", gyr[0], gyr[1], gyr[2], gyr[3]);
+  client.publish(topic, payload);
 
   //Save on SDCARD
-  sdcard_save(outputStringGyr(gyr));
+  //sdcard_save(payload);
 }
 
 

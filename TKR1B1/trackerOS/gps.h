@@ -12,17 +12,18 @@ void setupGPS() {
   Serial.println();
 }
 
-char* outputStringGPSPos(float (&GPSPos)[5]) {
-  const char* available = GPSPos[1] == 0.00 ? "false" : "true";
-  char* result = (char*)malloc(100);
+String outputStringGPSPos(float (&GPSPos)[5]) {
+  const String available = GPSPos[1] == 0.00 ? "false" : "true";
+  /* char* result = (char*)malloc(100);
   snprintf(result, 100, "GPS_POSITION;%.2f;%s;%.4f;%.4f;%.4f", GPSPos[0], available, GPSPos[2], GPSPos[3], GPSPos[4]);
-  return result;
+  return result;*/
+  return "GPS_POSITION;" + String(GPSPos[0]) + ";" + available + ";" + String(GPSPos[1]) + ";" + String(GPSPos[2]) + ";" + String(GPSPos[3]) + ";" + String(GPSPos[4]);
 }
-char* outputStringGPSNav(float (&GPSNav)[5]) {
-  const char* available = GPSNav[1] == 0.00 ? "false" : "true";
-  char* result = (char*)malloc(100);
-  snprintf(result, 100, "GPS_NAVIGATION;%.2f;%s;%.4f;%.4f;%.4f", GPSNav[0], available, GPSNav[2], GPSNav[3], GPSNav[4]);
-  return result;
+String outputStringGPSNav(float (&GPSNav)[5]) {
+  const String available = GPSNav[1] == 0.00 ? "false" : "true";
+  //char* result = (char*)malloc(100);
+  //snprintf(result, 100, "GPS_NAVIGATION;%.2f;%s;%.4f;%.4f;%.4f", GPSNav[0], available, GPSNav[2], GPSNav[3], GPSNav[4]);
+  return "GPS_NAVIGATION;" + String(GPSNav[0]) + ";" + available + ";" + String(GPSNav[1]) + ";" + String(GPSNav[2]) + ";" + String(GPSNav[3]) + ";" + String(GPSNav[4]);
 }
 
 void updateGPSPosition(int timestamp, MQTTClient client, TinyGPSPlus gps) {
@@ -35,11 +36,14 @@ void updateGPSPosition(int timestamp, MQTTClient client, TinyGPSPlus gps) {
   GPSPos[4] = gps.speed.isValid() ? gps.speed.knots() : 0.0;
 
   //Send using MQTT
-  String topicPath = "/" + String(DEVICE_SERIAL_NUMBER) + "/GPS_POSITION";
-  client.publish(topicPath, outputStringGPSPos(GPSPos));
+  char topic[50];
+  sprintf(topic, "/%s/GPS_POSITION", DEVICE_SERIAL_NUMBER);
+  char payload[50];
+  sprintf(payload, "GPS_POSITION;%.6f;%.6f;%.6f;%.6f;%.6f", GPSPos[0], GPSPos[1], GPSPos[2], GPSPos[3], GPSPos[4]);
+  client.publish(topic, payload);
 
   //Save on SDCARD
-  sdcard_save(outputStringGPSPos(GPSPos));
+  sdcard_save(payload);
 }
 
 void updateGPSNavigation(int timestamp, MQTTClient client, TinyGPSPlus gps, TinyGPSCustom magneticVariation) {
@@ -52,11 +56,14 @@ void updateGPSNavigation(int timestamp, MQTTClient client, TinyGPSPlus gps, Tiny
   GPSNav[4] = magneticVariation.isValid() ? atof(magneticVariation.value()) : 0.0;  // Magnetic Variation
 
   //Send using MQTT
-  String topicPath = "/" + String(DEVICE_SERIAL_NUMBER) + "/GPS_NAVIGATION";
-  client.publish(topicPath, outputStringGPSNav(GPSNav));
+  char topic[50];
+  sprintf(topic, "/%s/GPS_NAVIGATION", DEVICE_SERIAL_NUMBER);
+  char payload[50];
+  sprintf(payload, "GPS_NAVIGATION;%.6f;%.6f;%.6f;%.6f;%.6f", GPSNav[0], GPSNav[1], GPSNav[2], GPSNav[3], GPSNav[4]);
+  client.publish(topic, payload);
 
   //Save on SDCARD
-  sdcard_save(outputStringGPSNav(GPSNav));
+  //sdcard_save(payload);
 }
 
 #endif

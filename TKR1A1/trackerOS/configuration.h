@@ -31,6 +31,12 @@
   The SERIAL_NUMBER should be printed and given to the user to configure the device for his account.
 */
 #define DEVICE_SERIAL_NUMBER "AAAA0000AAAA"
+/*
+  Set a value to declare if allow skip of BLE or not.
+  0: FALSE, disable the skip connection
+  1: TRUE, enable the skip connection
+*/
+#define SKIP_BLE_CONNECTION 0
 
 
 
