@@ -32,11 +32,11 @@
 */
 #define DEVICE_SERIAL_NUMBER "AAAA0000AAAA"
 /*
-  Set a value to declare if allow skip of BLE or not.
-  0: FALSE, disable the skip connection
-  1: TRUE, enable the skip connection
+  Set a value to declare if enable the usage of only BLE connection or enable skip for storage on the device.
+  0: FALSE, don't use only the BLE connection
+  1: TRUE, use only the BLE connection
 */
-#define SKIP_BLE_CONNECTION 0
+#define USE_ONLY_BLE_CONNECTION 0
 
 
 

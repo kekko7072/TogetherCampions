@@ -70,18 +70,21 @@ void setup() {
 }
 
 void loop() {
+
+  Serial.println("Waiting smartphone connected");
   Serial.println(uuid);
-  
-  // wait for a Bluetooth® Low Energy central
+
+  // Wait for a Bluetooth® Low Energy central
   BLEDevice central = BLE.central();
 
   // If a central is connected to the peripheral:
-  if (central && SKIP_BLE_CONNECTION == 1) {
+  if (central) {
+
     Serial.print("Connected to central: ");
     // print the central's BT address:
     Serial.println(central.address());
 
-    // check the battery level every 200ms
+    // Check the battery level every 200ms
     // while the central is connected:
     while (central.connected()) {
 
@@ -90,8 +93,6 @@ void loop() {
       while (Serial1.available() > 0) {
         gps.encode(Serial1.read());
       }
-
-      //mpu.getEvent(&a, &g, &temp);
 
       if (currentMillis - previousMillis >= measurements_milliseconds) {
         //System
@@ -108,15 +109,13 @@ void loop() {
         previousMillis = currentMillis;  //Clean to re-run cicle
       }
     }
-    // If a central is not connected store data:
-  } else {
+  } else if (USE_ONLY_BLE_CONNECTION == 0) {
+    Serial.println("\nSaving data directly\n");
     long currentMillis = millis();
 
     while (Serial1.available() > 0) {
       gps.encode(Serial1.read());
     }
-
-    //mpu.getEvent(&a, &g, &temp);
 
     if (currentMillis - previousMillis >= measurements_milliseconds) {
       //System
