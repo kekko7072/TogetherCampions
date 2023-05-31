@@ -109,8 +109,10 @@ void loop() {
         previousMillis = currentMillis;  //Clean to re-run cicle
       }
     }
-  } else if (USE_ONLY_BLE_CONNECTION == 0) {
-    Serial.println("\nSaving data directly\n");
+  } /*
+  TODO: THIS CODE WILL NOT TURN ON GPS, CHECK WHY
+  else if (USE_ONLY_BLE_CONNECTION == 0) {
+   
     long currentMillis = millis();
 
     while (Serial1.available() > 0) {
@@ -131,5 +133,5 @@ void loop() {
 
       previousMillis = currentMillis;  //Clean to re-run cicle
     }
-  }
+  }*/
 }

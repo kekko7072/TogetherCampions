@@ -36,7 +36,7 @@
   0: FALSE, don't use only the BLE connection
   1: TRUE, use only the BLE connection
 */
-#define USE_ONLY_BLE_CONNECTION 0
+#define USE_ONLY_BLE_CONNECTION 1
 
 
 

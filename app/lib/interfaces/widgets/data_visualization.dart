@@ -61,7 +61,7 @@ class _DataChartVisualizationSystemState
                       ),
                     },
                     coord: RectCoord(),
-                    elements: [LineElement()],
+                    marks: [LineMark()],
                     rebuild: true,
                     axes: [
                       Defaults.horizontalAxis,
@@ -110,7 +110,7 @@ class _DataChartVisualizationSystemState
                       ),
                     },
                     coord: RectCoord(),
-                    elements: [LineElement()],
+                    marks: [LineMark()],
                     rebuild: true,
                     axes: [
                       Defaults.horizontalAxis,

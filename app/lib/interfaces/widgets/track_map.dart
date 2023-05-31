@@ -223,7 +223,7 @@ class TrackMapState extends State<TrackMap> {
                                     '${UnitsService.speedUnitsConvertFromKTS(widget.unitsSystem.speedUnits, double.parse('$number')).roundToDouble()} ${UnitsService.speedUnitsToString(widget.unitsSystem.speedUnits)}')),
                       },
                       coord: RectCoord(),
-                      elements: [LineElement()],
+                      marks: [LineMark()],
                       rebuild: true,
                       axes: [
                         Defaults.horizontalAxis,

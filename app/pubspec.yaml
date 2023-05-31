@@ -3,7 +3,7 @@ description: Tracker app for GPS device.
 
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
-version: 1.0.2+8
+version: 1.0.2+12
 
 environment:
   sdk: ">=2.17.6 <3.0.0"
@@ -17,20 +17,20 @@ dependencies:
   provider: ^6.0.5
   path_provider: ^2.0.13
   uuid: ^3.0.7
-  syncfusion_flutter_maps: ^20.4.52
+  syncfusion_flutter_maps: ^21.2.8
   file_picker: ^5.2.5
   http: ^0.13.5
   flutter_libserialport: ^0.3.0
   geolocator: ^9.0.2
   geolocator_apple: ^2.2.5
   battery_plus: ^3.0.3
-  sensors_plus: ^2.0.2
+  sensors_plus: ^3.0.2
   flutter_blue_plus: ^1.5.2
   flutter_web_bluetooth: ^0.2.0
-  mqtt_client: ^9.7.4
+  mqtt_client: ^10.0.0
   open_settings: ^2.0.2
   multiple_stream_builder: ^3.0.2
-  shared_preferences: ^2.0.18
+  shared_preferences: ^2.1.1
   device_info_plus: ^9.0.2
 
   #Design
@@ -39,7 +39,7 @@ dependencies:
   font_awesome_flutter: ^10.4.0
   battery_indicator: ^0.1.2
   flutter_easyloading: ^3.0.5
-  graphic: ^1.0.1
+  graphic: ^2.2.0
   badges: ^3.1.1
   cupertino_onboarding: ^1.1.1
 

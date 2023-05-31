@@ -43,7 +43,7 @@ PODS:
     - flutter_blue_plus/Protos (= 0.0.1)
   - flutter_blue_plus/Protos (0.0.1):
     - Flutter
-    - Protobuf (~> 3.11)
+    - Protobuf (~> 3.21)
   - geolocator_apple (1.2.0):
     - Flutter
   - open_settings (0.0.1):
@@ -51,10 +51,10 @@ PODS:
   - path_provider_foundation (0.0.1):
     - Flutter
     - FlutterMacOS
-  - Protobuf (3.22.0)
-  - SDWebImage (5.15.3):
-    - SDWebImage/Core (= 5.15.3)
-  - SDWebImage/Core (5.15.3)
+  - Protobuf (3.23.1)
+  - SDWebImage (5.15.8):
+    - SDWebImage/Core (= 5.15.8)
+  - SDWebImage/Core (5.15.8)
   - sensors_plus (0.0.1):
     - Flutter
   - shared_preferences_foundation (0.0.1):
@@ -70,9 +70,9 @@ DEPENDENCIES:
   - flutter_blue_plus (from `.symlinks/plugins/flutter_blue_plus/ios`)
   - geolocator_apple (from `.symlinks/plugins/geolocator_apple/ios`)
   - open_settings (from `.symlinks/plugins/open_settings/ios`)
-  - path_provider_foundation (from `.symlinks/plugins/path_provider_foundation/ios`)
+  - path_provider_foundation (from `.symlinks/plugins/path_provider_foundation/darwin`)
   - sensors_plus (from `.symlinks/plugins/sensors_plus/ios`)
-  - shared_preferences_foundation (from `.symlinks/plugins/shared_preferences_foundation/ios`)
+  - shared_preferences_foundation (from `.symlinks/plugins/shared_preferences_foundation/darwin`)
 
 SPEC REPOS:
   trunk:
@@ -98,29 +98,29 @@ EXTERNAL SOURCES:
   open_settings:
     :path: ".symlinks/plugins/open_settings/ios"
   path_provider_foundation:
-    :path: ".symlinks/plugins/path_provider_foundation/ios"
+    :path: ".symlinks/plugins/path_provider_foundation/darwin"
   sensors_plus:
     :path: ".symlinks/plugins/sensors_plus/ios"
   shared_preferences_foundation:
-    :path: ".symlinks/plugins/shared_preferences_foundation/ios"
+    :path: ".symlinks/plugins/shared_preferences_foundation/darwin"
 
 SPEC CHECKSUMS:
   battery_plus: 7851ab482c336dd101ae735dc9363f01e1223c7c
-  device_info_plus: e5c5da33f982a436e103237c0c85f9031142abed
+  device_info_plus: 7545d84d8d1b896cb16a4ff98c19f07ec4b298ea
   DKImagePickerController: b512c28220a2b8ac7419f21c491fc8534b7601ac
   DKPhotoGallery: fdfad5125a9fdda9cc57df834d49df790dbb4179
   file_picker: ce3938a0df3cc1ef404671531facef740d03f920
   Flutter: f04841e97a9d0b0a8025694d0796dd46242b2854
-  flutter_blue_plus: 6787777145d615de01828f3a9fa423c3c702f0b3
+  flutter_blue_plus: 316ac8d1179789616d2c148e8a03c37720e63933
   geolocator_apple: cc556e6844d508c95df1e87e3ea6fa4e58c50401
   open_settings: 9628e736cb2738fd1dc84159565755c214478158
-  path_provider_foundation: 37748e03f12783f9de2cb2c4eadfaa25fe6d4852
-  Protobuf: 5e6cbc143d02fe08585d86b0098f8b755d2caaab
-  SDWebImage: 302d4e14efff86b36b5f36d1bf891b635436d071
-  sensors_plus: 5717760720f7e6acd96fdbd75b7428f5ad755ec2
-  shared_preferences_foundation: 297b3ebca31b34ec92be11acd7fb0ba932c822ca
+  path_provider_foundation: eaf5b3e458fc0e5fbb9940fb09980e853fe058b8
+  Protobuf: 3dd214698ddb7afd832da281c777b2e9facef401
+  SDWebImage: cb032eba469c54e0000e78bcb0a13cdde0a52798
+  sensors_plus: bda64198ccc7d3ccbb49e6ae17d92f67687bee20
+  shared_preferences_foundation: e2dae3258e06f44cc55f49d42024fd8dd03c590c
   SwiftyGif: 93a1cc87bf3a51916001cf8f3d63835fb64c819f
 
 PODFILE CHECKSUM: 775997f741c536251164e3eacf6e34abf2eb7a17
 
-COCOAPODS: 1.11.3
+COCOAPODS: 1.12.1

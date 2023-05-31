@@ -145,7 +145,7 @@ class _TrackBLEScreenState extends State<TrackBLEScreen> {
                                                 IconData icon;
                                                 switch (snapshot.data) {
                                                   case BluetoothDeviceState
-                                                      .connected:
+                                                        .connected:
                                                     onPressed = () => widget
                                                         .deviceBLE
                                                         .disconnect();
@@ -153,7 +153,7 @@ class _TrackBLEScreenState extends State<TrackBLEScreen> {
                                                         .bluetooth_disabled;
                                                     break;
                                                   case BluetoothDeviceState
-                                                      .disconnected:
+                                                        .disconnected:
                                                     onPressed = () => widget
                                                         .deviceBLE
                                                         .connect();
@@ -354,7 +354,7 @@ class _TrackBLEScreenState extends State<TrackBLEScreen> {
                                                 IconData icon;
                                                 switch (snapshot.data) {
                                                   case BluetoothDeviceState
-                                                      .connected:
+                                                        .connected:
                                                     onPressed = () => widget
                                                         .deviceBLE
                                                         .disconnect();
@@ -362,7 +362,7 @@ class _TrackBLEScreenState extends State<TrackBLEScreen> {
                                                         .bluetooth_disabled;
                                                     break;
                                                   case BluetoothDeviceState
-                                                      .disconnected:
+                                                        .disconnected:
                                                     onPressed = () => widget
                                                         .deviceBLE
                                                         .connect();
@@ -811,7 +811,7 @@ class _TrackBLEScreenState extends State<TrackBLEScreen> {
                                           ),
                                         },
                                         coord: RectCoord(),
-                                        elements: [LineElement()],
+                                        marks: [LineMark()],
                                         rebuild: true,
                                         axes: [
                                           Defaults.horizontalAxis,
@@ -859,7 +859,7 @@ class _TrackBLEScreenState extends State<TrackBLEScreen> {
                                                 ),
                                               },
                                               coord: PolarCoord(),
-                                              elements: [LineElement()],
+                                              marks: [LineMark()],
                                               rebuild: true,
                                               axes: [
                                                 Defaults.horizontalAxis,
@@ -902,7 +902,7 @@ class _TrackBLEScreenState extends State<TrackBLEScreen> {
                                                 ),
                                               },
                                               coord: PolarCoord(),
-                                              elements: [LineElement()],
+                                              marks: [LineMark()],
                                               rebuild: true,
                                               axes: [
                                                 Defaults.horizontalAxis,
