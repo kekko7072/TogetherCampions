@@ -1,8 +1,12 @@
 import 'package:app/services/imports.dart';
 import 'package:flutter/cupertino.dart';
 
+import '../widgets/card_data_navigation.dart';
+
 ///TODO see https://medium.com/itnext/how-to-build-interactive-charts-in-flutter-e317492d5ba1
 ///to build the polar
+
+enum DashboardMode { navigation, graph, rawData }
 
 class TrackBLEScreen extends StatefulWidget {
   const TrackBLEScreen(
@@ -21,6 +25,8 @@ class TrackBLEScreen extends StatefulWidget {
 }
 
 class _TrackBLEScreenState extends State<TrackBLEScreen> {
+  DashboardMode dashboardMode = DashboardMode.navigation;
+
   bool recording = false;
   bool reconnectAutomatically = true;
 
@@ -456,13 +462,43 @@ class _TrackBLEScreenState extends State<TrackBLEScreen> {
                                 builder: (c, snapshot) {
                                   if (snapshot.data != null) {
                                     return Column(
-                                      children:
-                                          _buildServiceTiles(snapshot.data!),
+                                      children: _buildServiceTiles(
+                                          dashboardMode, snapshot.data!),
                                     );
                                   } else {
                                     return const CircularProgressIndicator();
                                   }
                                 },
+                              ),
+                              // Create a ChipAction to display the current mode and change with other
+                              Wrap(
+                                alignment: WrapAlignment.center,
+                                children: [
+                                  for (DashboardMode mode
+                                      in DashboardMode.values) ...[
+                                    ActionChip(
+                                      label: Text(
+                                        mode
+                                            .toString()
+                                            .split('.')[1]
+                                            .toUpperCase(),
+                                        style: TextStyle(
+                                          color: dashboardMode == mode
+                                              ? Colors.white
+                                              : Colors.black,
+                                          fontWeight: dashboardMode == mode
+                                              ? FontWeight.bold
+                                              : FontWeight.normal,
+                                        ),
+                                      ),
+                                      onPressed: () =>
+                                          setState(() => dashboardMode = mode),
+                                      backgroundColor: dashboardMode == mode
+                                          ? AppStyle.primaryColor
+                                          : Colors.grey,
+                                    ),
+                                  ]
+                                ],
                               ),
                             ],
                           ),
@@ -474,7 +510,8 @@ class _TrackBLEScreenState extends State<TrackBLEScreen> {
         });
   }
 
-  List<Widget> _buildServiceTiles(List<BluetoothService> services) {
+  List<Widget> _buildServiceTiles(
+      DashboardMode dashboardMode, List<BluetoothService> services) {
     void enableNotification(BluetoothCharacteristic? characteristic) async {
       await characteristic?.setNotifyValue(true);
       await characteristic?.read();
@@ -756,188 +793,318 @@ class _TrackBLEScreenState extends State<TrackBLEScreen> {
                           debugPrint("\nERROR ADDING ACCELEROMETER: $e\n");
                         }
                       }
-                      return ListTile(
-                        title: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            Text(
-                              characteristic,
-                              style: Theme.of(context).textTheme.titleMedium,
-                            ),
-                            if (c.isNotifying) ...[
-                              if (accelerometer.isNotEmpty) ...[
+
+                      switch (dashboardMode) {
+                        case DashboardMode.navigation:
+                          return ListTile(
+                            title: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: <Widget>[
                                 Text(
-                                    '| A |: ${CalculationService.mediumAcceleration(accelerometer.last).toStringAsFixed(2)} g'),
-                                Wrap(
-                                  spacing: 10,
-                                  children: [
-                                    Text(
-                                      'Ax: ${(accelerometer.last.aX / 16384.0).toStringAsFixed(2)} g',
-                                    ),
-                                    Text(
-                                      'Ay: ${(accelerometer.last.aY / 16384.0).toStringAsFixed(2)} g',
-                                    ),
-                                    Text(
-                                      'Az: ${(accelerometer.last.aZ / 16384.0).toStringAsFixed(2)} g',
-                                    ),
-                                    SizedBox(
-                                      height:
-                                          MediaQuery.of(context).size.height /
-                                              4,
-                                      width: MediaQuery.of(context).size.width,
-                                      //https://medium.com/analytics-vidhya/the-versatility-of-the-grammar-of-graphics-d1366760424d
-
-                                      child: Chart(
-                                        data: accelerometer,
-                                        variables: {
-                                          'timestamp': Variable(
-                                            accessor: (Accelerometer log) =>
-                                                log.timestamp -
-                                                accelerometer.first.timestamp,
-                                            scale: LinearScale(
-                                                formatter: (number) =>
-                                                    CalculationService
-                                                        .timestamp(
-                                                            number.toInt())),
-                                          ),
-                                          'acceleration': Variable(
-                                            accessor: (Accelerometer log) =>
-                                                CalculationService
-                                                    .mediumAcceleration(log),
-                                            scale: LinearScale(
-                                                formatter: (number) =>
-                                                    '$number g'),
-                                          ),
-                                        },
-                                        coord: RectCoord(),
-                                        marks: [LineMark()],
-                                        rebuild: true,
-                                        axes: [
-                                          Defaults.horizontalAxis,
-                                          Defaults.verticalAxis,
-                                        ],
-                                      ),
-                                    ),
-                                  ],
+                                  characteristic,
+                                  style:
+                                      Theme.of(context).textTheme.titleMedium,
                                 ),
-                                const SizedBox(height: 10),
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Expanded(
-                                      child: Column(
-                                        children: [
-                                          Text(
-                                            'Pitch: ${CalculationService.pitch(accelerometer.last)}°',
+                                if (c.isNotifying) ...[
+                                  if (accelerometer.isNotEmpty) ...[
+                                    CardDataNavigation(
+                                        value:
+                                            '| A |: ${CalculationService.mediumAcceleration(accelerometer.last).toStringAsFixed(2)} g'),
+                                    Wrap(
+                                      spacing: 10,
+                                      children: [
+                                        CardDataNavigation(
+                                          value:
+                                              'Ax: ${(accelerometer.last.aX / 16384.0).toStringAsFixed(2)} g',
+                                        ),
+                                        CardDataNavigation(
+                                          value:
+                                              'Ay: ${(accelerometer.last.aY / 16384.0).toStringAsFixed(2)} g',
+                                        ),
+                                        CardDataNavigation(
+                                          value:
+                                              'Az: ${(accelerometer.last.aZ / 16384.0).toStringAsFixed(2)} g',
+                                        ),
+                                        CardDataNavigation(
+                                          value:
+                                              'Pitch: ${CalculationService.pitch(accelerometer.last)}°',
+                                        ),
+                                        CardDataNavigation(
+                                          value:
+                                              'Roll: ${CalculationService.roll(accelerometer.last)}°',
+                                        ),
+                                      ],
+                                    ),
+                                  ] else ...[
+                                    Text('Waiting $characteristic data...')
+                                  ]
+                                ] else ...[
+                                  IconButton(
+                                    icon: Icon(
+                                        c.isNotifying
+                                            ? Icons.sync_disabled
+                                            : Icons.sync,
+                                        color: Theme.of(context)
+                                            .iconTheme
+                                            .color
+                                            ?.withOpacity(0.5)),
+                                    onPressed: () async {
+                                      await c.setNotifyValue(!c.isNotifying);
+                                      await c.read();
+                                    },
+                                  )
+                                ]
+                              ],
+                            ),
+                            contentPadding: const EdgeInsets.all(0.0),
+                          );
+                        case DashboardMode.graph:
+                          return ListTile(
+                            title: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: <Widget>[
+                                Text(
+                                  characteristic,
+                                  style:
+                                      Theme.of(context).textTheme.titleMedium,
+                                ),
+                                if (c.isNotifying) ...[
+                                  if (accelerometer.isNotEmpty) ...[
+                                    Wrap(
+                                      spacing: 10,
+                                      children: [
+                                        SizedBox(
+                                          height: MediaQuery.of(context)
+                                                  .size
+                                                  .height /
+                                              4,
+                                          width:
+                                              MediaQuery.of(context).size.width,
+                                          //https://medium.com/analytics-vidhya/the-versatility-of-the-grammar-of-graphics-d1366760424d
+
+                                          child: Chart(
+                                            data: accelerometer,
+                                            variables: {
+                                              'timestamp': Variable(
+                                                accessor: (Accelerometer log) =>
+                                                    log.timestamp -
+                                                    accelerometer
+                                                        .first.timestamp,
+                                                scale: LinearScale(
+                                                    formatter: (number) =>
+                                                        CalculationService
+                                                            .timestamp(number
+                                                                .toInt())),
+                                              ),
+                                              'acceleration': Variable(
+                                                accessor: (Accelerometer log) =>
+                                                    CalculationService
+                                                        .mediumAcceleration(
+                                                            log),
+                                                scale: LinearScale(
+                                                    formatter: (number) =>
+                                                        '$number g'),
+                                              ),
+                                            },
+                                            coord: RectCoord(),
+                                            marks: [LineMark()],
+                                            rebuild: true,
+                                            axes: [
+                                              Defaults.horizontalAxis,
+                                              Defaults.verticalAxis,
+                                            ],
                                           ),
-                                          SizedBox(
-                                            height: 100,
+                                        ),
+                                      ],
+                                    ),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Expanded(
+                                          child: Column(
+                                            children: [
+                                              Text(
+                                                'Pitch: ${CalculationService.pitch(accelerometer.last)}°',
+                                              ),
+                                              SizedBox(
+                                                height: 100,
 
-                                            //https://medium.com/analytics-vidhya/the-versatility-of-the-grammar-of-graphics-d1366760424d
+                                                //https://medium.com/analytics-vidhya/the-versatility-of-the-grammar-of-graphics-d1366760424d
 
-                                            child: Chart(
-                                              data: accelerometer,
-                                              variables: {
-                                                'timestamp': Variable(
-                                                  accessor:
-                                                      (Accelerometer log) =>
-                                                          log.timestamp,
-                                                  scale: LinearScale(
-                                                      formatter: (number) =>
-                                                          ''), //Leave empty
-                                                ),
-                                                'pitch': Variable(
-                                                  accessor:
-                                                      (Accelerometer log) =>
+                                                child: Chart(
+                                                  data: accelerometer,
+                                                  variables: {
+                                                    'timestamp': Variable(
+                                                      accessor:
+                                                          (Accelerometer log) =>
+                                                              log.timestamp,
+                                                      scale: LinearScale(
+                                                          formatter: (number) =>
+                                                              ''), //Leave empty
+                                                    ),
+                                                    'pitch': Variable(
+                                                      accessor: (Accelerometer
+                                                              log) =>
                                                           CalculationService
                                                                   .pitch(log)
                                                               .roundToDouble(),
-                                                  scale: LinearScale(
-                                                      formatter: (number) =>
-                                                          '${number.roundToDouble()} °'),
+                                                      scale: LinearScale(
+                                                          formatter: (number) =>
+                                                              '${number.roundToDouble()} °'),
+                                                    ),
+                                                  },
+                                                  coord: PolarCoord(),
+                                                  marks: [LineMark()],
+                                                  rebuild: true,
+                                                  axes: [
+                                                    Defaults.horizontalAxis,
+                                                    Defaults.verticalAxis,
+                                                  ],
                                                 ),
-                                              },
-                                              coord: PolarCoord(),
-                                              marks: [LineMark()],
-                                              rebuild: true,
-                                              axes: [
-                                                Defaults.horizontalAxis,
-                                                Defaults.verticalAxis,
-                                              ],
-                                            ),
+                                              ),
+                                            ],
                                           ),
-                                        ],
-                                      ),
+                                        ),
+                                        Expanded(
+                                          child: Column(
+                                            children: [
+                                              Text(
+                                                'Roll: ${CalculationService.roll(accelerometer.last)}°',
+                                              ),
+                                              SizedBox(
+                                                height: 100,
+                                                //https://medium.com/analytics-vidhya/the-versatility-of-the-grammar-of-graphics-d1366760424d
+                                                child: Chart(
+                                                  data: accelerometer,
+                                                  variables: {
+                                                    'timestamp': Variable(
+                                                      accessor:
+                                                          (Accelerometer log) =>
+                                                              log.timestamp,
+                                                      scale: LinearScale(
+                                                          formatter: (number) =>
+                                                              ''), //Leave empty
+                                                    ),
+                                                    'roll': Variable(
+                                                      accessor:
+                                                          (Accelerometer log) =>
+                                                              CalculationService
+                                                                      .roll(log)
+                                                                  .toInt(),
+                                                      scale: LinearScale(
+                                                          formatter: (number) =>
+                                                              '${number.toInt()} °'),
+                                                    ),
+                                                  },
+                                                  coord: PolarCoord(),
+                                                  marks: [LineMark()],
+                                                  rebuild: true,
+                                                  axes: [
+                                                    Defaults.horizontalAxis,
+                                                    Defaults.verticalAxis,
+                                                  ],
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                    Expanded(
-                                      child: Column(
-                                        children: [
-                                          Text(
+                                  ] else ...[
+                                    Text('Waiting $characteristic data...')
+                                  ]
+                                ] else ...[
+                                  IconButton(
+                                    icon: Icon(
+                                        c.isNotifying
+                                            ? Icons.sync_disabled
+                                            : Icons.sync,
+                                        color: Theme.of(context)
+                                            .iconTheme
+                                            .color
+                                            ?.withOpacity(0.5)),
+                                    onPressed: () async {
+                                      await c.setNotifyValue(!c.isNotifying);
+                                      await c.read();
+                                    },
+                                  )
+                                ]
+                              ],
+                            ),
+                            contentPadding: const EdgeInsets.all(0.0),
+                          );
+                        case DashboardMode.rawData:
+                          return ListTile(
+                            title: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: <Widget>[
+                                Text(
+                                  characteristic,
+                                  style:
+                                      Theme.of(context).textTheme.titleMedium,
+                                ),
+                                if (c.isNotifying) ...[
+                                  if (accelerometer.isNotEmpty) ...[
+                                    Text(
+                                        '| A |: ${CalculationService.mediumAcceleration(accelerometer.last).toStringAsFixed(2)} g'),
+                                    Wrap(
+                                      spacing: 10,
+                                      children: [
+                                        Text(
+                                          'Ax: ${(accelerometer.last.aX / 16384.0).toStringAsFixed(2)} g',
+                                        ),
+                                        Text(
+                                          'Ay: ${(accelerometer.last.aY / 16384.0).toStringAsFixed(2)} g',
+                                        ),
+                                        Text(
+                                          'Az: ${(accelerometer.last.aZ / 16384.0).toStringAsFixed(2)} g',
+                                        ),
+                                      ],
+                                    ),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Expanded(
+                                          child: Text(
+                                            'Pitch: ${CalculationService.pitch(accelerometer.last)}°',
+                                          ),
+                                        ),
+                                        Expanded(
+                                          child: Text(
                                             'Roll: ${CalculationService.roll(accelerometer.last)}°',
                                           ),
-                                          SizedBox(
-                                            height: 100,
-                                            //https://medium.com/analytics-vidhya/the-versatility-of-the-grammar-of-graphics-d1366760424d
-                                            child: Chart(
-                                              data: accelerometer,
-                                              variables: {
-                                                'timestamp': Variable(
-                                                  accessor:
-                                                      (Accelerometer log) =>
-                                                          log.timestamp,
-                                                  scale: LinearScale(
-                                                      formatter: (number) =>
-                                                          ''), //Leave empty
-                                                ),
-                                                'roll': Variable(
-                                                  accessor:
-                                                      (Accelerometer log) =>
-                                                          CalculationService
-                                                                  .roll(log)
-                                                              .toInt(),
-                                                  scale: LinearScale(
-                                                      formatter: (number) =>
-                                                          '${number.toInt()} °'),
-                                                ),
-                                              },
-                                              coord: PolarCoord(),
-                                              marks: [LineMark()],
-                                              rebuild: true,
-                                              axes: [
-                                                Defaults.horizontalAxis,
-                                                Defaults.verticalAxis,
-                                              ],
-                                            ),
-                                          ),
-                                        ],
-                                      ),
+                                        ),
+                                      ],
                                     ),
-                                  ],
-                                ),
-                              ] else ...[
-                                Text('Waiting $characteristic data...')
-                              ]
-                            ] else ...[
-                              IconButton(
-                                icon: Icon(
-                                    c.isNotifying
-                                        ? Icons.sync_disabled
-                                        : Icons.sync,
-                                    color: Theme.of(context)
-                                        .iconTheme
-                                        .color
-                                        ?.withOpacity(0.5)),
-                                onPressed: () async {
-                                  await c.setNotifyValue(!c.isNotifying);
-                                  await c.read();
-                                },
-                              )
-                            ]
-                          ],
-                        ),
-                        contentPadding: const EdgeInsets.all(0.0),
-                      );
+                                  ] else ...[
+                                    Text('Waiting $characteristic data...')
+                                  ]
+                                ] else ...[
+                                  IconButton(
+                                    icon: Icon(
+                                        c.isNotifying
+                                            ? Icons.sync_disabled
+                                            : Icons.sync,
+                                        color: Theme.of(context)
+                                            .iconTheme
+                                            .color
+                                            ?.withOpacity(0.5)),
+                                    onPressed: () async {
+                                      await c.setNotifyValue(!c.isNotifying);
+                                      await c.read();
+                                    },
+                                  )
+                                ]
+                              ],
+                            ),
+                            contentPadding: const EdgeInsets.all(0.0),
+                          );
+                      }
                     }
                   case BLEMpuCharacteristic.gyroscope:
                     {

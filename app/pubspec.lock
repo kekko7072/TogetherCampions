@@ -303,10 +303,10 @@ packages:
     dependency: "direct main"
     description:
       name: flutter_web_bluetooth
-      sha256: ea6060fdd6a8fe74f1b8c68eac4b8a715c60505694d210b681f0cf5bd73e6781
+      sha256: f7809fc6bffe982599f5f05ffeea537d18d14728eb42fbd4de7c51ea81f701a9
       url: "https://pub.dev"
     source: hosted
-    version: "0.2.0"
+    version: "0.2.1"
   flutter_web_plugins:
     dependency: transitive
     description: flutter
